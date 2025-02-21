@@ -1,0 +1,72 @@
+class Main {
+    public static void main(String[] args) {
+        run()
+    }
+
+    public void run() {}
+}
+
+A different class indicates a new class in java
+
+class Core {
+    private ArrayList<Schedule> schedules;
+    private int selectedSchedule;
+    private CourseRegistry courseRegistry;
+
+    public void searchGeneral() {}
+    public void quickSchedule() {}
+    public void searchCourse() {}
+    public void hasConflict() {}
+}
+
+class Schedule {
+    private ArrayList<Course> courses;
+    private int scheduleID;
+    private Course lastAdded;
+    private Course lastRemoved;
+
+    public void loadSchedule() {}
+    public void saveSchedule() {}
+    public void printSchedule() {}
+    public boolean hasConflict() {}
+    public void removeCourse() {}
+    public void addCourse() {}
+    public void undoLastAdd() {}
+    public void undoLastRemove() {}
+}
+
+class CourseRegistry {
+    private ArrayList<Course> courses;
+    
+    public CourseRegistry() {}
+}
+
+class Course {
+    private boolean isFavorite;
+    //private variables concerining all course information
+    
+    public boolean hasConflict(Course courseToCompare) { return false; }
+}
+
+class SearchAdvanced {
+    private ArrayList<Filter> activeFilters;
+    private ArrayList<Course> filteredCourses;
+    private ArrayList<Course> allCourses;
+    
+    public void removeFilter() {}
+    public SearchAdvanced(ArrayList <Course>) {} // Class constructor
+    public void refreshCourses() {}
+    public void addFilter(Filter filter) {}
+}
+
+abstract class Filter {
+    protected String filterType;
+
+    public Filter(String filterType) {
+        this.filterName = filterType;
+    }
+
+    public abstract String getType();
+    public abstract String getValue();
+}
+
