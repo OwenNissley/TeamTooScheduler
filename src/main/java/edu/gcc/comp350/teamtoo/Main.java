@@ -5,6 +5,5 @@ class Main {
     {
         run();
     }
-
     public static void run() {}
 }
