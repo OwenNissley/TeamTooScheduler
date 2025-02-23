@@ -2,12 +2,18 @@ package edu.gcc.comp350.teamtoo;
 
 abstract public class Filter
 {
-    protected String filterType;
+    protected FilterType filterType;
 
-    public Filter(String filterType) {
+    public Filter(FilterType filterType)
+    {
         this.filterType = filterType;
     }
 
-    public abstract String getType();
-    public abstract String getValue();
+    public FilterType getFilterType()
+    {
+        return filterType;
+    }
+
+    //returns true if course is valid based on filter value
+    public abstract boolean filtersCourse(Course course);
 }
