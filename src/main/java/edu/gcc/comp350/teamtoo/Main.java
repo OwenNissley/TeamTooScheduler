@@ -2,6 +2,8 @@ package edu.gcc.comp350.teamtoo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -125,16 +127,16 @@ public class Main {
 
         // Row 1: Time
         JCheckBox timeCheckBox = new JCheckBox("Time");
-        JTextField startTimeField = new JTextField(5);
+        JComboBox<String> startTimeDropdown = new JComboBox<>(generateTimeOptions().toArray(new String[0]));
         JComboBox<String> startAmPmCombo = new JComboBox<>(new String[]{"AM", "PM"});
-        JTextField endTimeField = new JTextField(5);
+        JComboBox<String> endTimeDropdown = new JComboBox<>(generateTimeOptions().toArray(new String[0]));
         JComboBox<String> endAmPmCombo = new JComboBox<>(new String[]{"AM", "PM"});
         JPanel timePanel = new JPanel(new FlowLayout());
         timePanel.add(new JLabel("Start:"));
-        timePanel.add(startTimeField);
+        timePanel.add(startTimeDropdown);
         timePanel.add(startAmPmCombo);
         timePanel.add(new JLabel("End:"));
-        timePanel.add(endTimeField);
+        timePanel.add(endTimeDropdown);
         timePanel.add(endAmPmCombo);
 
         gbc.gridx = 0;
@@ -218,7 +220,7 @@ public class Main {
         });
 
         advancedSearchButton.addActionListener(e -> {
-            String errorMessage = validateAdvancedSearch(timeCheckBox, startTimeField, endTimeField, daysCheckBox,
+            String errorMessage = validateAdvancedSearch(timeCheckBox, startTimeDropdown, endTimeDropdown, startAmPmCombo, endAmPmCombo,daysCheckBox,
                     mwfButton, trButton, courseCodeCheckBox, courseCodeField, keywordCheckBox, keywordField,
                     semesterCheckBox, semesterCombo, yearCombo);
 
@@ -237,8 +239,8 @@ public class Main {
         frame.repaint();
     }
 
-    private static String validateAdvancedSearch(JCheckBox timeCheckBox, JTextField startTimeField,
-                                                 JTextField endTimeField, JCheckBox daysCheckBox,
+    private static String validateAdvancedSearch(JCheckBox timeCheckBox, JComboBox<String> startTimeDropdown,
+                                                 JComboBox<String> endTimeDropdown, JComboBox<String> startAmPmCombo, JComboBox<String> endAmPmCombo,JCheckBox daysCheckBox,
                                                  JRadioButton mwfButton, JRadioButton trButton,
                                                  JCheckBox courseCodeCheckBox, JTextField courseCodeField,
                                                  JCheckBox keywordCheckBox, JTextField keywordField,
@@ -247,16 +249,19 @@ public class Main {
         StringBuilder errorMessage = new StringBuilder();
 
         if (timeCheckBox.isSelected()) {
-            try {
-                int startTime = Integer.parseInt(startTimeField.getText());
-                int endTime = Integer.parseInt(endTimeField.getText());
-                if (startTime <= 0 || startTime > 12 || endTime <= 0 || endTime > 12) {
-                    errorMessage.append("Time must be between 1 and 12.\n");
-                }
-            } catch (NumberFormatException e) {
-                errorMessage.append("Start and End Time must be integers.\n");
+            // Retrieve selected times
+            String startTime = startTimeDropdown.getSelectedItem() + " " + startAmPmCombo.getSelectedItem();
+            String endTime = endTimeDropdown.getSelectedItem() + " " + endAmPmCombo.getSelectedItem();
+
+            // Convert times to minutes and validate order
+            int startTimeInMinutes = parseTimeToMinutes(startTime);
+            int endTimeInMinutes = parseTimeToMinutes(endTime);
+
+            if (startTimeInMinutes >= endTimeInMinutes) {
+                errorMessage.append("End time must be later than start time.\n");
             }
         }
+
 
         if (daysCheckBox.isSelected() && !mwfButton.isSelected() && !trButton.isSelected()) {
             errorMessage.append("You must select either MWF or TR for Days of Week.\n");
@@ -447,5 +452,31 @@ public class Main {
         // Refresh the frame
         frame.revalidate();
         frame.repaint();
+    }
+
+    private static List<String> generateTimeOptions() {
+        List<String> times = new ArrayList<>();
+        for (int hour = 1; hour <= 12; hour++) {
+            times.add(hour + ":00");
+            times.add(hour + ":30");
+        }
+        return times;
+    }
+
+    private static int parseTimeToMinutes(String time) {
+        // Example format: "1:30 PM"
+        String[] parts = time.split(" ");
+        String[] timeParts = parts[0].split(":");
+        int hour = Integer.parseInt(timeParts[0]);
+        int minute = Integer.parseInt(timeParts[1]);
+
+        // Adjust for AM/PM
+        if (parts[1].equals("PM") && hour != 12) {
+            hour += 12;
+        } else if (parts[1].equals("AM") && hour == 12) {
+            hour = 0;
+        }
+
+        return hour * 60 + minute; // Convert to total minutes
     }
 }
