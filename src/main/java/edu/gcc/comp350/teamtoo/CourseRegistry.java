@@ -38,14 +38,15 @@ public class CourseRegistry {
 
             // Store parsed courses
             this.courses = registry.getCourses();
-
+            ArrayList<String> names = new ArrayList<>();
             // Print all course data
             for (Course course : courses) {
-                System.out.println("\n--- Course ---");
+                //System.out.println("\n--- Course ---");
+               /*
                 System.out.println("Credits: " + course.getCredits());
                 System.out.println("Faculty: " + course.getFaculty());
-                System.out.println("Is Lab: " + course.Lab());
-                System.out.println("Is Open: " + course.Open());
+                System.out.println("Is Lab: " + course.isLab());
+                System.out.println("Is Open: " + course.isOpen());
                 System.out.println("Location: " + course.getLocation());
                 System.out.println("Name: " + course.getName());
                 System.out.println("Number: " + course.getNumber());
@@ -55,12 +56,24 @@ public class CourseRegistry {
                 System.out.println("Subject: " + course.getSubject());
                 System.out.println("Total Seats: " + course.getTotalSeats());
 
+
+                */
                 // Print times
-                System.out.println("Times:");
+                //System.out.println("Times:");
+                int i =0;
                 for (Course.TimeSlot timeSlot : course.getTimes()) {
-                    System.out.println("  Day: " + timeSlot.getDay() + ", Start Time: " + timeSlot.getStartTime() + ", End Time: " + timeSlot.getEndTime());
+                   // System.out.println("  Day: " + timeSlot.getDay());
+                    i++;//+ //", Start Time: " + timeSlot.getStartTime() + ", End Time: " + timeSlot.getEndTime());
+                }
+                if (i ==4 ){
+                    names.add(course.getName());
+                    course.formatDays();
+                    System.out.println("Days: " + course.getDays());
+                    //throw new IOException("Too many classes");
+
                 }
             }
+            System.out.println(names.toString());
 
         } catch (IOException e) {
             e.printStackTrace();

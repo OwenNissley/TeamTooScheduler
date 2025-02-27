@@ -31,6 +31,8 @@ public class Course {
     @JsonProperty("total_seats")// Changed to List<TimeSlot> for multiple TimeSlots
     private int totalSeats;
 
+    private String days;
+
     public Course() {}
 
     // **Constructor**
@@ -53,45 +55,25 @@ public class Course {
         this.totalSeats = totalSeats;
     }
 
-    // Getters and setters
+    // Getters, May note be needed
     public int getCredits() { return credits; }
-    public void setCredits(int credits) { this.credits = credits; }
-
-    public List<String> getFaculty() { return faculty; }
-    public void setFaculty(List<String> faculty) { this.faculty = faculty; }
-
-    public boolean Lab() { return lab; }
-    public void setLab(boolean is_lab) { this.lab = is_lab; }
-
-    public boolean Open() { return open; }
-    public void setOpen(boolean is_open) { this.open = is_open; }
-
+    public String getFaculty() {
+        String result = String.join(" ", faculty);
+        return result;
+    }
+    public boolean isLab() { return lab; }
+    public boolean isOpen() { return open; }
     public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
-
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
     public int getNumber() { return number; }
-    public void setNumber(int number) { this.number = number; }
-
     public int getOpenSeats() { return openSeats; }
-    public void setOpenSeats(int open_seats) { this.openSeats = open_seats; }
-
     public char getSection() { return section; }
-    public void setSection(char section) { this.section = section; }
-
     public String getSemester() { return semester; }
-    public void setSemester(String semester) { this.semester = semester; }
-
     public String getSubject() { return subject; }
-    public void setSubject(String subject) { this.subject = subject; }
-
     public List<TimeSlot> getTimes() { return times; }
-    public void setTimes(List<TimeSlot> times) { this.times = times; }
-
     public int getTotalSeats() { return totalSeats; }
-    public void setTotalSeats(int total_seats) { this.totalSeats = total_seats; }
+    public String getDays() { return days; }
+
 
     public static class TimeSlot {
 
@@ -113,15 +95,25 @@ public class Course {
             this.end_time = end_time;
         }
 
-        // Getters and setters
+        // Getters for TimeSlot
         public String getDay() { return day; }
-        public void setDay(String day) { this.day = day; }
 
         public String getStartTime() { return start_time; }
-        public void setStartTime(String start_time) { this.start_time = start_time; }
 
         public String getEndTime() { return end_time; }
-        public void setEndTime(String end_time) { this.end_time = end_time; }
+
     }
+
+    public void formatDays() {
+        char [] days = new char[4];
+        int i = 0;
+        for (TimeSlot time : times) {
+           days[i] = time.getDay().charAt(0);
+            i++;
+        }
+        this.days = new String(days);
+
+    }
+
 }
 
