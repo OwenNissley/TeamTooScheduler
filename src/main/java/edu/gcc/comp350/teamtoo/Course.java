@@ -31,7 +31,6 @@ public class Course {
     @JsonProperty("total_seats")// Changed to List<TimeSlot> for multiple TimeSlots
     private int totalSeats;
 
-    private String days;
 
     public Course() {}
 
@@ -72,7 +71,7 @@ public class Course {
     public String getSubject() { return subject; }
     public List<TimeSlot> getTimes() { return times; }
     public int getTotalSeats() { return totalSeats; }
-    public String getDays() { return days; }
+
 
 
     public static class TimeSlot {
@@ -98,22 +97,35 @@ public class Course {
         // Getters for TimeSlot
         public String getDay() { return day; }
 
-        public String getStartTime() { return start_time; }
+        public String getStartTime() { return convertTo12HourFormat(start_time);}
 
-        public String getEndTime() { return end_time; }
+        public String getEndTime() { return convertTo12HourFormat(end_time); }
 
     }
 
-    public void formatDays() {
-        char [] days = new char[4];
+    public String daysString() {
+        int howManyDays = times.size();
+        char [] days = new char[howManyDays];
         int i = 0;
         for (TimeSlot time : times) {
            days[i] = time.getDay().charAt(0);
             i++;
         }
-        this.days = new String(days);
-
+        return new String(days);
     }
+
+    public static String convertTo12HourFormat(String militaryTime) {
+        String[] parts = militaryTime.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+
+        String period = (hours < 12) ? "AM" : "PM";
+        hours = (hours == 0) ? 12 : (hours > 12 ? hours - 12 : hours);
+
+        return String.format("%d:%02d %s", hours, minutes, period);
+    }
+
+
 
 }
 

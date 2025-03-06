@@ -38,11 +38,11 @@ public class CourseRegistry {
 
             // Store parsed courses
             this.courses = registry.getCourses();
-            ArrayList<String> names = new ArrayList<>();
+          //  ArrayList<String> names = new ArrayList<>();
             // Print all course data
             for (Course course : courses) {
-                //System.out.println("\n--- Course ---");
-               /*
+                System.out.println("\n--- Course ---");
+
                 System.out.println("Credits: " + course.getCredits());
                 System.out.println("Faculty: " + course.getFaculty());
                 System.out.println("Is Lab: " + course.isLab());
@@ -57,23 +57,17 @@ public class CourseRegistry {
                 System.out.println("Total Seats: " + course.getTotalSeats());
 
 
-                */
+
                 // Print times
-                //System.out.println("Times:");
+                System.out.println("Times:");
                 int i =0;
                 for (Course.TimeSlot timeSlot : course.getTimes()) {
-                   // System.out.println("  Day: " + timeSlot.getDay());
-                    i++;//+ //", Start Time: " + timeSlot.getStartTime() + ", End Time: " + timeSlot.getEndTime());
+                    System.out.println("  Day: " + timeSlot.getDay());
+                    System.out.println("Start Time: " + timeSlot.getStartTime() + ", End Time: " + timeSlot.getEndTime());
+                    i++;
                 }
-                if (i ==4 ){
-                    names.add(course.getName());
-                    course.formatDays();
-                    System.out.println("Days: " + course.getDays());
-                    //throw new IOException("Too many classes");
-
-                }
+                System.out.println("Days: " + course.daysString());
             }
-            System.out.println(names.toString());
 
         } catch (IOException e) {
             e.printStackTrace();
