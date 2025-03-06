@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CourseRegistry {
-    private List<Course> courses;
+    private ArrayList<Course> courses;
 
     @JsonProperty("date")
     private String date;
@@ -22,7 +22,7 @@ public class CourseRegistry {
         this.courses = new ArrayList<>();
     }
 
-    public List<Course> getCourses() {
+    public ArrayList<Course> getCourses() {
         return courses;
     }
 
@@ -40,7 +40,7 @@ public class CourseRegistry {
             this.courses = registry.getCourses();
           //  ArrayList<String> names = new ArrayList<>();
             // Print all course data
-            for (Course course : courses) {
+           /* for (Course course : courses) {
                 System.out.println("\n--- Course ---");
 
                 System.out.println("Credits: " + course.getCredits());
@@ -69,6 +69,8 @@ public class CourseRegistry {
                 System.out.println("Days: " + course.daysString());
             }
 
+
+            */
         } catch (IOException e) {
             e.printStackTrace();
         }
