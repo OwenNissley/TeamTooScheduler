@@ -7,6 +7,7 @@ public class generalSearch {
 
     private ArrayList<Course> courses;
     private ArrayList<Course> searchResults;
+    // private String term;
 
     public generalSearch() {
         this.courses = new ArrayList<>();
@@ -23,39 +24,58 @@ public class generalSearch {
         this.searchResults = new ArrayList<>();
     }
 
+    /*
+    public generalSearch(CourseRegistry courseRegistry, Schedule schedule) {
+        this.courses = courseRegistry.getCourses();
+        this.searchResults = new ArrayList<>();
+        this.term = schedule.getTerm();
+     */
+
     public ArrayList<Course> getSearchResults() {
         return searchResults;
     }
 
-    public ArrayList<Course> searchCourses(String searchInput) {
+    public ArrayList<Course> searchCourses(String searchInput, String term) {
         searchResults.clear();
 
-        // Step 1: Exact Match Search
+        // Validate search input
+        if (searchInput == null || searchInput.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search input cannot be null or empty.");
+        }
+
+        // Validate term format (YYYY_Season)
+        if (!term.matches("\\d{4}_(Fall|Spring)")) {
+            throw new IllegalArgumentException("Invalid term format. Expected format: YYYY_Season (e.g., 2023_Fall)");
+        }
+
+        // Step 1: Exact Match Search (Only for the specified term)
         for (Course course : courses) {
-            if (course.getName().equalsIgnoreCase(searchInput)) {
+            if (course.getSemester().equals(term) && course.getName().equalsIgnoreCase(searchInput)) {
                 searchResults.add(course);
             }
         }
 
-        // If exact match found, return results immediately
+        // If exact match found, return results
         if (!searchResults.isEmpty()) {
             return searchResults;
         }
 
-        // Step 2: N-Gram Similarity Matching
-        int n = 2; // Using bi-grams for better typo handling
-        double threshold = 0.4; // Adjust based on desired strictness
+        // Step 2: N-Gram Similarity Matching (Only for the specified term)
+        int n = 2; // Bi-grams
+        double threshold = 0.25; // Adjust for sensitivity
 
         Map<Course, Double> similarityScores = new HashMap<>();
 
         for (Course course : courses) {
-            double similarity = nGramSimilarity(searchInput, course.getName(), n);
-            if (similarity >= threshold) {
-                similarityScores.put(course, similarity);
+            if (course.getSemester().equals(term)) {  // Filter by term
+                double similarity = nGramSimilarity(searchInput, course.getName(), n);
+                if (similarity >= threshold) {
+                    similarityScores.put(course, similarity);
+                }
             }
         }
 
-        // Sort results by similarity score (highest first)
+        // Sort by similarity score (highest first)
         similarityScores.entrySet()
                 .stream()
                 .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
@@ -63,6 +83,7 @@ public class generalSearch {
 
         return searchResults;
     }
+
 
     /**
      * Computes N-Gram similarity between two strings.
@@ -99,9 +120,9 @@ public class generalSearch {
         CourseRegistry courseRegistry = new CourseRegistry();
         courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
         generalSearch genSearch = new generalSearch(courseRegistry);
-        ArrayList<Course> results = genSearch.searchCourses("DATA ANALYTICS FO");
+        ArrayList<Course> results = genSearch.searchCourses("Differantail Eqations", "2025_Spring");
         for (Course course : results) {
-            System.out.println(course.getName() + " - " + course.getSection());
+            System.out.println(course.getName() + " - " + course.getSection() + " - " + course.getSemester());
         }
         System.out.println("Search Results: " + results.size());
     }
