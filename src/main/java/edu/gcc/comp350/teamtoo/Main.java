@@ -36,7 +36,7 @@ public class Main {
         homeButton.addActionListener(e -> homeButtonClicked(mainPanel, frame));
         addCourseButton.addActionListener(e -> addCourseButtonClicked(mainPanel, frame));
         reviewButton.addActionListener(e -> reviewButtonClicked(mainPanel, frame));
-        courseDirectoryButton.addActionListener(e -> courseDirectoryButtonClicked());
+        courseDirectoryButton.addActionListener(e -> courseDirectoryButtonClicked(mainPanel, frame));
 
         ribbonPanel.add(homeButton);
         ribbonPanel.add(addCourseButton);
@@ -61,8 +61,9 @@ public class Main {
         showReviewView(mainPanel, frame);
     }
 
-    private static void courseDirectoryButtonClicked() {
+    private static void courseDirectoryButtonClicked(JPanel mainPanel, JFrame frame) {
         System.out.println("Course Directory");
+        showCourseDirectoryView(mainPanel, frame);
     }
 
     private static void showHomeView(JPanel mainPanel, JFrame frame) {
@@ -82,6 +83,18 @@ public class Main {
         mainPanel.removeAll();
         mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
         mainPanel.add(homePanel, BorderLayout.CENTER);
+
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    private static void showCourseDirectoryView(JPanel mainPanel, JFrame frame) {
+        JPanel courseDirectoryPanel = new JPanel();
+        courseDirectoryPanel.setLayout(new BoxLayout(courseDirectoryPanel, BoxLayout.Y_AXIS));
+
+        mainPanel.removeAll();
+        mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
+        mainPanel.add(courseDirectoryPanel, BorderLayout.CENTER);
 
         frame.revalidate();
         frame.repaint();
