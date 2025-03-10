@@ -3,29 +3,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class generalSearch {
+public class GeneralSearch {
 
     private ArrayList<Course> courses;
     private ArrayList<Course> searchResults;
     // private String term;
 
-    public generalSearch() {
+    public GeneralSearch() {
         this.courses = new ArrayList<>();
         this.searchResults = new ArrayList<>();
     }
 
-    public generalSearch(ArrayList<Course> courses) {
+    public GeneralSearch(ArrayList<Course> courses) {
         this.courses = courses;
         this.searchResults = new ArrayList<>();
     }
 
-    public generalSearch(CourseRegistry courseRegistry) {
+    public GeneralSearch(CourseRegistry courseRegistry) {
         this.courses = courseRegistry.getCourses();
         this.searchResults = new ArrayList<>();
     }
 
     /*
-    public generalSearch(CourseRegistry courseRegistry, Schedule schedule) {
+    public GeneralSearch(CourseRegistry courseRegistry, Schedule schedule) {
         this.courses = courseRegistry.getCourses();
         this.searchResults = new ArrayList<>();
         this.term = schedule.getTerm();
@@ -85,6 +85,38 @@ public class generalSearch {
     }
 
 
+    public ArrayList<Course> searchCourses(String searchInput) {
+        searchResults.clear();
+
+        // Validate search input
+        if (searchInput == null || searchInput.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search input cannot be null or empty.");
+        }
+
+        // N-Gram Similarity Matching (Only for the specified term)
+        int n = 2; // Bi-grams
+        double threshold = 0.25; // Adjust for sensitivity
+
+        Map<Course, Double> similarityScores = new HashMap<>();
+
+        for (Course course : courses) {
+                double similarity = nGramSimilarity(searchInput, course.getName(), n);
+                if (similarity >= threshold) {
+                    similarityScores.put(course, similarity);
+                }
+        }
+
+        // Sort by similarity score (highest first)
+        similarityScores.entrySet()
+                .stream()
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .forEach(entry -> searchResults.add(entry.getKey()));
+
+        return searchResults;
+    }
+
+
+
     /**
      * Computes N-Gram similarity between two strings.
      * Uses Jaccard similarity over N-grams.
@@ -117,9 +149,10 @@ public class generalSearch {
     }
 
     public static void main(String[] args) {
+        //Test Code
         CourseRegistry courseRegistry = new CourseRegistry();
         courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
-        generalSearch genSearch = new generalSearch(courseRegistry);
+        GeneralSearch genSearch = new GeneralSearch(courseRegistry);
         ArrayList<Course> results = genSearch.searchCourses("Differantail Eqations", "2025_Spring");
         for (Course course : results) {
             System.out.println(course.getName() + " - " + course.getSection() + " - " + course.getSemester());
