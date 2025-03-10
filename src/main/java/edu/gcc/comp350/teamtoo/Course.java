@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class Course {
+    // private boolean isFavorite
     private int credits;
     private List<String> faculty;
 
