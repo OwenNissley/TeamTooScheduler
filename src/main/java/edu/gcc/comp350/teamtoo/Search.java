@@ -6,14 +6,27 @@ import java.util.ArrayList;
 public class Search
 {
     private ArrayList<Filter> activeFilters;
+    private ArrayList<Course> termFilteredCourses;
     private ArrayList<Course> generalFilteredCourses;
     private final ArrayList<Course> allCourses;
 
     public Search(ArrayList<Course> allCourses) {
         this.allCourses = allCourses;
 
+        this.termFilteredCourses = new ArrayList<>();
         this.activeFilters = new ArrayList<>();
         this.generalFilteredCourses = new ArrayList<>();
+    }
+
+    //add classes to define termFilteredCourses right away (before other searches can be doen)
+    //add checks to make sure term is selected prior to other searches
+    public void filterBasedOnTerm(String term)
+    {
+        Filter termFilter = new FilterTerm(term);
+        for (Course course : allCourses) {
+            if (termFilter.filtersCourse(course))
+                termFilteredCourses.add(course);
+        }
     }
 
     //clear generalFilteredCourses
@@ -47,10 +60,10 @@ public class Search
         //this is inefficient and needs changed at some point
         if (generalFilteredCourses.isEmpty())
         {
-            //for (Course course : allCourses) {
+            //for (Course course : termFilteredCourses) {
             //    generalFilteredCourses.add(course); // we don't need to deep copy course, since they don't change
             //}
-            pointer = allCourses; //I think we can get away with this
+            pointer = termFilteredCourses; //I think we can get away with this
         }
 
         if (activeFilters.isEmpty())
@@ -73,12 +86,20 @@ public class Search
         return advancedFilteredCourses;
     }
 
-    //does not return, only updates generalFilteredCourses
+    //does not return, only updates generalFilteredCourses from termFilteredCourses
     public void SearchGeneral(String searchTerm)
     {
         generalFilteredCourses.clear();
-
         //fill generalFilteredCourses.add() based on searchTerm
+        if (termFilteredCourses.isEmpty()){
+            System.out.println("\\u001B[31mERROR: no term filtered courses.\\u001B[0m\" ");
+        }else {
+            GeneralSearch genSearch = new GeneralSearch(termFilteredCourses);
+            ArrayList<Course> results = genSearch.searchCourses(searchTerm);
+            for (Course course : results) {
+                generalFilteredCourses.add(course);
+            }
+        }
     }
 
 }
