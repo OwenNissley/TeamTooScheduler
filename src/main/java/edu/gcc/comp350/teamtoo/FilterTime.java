@@ -1,4 +1,4 @@
-package edu.gcc.comp350.teamtoo;
+/*package edu.gcc.comp350.teamtoo;
 
 // Subclass extending the abstract class "Filter"
 public class FilterTime extends Filter {
@@ -12,8 +12,8 @@ public class FilterTime extends Filter {
         this.endTime = parseTimeToMinutes(endTime);
     }
 
-    @Override
-    public boolean filtersCourse(Course course) {
+ //   @Override
+   /* public boolean filtersCourse(Course course) {
         if (startTime <= parseTimeToMinutes(course.startTime) && endTime >= parseTimeToMinutes(course.endTime))
         {
             return true;
@@ -21,8 +21,11 @@ public class FilterTime extends Filter {
         return false;
     }
 
+    */
+
     //takes a time string and returns the minute value
     //useful for Time Filter
+/*
     private static int parseTimeToMinutes(String time) {
         // Example format: "1:30 PM"
         String[] parts = time.split(" ");
@@ -40,3 +43,5 @@ public class FilterTime extends Filter {
         return hour * 60 + minute; // Convert to total minutes
     }
 }
+
+*/
