@@ -11,4 +11,19 @@ public class Core {
     public void quickSchedule() {}
     public void searchCourse() {}
     public void hasConflict() {}
+
+    public void addCourse(Course course) {
+        if (selectedSchedule < schedules.size()) {
+            Schedule schedule = schedules.get(selectedSchedule);
+            schedule.addCourse(course);
+
+        }
+    }
+
+    public void removeCourse(Course course) {
+        if (selectedSchedule < schedules.size()) {
+            Schedule schedule = schedules.get(selectedSchedule);
+            schedule.removeCourse(course);
+        }
+    }
 }
