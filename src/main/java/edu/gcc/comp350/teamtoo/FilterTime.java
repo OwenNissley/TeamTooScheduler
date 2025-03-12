@@ -1,32 +1,55 @@
-/*package edu.gcc.comp350.teamtoo;
+package edu.gcc.comp350.teamtoo;
+
+import java.util.ArrayList;
 
 // Subclass extending the abstract class "Filter"
 public class FilterTime extends Filter {
 
-    int startTime;
-    int endTime;
+    private String startTime;
+    private String endTime;
 
-    public FilterTime(FilterType filterType, String startTime, String endTime) {
-        super(filterType);
-        this.startTime = parseTimeToMinutes(startTime);
-        this.endTime = parseTimeToMinutes(endTime);
+    public FilterTime( String startTime, String endTime) {
+        super(FilterType.TIME);
+        if (startTime.matches("\\d{1,2}:\\d{2} (AM|PM)")) {
+            System.out.println("Valid format");
+        } else {
+           throw new RuntimeException("Invalid format, need hour:minute AM/PM");
+        }
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
  //   @Override
-   /* public boolean filtersCourse(Course course) {
-        if (startTime <= parseTimeToMinutes(course.startTime) && endTime >= parseTimeToMinutes(course.endTime))
-        {
-            return true;
+    public boolean filtersCourse(Course course) {
+       boolean didFilterFit = false;
+        ArrayList<Course.TimeSlot> times = course.getTimes();
+        for(Course.TimeSlot timeSlot : times){
+            if (timeSlot.getStartTime().equals(startTime) && timeSlot.getEndTime().equals(endTime)){
+                didFilterFit =true;
+            }
         }
-        return false;
+        return didFilterFit;
     }
 
-    */
+    public static void main(String[] args) {
+        ArrayList<Course> filteredCourses = new ArrayList<>();
+        CourseRegistry registry = new CourseRegistry();
+        registry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");  // Load and print courses
+        Filter timeFilter = new FilterTime("9:00 AM","9:50 AM");
+        for(Course course: registry.getCourses()){
+            if (timeFilter.filtersCourse(course)){
+                filteredCourses.add(course);
+            }
+        }
+        System.out.println(Arr(filteredCourses));
+    }
+
+
 
     //takes a time string and returns the minute value
     //useful for Time Filter
-/*
-    private static int parseTimeToMinutes(String time) {
+
+   /* private static int parseTimeToMinutes(String time) {
         // Example format: "1:30 PM"
         String[] parts = time.split(" ");
         String[] timeParts = parts[0].split(":");
@@ -42,6 +65,7 @@ public class FilterTime extends Filter {
 
         return hour * 60 + minute; // Convert to total minutes
     }
+
+    */
 }
 
-*/
