@@ -3,12 +3,12 @@ package edu.gcc.comp350.teamtoo;
 import java.util.ArrayList;
 
 // Subclass extending the abstract class "Filter"
-public class FilterDay extends Filter {
+public class FilterDaysOfWeek extends Filter {
 
     private String dayPattern;
 
-    public FilterDay(String dayPattern) {
-        super(FilterType.DAY_OF_WEEK);
+    public FilterDaysOfWeek(String dayPattern) {
+        super(FilterType.DAYS_OF_WEEK);
         if (isValidDayPattern(dayPattern)) {
             this.dayPattern = dayPattern;
         } else {
@@ -35,7 +35,7 @@ public class FilterDay extends Filter {
         CourseRegistry registry = new CourseRegistry();
         registry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json"); // Load courses
 
-        Filter dayFilter = new FilterDay("MWF");
+        Filter dayFilter = new FilterDaysOfWeek("MWF");
         for (Course course : registry.getCourses()) {
             if (dayFilter.filtersCourse(course)) {
                 filteredCourses.add(course);

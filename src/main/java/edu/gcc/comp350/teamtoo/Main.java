@@ -104,12 +104,15 @@ public class Main {
         //JCheckBox semesterCheckBox = new JCheckBox("Semester");
         JComboBox<String> semesterCombo = new JComboBox<>(new String[]{"Fall", "Spring"});
         JComboBox<Integer> yearCombo = new JComboBox<>();
-        for (int year = 2020; year <= 2030; year++) {
+        for (int year = 2023; year <= 2025; year++) {
             yearCombo.addItem(year);
         }
         JPanel semesterPanel = new JPanel(new FlowLayout());
         semesterPanel.add(semesterCombo);
         semesterPanel.add(yearCombo);
+
+        //instantly sort based on semester
+        core.addFilter(new FilterSemester(yearCombo.getSelectedItem().toString(), semesterCombo.getSelectedItem().toString()));
 
         semesterWrapper.add(semesterLabel);
         //semesterWrapper.add(semesterCheckBox);
@@ -198,6 +201,7 @@ public class Main {
         advancedSearchPanel.add(courseCodeField, gbc);
 
         // Row 4: Course Keyword
+        /*
         JCheckBox keywordCheckBox = new JCheckBox("Course Keyword");
         JTextField keywordField = new JTextField(15);
         gbc.gridx = 0;
@@ -205,6 +209,7 @@ public class Main {
         advancedSearchPanel.add(keywordCheckBox, gbc);
         gbc.gridx = 1;
         advancedSearchPanel.add(keywordField, gbc);
+        */
 
         advancedSearchWrapper.add(advancedSearchLabel);
         advancedSearchWrapper.add(advancedSearchPanel); // No Space Now!
@@ -241,12 +246,42 @@ public class Main {
                 errorLabel.setText("You must select a semester and year.");
             } else {
                 String errorMessage = validateAdvancedSearch(timeCheckBox, startTimeDropdown, endTimeDropdown, startAmPmCombo, endAmPmCombo, daysCheckBox,
-                        mwfButton, trButton, courseCodeCheckBox, courseCodeField, keywordCheckBox, keywordField,
+                        mwfButton, trButton, courseCodeCheckBox, courseCodeField, /*keywordCheckBox, keywordField,
                         /*semesterCheckBox, */semesterCombo, yearCombo);
 
                 if (!errorMessage.isEmpty()) {
                     errorLabel.setText(errorMessage);
                 } else {
+                    //for each filter, call core.addFilter()
+
+                    //time filter
+                    if (timeCheckBox.isSelected()) {
+                        // Retrieve selected times
+                        String startTime = startTimeDropdown.getSelectedItem() + " " + startAmPmCombo.getSelectedItem();
+                        String endTime = endTimeDropdown.getSelectedItem() + " " + endAmPmCombo.getSelectedItem();
+
+                        // Convert times to minutes and validate order
+                        //int startTimeInMinutes = parseTimeToMinutes(startTime);
+                        //int endTimeInMinutes = parseTimeToMinutes(endTime);
+
+                        core.addFilter(new FilterTime(startTime, endTime));
+                    }
+
+                    //days of the week filter
+                    if (daysCheckBox.isSelected()) {
+                        if (mwfButton.isSelected()) {
+                            core.addFilter(new FilterDaysOfWeek("MWF"));
+                        } else if (trButton.isSelected()) {
+                            core.addFilter(new FilterDaysOfWeek("TR"));
+                        }
+                    }
+
+                    //course code filter
+                    if (courseCodeCheckBox.isSelected()) {
+                        core.addFilter(new FilterCourseCode(Integer.parseInt(courseCodeField.getText())));
+                    }
+
+
                     System.out.println("Advanced Search executed.");
 
                     // Call core.searchAdvanced()
@@ -278,7 +313,7 @@ public class Main {
                                                  JComboBox<String> endTimeDropdown, JComboBox<String> startAmPmCombo, JComboBox<String> endAmPmCombo,JCheckBox daysCheckBox,
                                                  JRadioButton mwfButton, JRadioButton trButton,
                                                  JCheckBox courseCodeCheckBox, JTextField courseCodeField,
-                                                 JCheckBox keywordCheckBox, JTextField keywordField,
+                                                 /*JCheckBox keywordCheckBox, JTextField keywordField,
                                                  /*JCheckBox semesterCheckBox, */JComboBox<String> semesterCombo,
                                                  JComboBox<Integer> yearCombo) {
         StringBuilder errorMessage = new StringBuilder();
@@ -306,9 +341,14 @@ public class Main {
             errorMessage.append("Course Code cannot be empty.\n");
         }
 
-        if (keywordCheckBox.isSelected() && keywordField.getText().trim().isEmpty()) {
-            errorMessage.append("Course Keyword cannot be empty.\n");
+        //if course code is selected and not an integer
+        if (courseCodeCheckBox.isSelected() && !courseCodeField.getText().matches("\\d+")) {
+            errorMessage.append("Course Code must be an integer.\n");
         }
+
+        //if (keywordCheckBox.isSelected() && keywordField.getText().trim().isEmpty()) {
+        //    errorMessage.append("Course Keyword cannot be empty.\n");
+        //}
 
         if (/*semesterCheckBox.isSelected() && */(semesterCombo.getSelectedItem() == null || yearCombo.getSelectedItem() == null)) {
             errorMessage.append("You must select a semester and year.\n");

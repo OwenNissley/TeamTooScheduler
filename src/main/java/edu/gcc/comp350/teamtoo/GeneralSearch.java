@@ -95,7 +95,7 @@ public class GeneralSearch {
 
         // N-Gram Similarity Matching (Only for the specified term)
         int n = 2; // Bi-grams
-        double threshold = 0.25; // Adjust for sensitivity
+        double threshold = 0.1; // Adjust for sensitivity
 
         Map<Course, Double> similarityScores = new HashMap<>();
 

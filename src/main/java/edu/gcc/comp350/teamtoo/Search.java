@@ -85,9 +85,9 @@ public class Search
         if (activeFilters.isEmpty())
         {
             //TESTING PURPOSES ONLY
-            System.out.println("NO FILTERS...Size: " + generalFilteredCourses.size());
+            System.out.println("NO FILTERS...Size: " + pointer.size());
 
-            return generalFilteredCourses;
+            return pointer;
         }
 
         for(Filter filter : activeFilters)
@@ -101,6 +101,9 @@ public class Search
                 }
             }
         }
+
+        //for now, may be changed later
+        clearFilters();
 
         //TESTING PURPOSES ONLY
         System.out.println("Advanced Search Size: " + advancedFilteredCourses.size());
