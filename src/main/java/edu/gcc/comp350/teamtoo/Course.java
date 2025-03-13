@@ -2,6 +2,7 @@ package edu.gcc.comp350.teamtoo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Course {
@@ -27,7 +28,7 @@ public class Course {
     private char section;
     private String semester;
     private String subject;
-    private List<TimeSlot> times;
+    private ArrayList<TimeSlot> times;
 
     @JsonProperty("total_seats")// Changed to List<TimeSlot> for multiple TimeSlots
     private int totalSeats;
@@ -38,7 +39,7 @@ public class Course {
     // **Constructor**
     public Course(int credits, List<String> faculty, boolean lab, boolean open,
                   String location, String name, int number, int open_seats,
-                  char section, String semester, String subject, List<TimeSlot> times,
+                  char section, String semester, String subject, ArrayList<TimeSlot> times,
                   int totalSeats) {
         this.credits = credits;
         this.faculty = faculty;
@@ -70,7 +71,7 @@ public class Course {
     public char getSection() { return section; }
     public String getSemester() { return semester; }
     public String getSubject() { return subject; }
-    public List<TimeSlot> getTimes() { return times; }
+    public ArrayList<TimeSlot> getTimes() { return times; }
     public int getTotalSeats() { return totalSeats; }
 
 
