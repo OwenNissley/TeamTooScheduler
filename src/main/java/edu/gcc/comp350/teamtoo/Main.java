@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
+    private static final List<String> selectedCourses = new ArrayList<>();
+
     public static void main(String[] args) {
         run();
     }
@@ -73,9 +75,20 @@ public class Main {
         warningsTextArea.setEditable(false);
         warningsTextArea.setBorder(BorderFactory.createTitledBorder("Warnings"));
 
-        JTextArea courseListTextArea = new JTextArea("Available courses will appear here.");
+        JTextArea courseListTextArea = new JTextArea();
         courseListTextArea.setEditable(false);
         courseListTextArea.setBorder(BorderFactory.createTitledBorder("Course List"));
+
+        // Update displayed courses
+        StringBuilder courseText = new StringBuilder();
+        if (selectedCourses.isEmpty()) {
+            courseText.append("No courses added yet.");
+        } else {
+            for (String course : selectedCourses) {
+                courseText.append(course).append("\n");
+            }
+        }
+        courseListTextArea.setText(courseText.toString());
 
         homePanel.add(warningsTextArea, BorderLayout.NORTH);
         homePanel.add(courseListTextArea, BorderLayout.CENTER);
@@ -240,7 +253,7 @@ public class Main {
             if (!errorMessage.isEmpty()) {
                 errorLabel.setText(errorMessage);
             } else {
-                showCourseSelectionView(mainPanel, frame);
+                showCourseSelectionView(mainPanel, frame, new CourseRegistry());
             }
         });
 
@@ -295,82 +308,79 @@ public class Main {
         return errorMessage.toString().trim();
     }
 
-    private static void showCourseSelectionView(JPanel mainPanel, JFrame frame) {
-        JPanel courseSelectionPanel = new JPanel();
-        courseSelectionPanel.setLayout(new BoxLayout(courseSelectionPanel, BoxLayout.Y_AXIS));
+    private static void showCourseSelectionView(JPanel mainPanel, JFrame frame, CourseRegistry courseRegistry) {
+        courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
+        // Create a panel for course selection with a somewhat nice looking layout
+        JPanel selectionPanel = new JPanel();
+        selectionPanel.setLayout(new BoxLayout(selectionPanel, BoxLayout.Y_AXIS));
+        selectionPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));  // Add padding to the panel
 
-        // Header label aligned to the left
-        JLabel selectionLabel = new JLabel("Select a course to add:");
-        selectionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Title label with styling
+        JLabel label = new JLabel("Select a course to add:");
+        label.setFont(new Font("Arial", Font.BOLD, 16));  // Make the label text bold and larger
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        selectionPanel.add(label);
 
-        // Course options as radio buttons (only one can be selected)
-        ButtonGroup courseGroup = new ButtonGroup(); // Ensures single selection
-        JRadioButton course1 = new JRadioButton("Course 1: Introduction to Java");
-        JRadioButton course2 = new JRadioButton("Course 2: Advanced Java Programming");
-        JRadioButton course3 = new JRadioButton("Course 3: Software Engineering");
-        course1.setAlignmentX(Component.LEFT_ALIGNMENT);
-        course2.setAlignmentX(Component.LEFT_ALIGNMENT);
-        course3.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Dropdown for courses from CourseRegistry
+        JComboBox<Course> courseDropdown = new JComboBox<>();
 
-        courseGroup.add(course1);
-        courseGroup.add(course2);
-        courseGroup.add(course3);
+        // Populate the dropdown with courses from courseRegistry
+        for (Course course : courseRegistry.getCourses()) {
+            courseDropdown.addItem(course);  // Add the Course object itself to the JComboBox
+        }
 
-        // Add Selected Course button aligned to the left
-        JButton addCourseButton = new JButton("Add Selected Course");
-        addCourseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Back, Course Info, and Review buttons
-        JButton backButton = new JButton("Back");
-        JButton courseInfoButton = new JButton("Course Info");
-        JButton reviewButton = new JButton("Review");
-
-        // Align buttons in a horizontal layout
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT)); // Align buttons to the left
-        buttonPanel.add(backButton);
-        buttonPanel.add(courseInfoButton);
-        buttonPanel.add(reviewButton);
-
-        // Add components to the panel
-        courseSelectionPanel.add(selectionLabel); // Header
-        courseSelectionPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
-        courseSelectionPanel.add(course1);
-        courseSelectionPanel.add(course2);
-        courseSelectionPanel.add(course3);
-        courseSelectionPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
-        courseSelectionPanel.add(addCourseButton);
-        courseSelectionPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
-        courseSelectionPanel.add(buttonPanel);
-
-        // Back button action
-        backButton.addActionListener(e -> showAddCourseView(mainPanel, frame));
-
-        // Course Info button action
-        courseInfoButton.addActionListener(e -> {
-            if (course1.isSelected()) {
-                showCourseInfoView(mainPanel, frame, "Course 1: Introduction to Java");
-            } else if (course2.isSelected()) {
-                showCourseInfoView(mainPanel, frame, "Course 2: Advanced Java Programming");
-            } else if (course3.isSelected()) {
-                showCourseInfoView(mainPanel, frame, "Course 3: Software Engineering");
-            } else {
-                JOptionPane.showMessageDialog(frame, "Please select a course to view its info.");
+        // Set the renderer to display only the course name in the dropdown
+        // This was so much more trouble than it was worth but I couldn't find a workaround.
+        courseDropdown.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                // Use the course name for display
+                if (value instanceof Course) {
+                    value = ((Course) value).getName();  // Display course name in the dropdown
+                }
+                return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             }
         });
 
-        // Review button action (same as the ribbon Review button at the top)
-        reviewButton.addActionListener(e -> reviewButtonClicked(mainPanel, frame));
+        // Add the dropdown to the selection panel with alignment
+        courseDropdown.setAlignmentX(Component.CENTER_ALIGNMENT);
+        selectionPanel.add(courseDropdown);
 
-        // Add the updated panel to the main panel
+        // Add a button to add the selected course with some padding
+        JButton addButton = new JButton("Add Selected Course");
+        addButton.setFont(new Font("Arial", Font.PLAIN, 14));  // Make button text readable
+        addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        selectionPanel.add(Box.createVerticalStrut(10));  // Add vertical space between components
+        selectionPanel.add(addButton);
+
+        addButton.addActionListener(e -> {
+            Course selectedCourse = (Course) courseDropdown.getSelectedItem();
+            if (selectedCourse != null) {
+                // Add the course name to selectedCourses (assuming 'getName' returns the name of the course)
+                selectedCourses.add(selectedCourse.getName());  // Add course name to list
+
+                // Show a confirmation message
+                JOptionPane.showMessageDialog(frame, "Added: " + selectedCourse.getName());
+
+                // Refresh home and review views
+                showHomeView(mainPanel, frame);
+                showReviewView(mainPanel, frame);
+            }
+        });
+
+        // Clear existing panels and add new ones
         mainPanel.removeAll();
         mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
-        mainPanel.add(courseSelectionPanel, BorderLayout.CENTER);
+        mainPanel.add(selectionPanel, BorderLayout.CENTER);
 
-        // Refresh the frame
+        // Revalidate and repaint the frame to update the UI
         frame.revalidate();
         frame.repaint();
+
+        // Open the dropdown after the UI has been fully rendered
+        SwingUtilities.invokeLater(() -> courseDropdown.showPopup());
     }
+
 
     private static void showCourseInfoView(JPanel mainPanel, JFrame frame, String courseName) {
         JPanel courseInfoPanel = new JPanel();
@@ -382,7 +392,7 @@ public class Main {
         headingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        backButton.addActionListener(e -> showCourseSelectionView(mainPanel, frame));
+        backButton.addActionListener(e -> showCourseSelectionView(mainPanel, frame, new CourseRegistry()));
 
         courseInfoPanel.add(Box.createVerticalStrut(50)); // Add some spacing
         courseInfoPanel.add(headingLabel);
@@ -398,71 +408,51 @@ public class Main {
     }
 
     private static void showReviewView(JPanel mainPanel, JFrame frame) {
-        // Main panel for the Review screen
+        /*
+        Tried a few different things to get the vertical spacing between courses to fix itself but it won't work lol
+         */
         JPanel reviewPanel = new JPanel();
         reviewPanel.setLayout(new BoxLayout(reviewPanel, BoxLayout.Y_AXIS));
 
-        // Warnings panel at the top
-        JTextArea warningsTextArea = new JTextArea("Warnings will appear here.");
-        warningsTextArea.setEditable(false);
-        warningsTextArea.setBorder(BorderFactory.createTitledBorder("Warnings"));
-        //warningsTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Label for the review section
+        JLabel label = new JLabel("Review your courses:");
+        label.setFont(new Font("Arial", Font.BOLD, 16));  // Bold and bigger text for the label
+        reviewPanel.add(label);
 
-        // Schedule display area
-        JTextArea scheduleTextArea = new JTextArea("Scheduled classes will appear here.");
-        scheduleTextArea.setEditable(false);
-        scheduleTextArea.setBorder(BorderFactory.createTitledBorder("Schedule"));
-        //scheduleTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        if (selectedCourses.isEmpty()) {
+            reviewPanel.add(new JLabel("No courses added yet."));
+        } else {
+            for (String course : selectedCourses) {
+                JPanel coursePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));  // Adjust spacing between components in the panel
+                coursePanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));  // Reduce vertical spacing between panels
 
-        // Buttons panel
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT)); // Align buttons to the left
+                JLabel courseLabel = new JLabel(course);
+                courseLabel.setFont(new Font("Arial", Font.PLAIN, 14));  // Make the course name slightly smaller
 
-        JButton removeCourseButton = new JButton("Remove Course");
-        JButton undoButton = new JButton("Undo");
-        JButton courseInfoButton = new JButton("Course Info");
-        JButton removeAllButton = new JButton("Remove All");
+                JButton removeButton = new JButton("Remove");
+                removeButton.setFont(new Font("Arial", Font.PLAIN, 12));  // Adjust button text size
 
-        // Add buttons to the panel
-        buttonsPanel.add(removeCourseButton);
-        buttonsPanel.add(undoButton);
-        buttonsPanel.add(courseInfoButton);
-        buttonsPanel.add(removeAllButton);
+                // Action to remove the course
+                removeButton.addActionListener(e -> {
+                    selectedCourses.remove(course);
+                    showReviewView(mainPanel, frame); // Refresh review page
+                });
 
-        // Button click actions
-        removeCourseButton.addActionListener(e -> {
-            System.out.println("Remove Course button clicked.");
-            // TODO: Add logic to remove the selected course from the schedule
-        });
+                // Add the course label and remove button to the course panel
+                coursePanel.add(courseLabel);
+                coursePanel.add(removeButton);
 
-        undoButton.addActionListener(e -> {
-            System.out.println("Undo button clicked.");
-            // TODO: Add logic to undo the last change (if any exists)
-        });
+                // Add the coursePanel to the reviewPanel
+                reviewPanel.add(coursePanel);
+            }
+        }
 
-        courseInfoButton.addActionListener(e -> {
-            System.out.println("Course Info button clicked.");
-            // TODO: Add logic to show information about a specific course
-        });
-
-        removeAllButton.addActionListener(e -> {
-            System.out.println("Remove All button clicked.");
-            // TODO: Add logic to remove all courses from the schedule
-        });
-
-        // Add components to the review panel
-        reviewPanel.add(warningsTextArea, BorderLayout.NORTH); // Warnings section
-        reviewPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
-        reviewPanel.add(scheduleTextArea, BorderLayout.CENTER); // Schedule section
-        reviewPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
-        reviewPanel.add(buttonsPanel); // Buttons section
-
-        // Add the review panel to the main panel
+        // Clear existing panels and add new ones
         mainPanel.removeAll();
         mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
         mainPanel.add(reviewPanel, BorderLayout.CENTER);
 
-        // Refresh the frame
+        // Revalidate and repaint the frame to update the UI
         frame.revalidate();
         frame.repaint();
     }

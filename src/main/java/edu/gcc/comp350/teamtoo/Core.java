@@ -3,14 +3,36 @@ package edu.gcc.comp350.teamtoo;
 import java.util.ArrayList;
 
 public class Core {
+    private static Core instance;
+
     private ArrayList<Schedule> schedules;
     private int selectedSchedule;
     private CourseRegistry courseRegistry;
 
-    public void searchGeneral() {}
-    public void quickSchedule() {}
-    public void searchCourse() {}
-    public void hasConflict() {}
+    private Core() {
+        this.schedules = new ArrayList<>();
+        this.selectedSchedule = 0; // Default selection
+        this.courseRegistry = new CourseRegistry();
+    }
+
+    public static Core getInstance() {
+        if (instance == null) {
+            instance = new Core();
+        }
+        return instance;
+    }
+
+    public void searchGeneral() {
+    }
+
+    public void quickSchedule() {
+    }
+
+    public void searchCourse() {
+    }
+
+    public void hasConflict() {
+    }
 
     public void addCourse(Course course) {
         if (selectedSchedule < schedules.size()) {
