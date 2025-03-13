@@ -22,14 +22,14 @@ public class FilterTime extends Filter {
 
  //   @Override
     public boolean filtersCourse(Course course) {
-       boolean didFilterFit = false;
+        //boolean didFilterFit = false;
         ArrayList<Course.TimeSlot> times = course.getTimes();
         for(Course.TimeSlot timeSlot : times){
             if (timeSlot.getStartTime().equals(startTime) && timeSlot.getEndTime().equals(endTime)){
-                didFilterFit =true;
+                return true;//didFilterFit =true;
             }
         }
-        return didFilterFit;
+        return false;//return didFilterFit;
     }
 
     public static void main(String[] args) {

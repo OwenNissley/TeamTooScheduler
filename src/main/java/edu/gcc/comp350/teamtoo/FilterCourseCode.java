@@ -3,11 +3,11 @@ package edu.gcc.comp350.teamtoo;
 import java.util.ArrayList;
 
 // Subclass extending the abstract class "Filter"
-public class FilterCode extends Filter {
+public class FilterCourseCode extends Filter {
 
     private final int courseCode;
 
-    public FilterCode(int courseCode) {
+    public FilterCourseCode(int courseCode) {
         super(FilterType.COURSE_CODE);
         this.courseCode = courseCode;
     }
@@ -22,7 +22,7 @@ public class FilterCode extends Filter {
         CourseRegistry registry = new CourseRegistry();
         registry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json"); // Load courses
 
-        Filter codeFilter = new FilterCode(350);
+        Filter codeFilter = new FilterCourseCode(350);
         for (Course course : registry.getCourses()) {
             if (codeFilter.filtersCourse(course)) {
                 filteredCourses.add(course);
