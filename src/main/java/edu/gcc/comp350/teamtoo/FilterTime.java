@@ -1,6 +1,7 @@
 package edu.gcc.comp350.teamtoo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 // Subclass extending the abstract class "Filter"
 public class FilterTime extends Filter {
@@ -35,13 +36,23 @@ public class FilterTime extends Filter {
         ArrayList<Course> filteredCourses = new ArrayList<>();
         CourseRegistry registry = new CourseRegistry();
         registry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");  // Load and print courses
-        Filter timeFilter = new FilterTime("9:00 AM","9:50 AM");
+        Filter timeFilter = new FilterTime("9:30 AM","10:45 AM");
         for(Course course: registry.getCourses()){
             if (timeFilter.filtersCourse(course)){
                 filteredCourses.add(course);
             }
         }
-        System.out.println(Arr(filteredCourses));
+      /*  for(Course course: filteredCourses){
+            for(Course.TimeSlot timeSlot: course.getTimes()){
+                System.out.println(course.getName() + "--" +timeSlot.getDay() + ":" + timeSlot.getStartTime() + "-" + timeSlot.getEndTime());
+            }
+        }
+
+       */
+       // for (Course course : filteredCourses){
+         //   System.out.println(course.getName());
+        //}
+
     }
 
 
