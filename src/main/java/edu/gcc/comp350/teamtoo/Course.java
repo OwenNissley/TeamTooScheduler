@@ -127,7 +127,19 @@ public class Course {
         return String.format("%d:%02d %s", hours, minutes, period);
     }
 
-
+    public boolean hasConflict(Course course) {
+        for (TimeSlot time : times) {
+            for (TimeSlot otherTime : course.getTimes()) {
+                if (time.getDay().equals(otherTime.getDay())) {
+                    if (time.getStartTime().equals(otherTime.getStartTime()) ||
+                            time.getEndTime().equals(otherTime.getEndTime())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
 }
 

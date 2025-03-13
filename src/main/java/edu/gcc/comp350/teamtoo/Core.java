@@ -21,6 +21,8 @@ public class Core {
 
     public void quickSchedule() {}
 
+
+
     //-------------------------------------------------------------------------------------------------------------
     //HERE DOWN IS FOR SEARCHING
 
@@ -57,7 +59,24 @@ public class Core {
         ArrayList<Course> searchResults = search.searchAdvanced();
     }
 
-    public void hasConflict() {}
+    //END SEARCHING
+    //-------------------------------------------------------------------------------------------------------------
 
+
+
+
+
+    //-------------------------------------------------------------------------------------------------------------
+    //THE FOLLOWING IS FOR CONFLICTING SCHEDULES
+
+    //check if the current schedule has any conflicts
+    public boolean checkConflicts()
+    {
+        return schedules.get(selectedSchedule).getIsConflict();
+    }
+
+
+    //END CONFLICTING SCHEDULES
+    //-------------------------------------------------------------------------------------------------------------
 
 }

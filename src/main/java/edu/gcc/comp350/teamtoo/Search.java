@@ -46,7 +46,7 @@ public class Search
     }
 
     //clear generalFilteredCourses
-    public void clearGeneralFilteredCourses() {
+    private void clearGeneralFilteredCourses() {
         generalFilteredCourses.clear();
     }
 
@@ -56,7 +56,7 @@ public class Search
     }
 
     //clears all filters
-    public void clearFilters() {
+    private void clearFilters() {
         activeFilters.clear();
     }
 
