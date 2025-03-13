@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
+    private static Core core;
+
     public static void main(String[] args) {
+        core = new Core();
         run();
     }
 
@@ -90,6 +93,29 @@ public class Main {
     private static void showAddCourseView(JPanel mainPanel, JFrame frame) {
         JPanel addCoursePanel = new JPanel();
         addCoursePanel.setLayout(new BoxLayout(addCoursePanel, BoxLayout.Y_AXIS));
+
+        // Align Semester to the left
+        JPanel semesterWrapper = new JPanel();
+        semesterWrapper.setLayout(new BoxLayout(semesterWrapper, BoxLayout.Y_AXIS));
+        semesterWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel semesterLabel = new JLabel("Semester");
+        semesterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //JCheckBox semesterCheckBox = new JCheckBox("Semester");
+        JComboBox<String> semesterCombo = new JComboBox<>(new String[]{"Fall", "Spring"});
+        JComboBox<Integer> yearCombo = new JComboBox<>();
+        for (int year = 2020; year <= 2030; year++) {
+            yearCombo.addItem(year);
+        }
+        JPanel semesterPanel = new JPanel(new FlowLayout());
+        semesterPanel.add(semesterCombo);
+        semesterPanel.add(yearCombo);
+
+        semesterWrapper.add(semesterLabel);
+        //semesterWrapper.add(semesterCheckBox);
+        semesterWrapper.add(semesterPanel);
+
+        addCoursePanel.add(semesterWrapper);
 
         // Align General Search to the left
         JPanel generalSearchWrapper = new JPanel();
@@ -180,23 +206,6 @@ public class Main {
         gbc.gridx = 1;
         advancedSearchPanel.add(keywordField, gbc);
 
-        // Row 5: Semester
-        JCheckBox semesterCheckBox = new JCheckBox("Semester");
-        JComboBox<String> semesterCombo = new JComboBox<>(new String[]{"Fall", "Spring"});
-        JComboBox<Integer> yearCombo = new JComboBox<>();
-        for (int year = 2020; year <= 2030; year++) {
-            yearCombo.addItem(year);
-        }
-        JPanel semesterPanel = new JPanel(new FlowLayout());
-        semesterPanel.add(semesterCombo);
-        semesterPanel.add(yearCombo);
-
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        advancedSearchPanel.add(semesterCheckBox, gbc);
-        gbc.gridx = 1;
-        advancedSearchPanel.add(semesterPanel, gbc);
-
         advancedSearchWrapper.add(advancedSearchLabel);
         advancedSearchWrapper.add(advancedSearchPanel); // No Space Now!
 
@@ -211,25 +220,51 @@ public class Main {
 
         // Action Listeners
         generalSearchButton.addActionListener(e -> {
-            System.out.println("General Search executed: " + searchField.getText());
-            generalSearchPanel.removeAll();
-            JLabel searchResultLabel = new JLabel("Search result: " + searchField.getText());
-            generalSearchPanel.add(searchResultLabel);
-            generalSearchPanel.revalidate();
-            generalSearchPanel.repaint();
+            if (/*!semesterCheckBox.isSelected() || */semesterCombo.getSelectedItem() == null || yearCombo.getSelectedItem() == null) {
+                errorLabel.setText("You must select a semester and year.");
+            } else {
+                System.out.println("General Search executed: " + searchField.getText());
+
+                // Call core.SearchGeneral() with the search term
+                core.searchGeneral(searchField.getText());
+
+                generalSearchPanel.removeAll();
+                JLabel searchResultLabel = new JLabel("Search result: " + searchField.getText());
+                generalSearchPanel.add(searchResultLabel);
+                generalSearchPanel.revalidate();
+                generalSearchPanel.repaint();
+            }
         });
 
         advancedSearchButton.addActionListener(e -> {
-            String errorMessage = validateAdvancedSearch(timeCheckBox, startTimeDropdown, endTimeDropdown, startAmPmCombo, endAmPmCombo,daysCheckBox,
-                    mwfButton, trButton, courseCodeCheckBox, courseCodeField, keywordCheckBox, keywordField,
-                    semesterCheckBox, semesterCombo, yearCombo);
-
-            if (!errorMessage.isEmpty()) {
-                errorLabel.setText(errorMessage);
+            if (/*!semesterCheckBox.isSelected() || */semesterCombo.getSelectedItem() == null || yearCombo.getSelectedItem() == null) {
+                errorLabel.setText("You must select a semester and year.");
             } else {
-                showCourseSelectionView(mainPanel, frame);
+                String errorMessage = validateAdvancedSearch(timeCheckBox, startTimeDropdown, endTimeDropdown, startAmPmCombo, endAmPmCombo, daysCheckBox,
+                        mwfButton, trButton, courseCodeCheckBox, courseCodeField, keywordCheckBox, keywordField,
+                        /*semesterCheckBox, */semesterCombo, yearCombo);
+
+                if (!errorMessage.isEmpty()) {
+                    errorLabel.setText(errorMessage);
+                } else {
+                    System.out.println("Advanced Search executed.");
+
+                    // Call core.searchAdvanced()
+                    core.searchAdvanced();
+
+                    showCourseSelectionView(mainPanel, frame);
+                }
             }
         });
+
+        //when the semester or year fields are updated, call core.addFilter() with the new filter
+        semesterCombo.addActionListener(e -> {
+            core.addFilter(new FilterSemester(yearCombo.getSelectedItem().toString(), semesterCombo.getSelectedItem().toString()));
+        });
+        yearCombo.addActionListener(e -> {
+            core.addFilter(new FilterSemester(yearCombo.getSelectedItem().toString(), semesterCombo.getSelectedItem().toString()));
+        });
+
 
         mainPanel.removeAll();
         mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
@@ -244,7 +279,7 @@ public class Main {
                                                  JRadioButton mwfButton, JRadioButton trButton,
                                                  JCheckBox courseCodeCheckBox, JTextField courseCodeField,
                                                  JCheckBox keywordCheckBox, JTextField keywordField,
-                                                 JCheckBox semesterCheckBox, JComboBox<String> semesterCombo,
+                                                 /*JCheckBox semesterCheckBox, */JComboBox<String> semesterCombo,
                                                  JComboBox<Integer> yearCombo) {
         StringBuilder errorMessage = new StringBuilder();
 
@@ -275,7 +310,7 @@ public class Main {
             errorMessage.append("Course Keyword cannot be empty.\n");
         }
 
-        if (semesterCheckBox.isSelected() && (semesterCombo.getSelectedItem() == null || yearCombo.getSelectedItem() == null)) {
+        if (/*semesterCheckBox.isSelected() && */(semesterCombo.getSelectedItem() == null || yearCombo.getSelectedItem() == null)) {
             errorMessage.append("You must select a semester and year.\n");
         }
 
