@@ -19,6 +19,27 @@ public class Core {
         search = new Search(courseRegistry.getCourses());
     }
 
+
+    public void addCourse(Course course) {
+        if (selectedSchedule < schedules.size()) {
+            Schedule schedule = schedules.get(selectedSchedule);
+            schedule.addCourse(course);
+
+        }
+    }
+
+    public void removeCourse(Course course) {
+        if (selectedSchedule < schedules.size()) {
+            Schedule schedule = schedules.get(selectedSchedule);
+            schedule.removeCourse(course);
+        }
+    }
+
+    //write code to return current schedule
+    public ArrayList<Course> getSchedule() {
+        return schedules.get(selectedSchedule).getCourses();
+    }
+
     public void quickSchedule() {}
 
 
@@ -79,20 +100,4 @@ public class Core {
     //END CONFLICTING SCHEDULES
     //-------------------------------------------------------------------------------------------------------------
 
-
-
-    public void addCourse(Course course) {
-        if (selectedSchedule < schedules.size()) {
-            Schedule schedule = schedules.get(selectedSchedule);
-            schedule.addCourse(course);
-
-        }
-    }
-
-    public void removeCourse(Course course) {
-        if (selectedSchedule < schedules.size()) {
-            Schedule schedule = schedules.get(selectedSchedule);
-            schedule.removeCourse(course);
-        }
-    }
 }

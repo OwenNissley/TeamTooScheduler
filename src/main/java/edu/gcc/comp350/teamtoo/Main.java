@@ -78,16 +78,16 @@ public class Main {
         warningsTextArea.setEditable(false);
         warningsTextArea.setBorder(BorderFactory.createTitledBorder("Warnings"));
 
-        //JTextArea courseListTextArea = new JTextArea("Available courses will appear here.");
+        JTextArea courseListTextArea = new JTextArea("Available courses will appear here.");
         courseListTextArea.setEditable(false);
         courseListTextArea.setBorder(BorderFactory.createTitledBorder("Course List"));
 
         // Update displayed courses
         StringBuilder courseText = new StringBuilder();
-        if (selectedCourses.isEmpty()) {
+        if (core.getSchedule().isEmpty()) {
             courseText.append("No courses added yet.");
         } else {
-            for (String course : selectedCourses) {
+            for (Course course : core.getSchedule()) {
                 courseText.append(course).append("\n");
             }
         }

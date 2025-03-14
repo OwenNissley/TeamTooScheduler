@@ -56,6 +56,12 @@ public class Course {
         this.totalSeats = totalSeats;
     }
 
+    //to string method - returns string with name of course, number of credits, the times and days of week
+    @Override
+    public String toString() {
+        return name + " " + credits + " credits " + daysString() + " " + times.toString();
+    }
+
     // Getters, May note be needed
     public int getCredits() { return credits; }
     public String getFaculty() {
