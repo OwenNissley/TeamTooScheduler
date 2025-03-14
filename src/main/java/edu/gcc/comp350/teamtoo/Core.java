@@ -3,13 +3,13 @@ package edu.gcc.comp350.teamtoo;
 import java.util.ArrayList;
 
 public class Core {
-    private static Core instance;
+    //private static Core instance;
 
     private ArrayList<Schedule> schedules;
     private int selectedSchedule;
     private CourseRegistry courseRegistry;
 
-    private Core() {
+    /*private Core() {
         this.schedules = new ArrayList<>();
         this.selectedSchedule = 0; // Default selection
         this.courseRegistry = new CourseRegistry();
@@ -20,7 +20,7 @@ public class Core {
             instance = new Core();
         }
         return instance;
-    }
+    }*/
 
     public void searchGeneral() {
     }

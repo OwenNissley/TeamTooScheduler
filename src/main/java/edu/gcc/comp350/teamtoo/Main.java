@@ -253,7 +253,7 @@ public class Main {
             if (!errorMessage.isEmpty()) {
                 errorLabel.setText(errorMessage);
             } else {
-                showCourseSelectionView(mainPanel, frame, new CourseRegistry());
+                showCourseSelectionView(mainPanel, frame, new CourseRegistry()); //Tyler version of course selection requires registry
             }
         });
 
@@ -308,6 +308,85 @@ public class Main {
         return errorMessage.toString().trim();
     }
 
+    //STABLE VERSION OF COURSE SELECTION BY MICAH
+    private static void showCourseSelectionView(JPanel mainPanel, JFrame frame) {
+        JPanel courseSelectionPanel = new JPanel();
+        courseSelectionPanel.setLayout(new BoxLayout(courseSelectionPanel, BoxLayout.Y_AXIS));
+
+        // Header label aligned to the left
+        JLabel selectionLabel = new JLabel("Select a course to add:");
+        selectionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Course options as radio buttons (only one can be selected)
+        ButtonGroup courseGroup = new ButtonGroup(); // Ensures single selection
+        JRadioButton course1 = new JRadioButton("Course 1: Introduction to Java");
+        JRadioButton course2 = new JRadioButton("Course 2: Advanced Java Programming");
+        JRadioButton course3 = new JRadioButton("Course 3: Software Engineering");
+        course1.setAlignmentX(Component.LEFT_ALIGNMENT);
+        course2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        course3.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        courseGroup.add(course1);
+        courseGroup.add(course2);
+        courseGroup.add(course3);
+
+        // Add Selected Course button aligned to the left
+        JButton addCourseButton = new JButton("Add Selected Course");
+        addCourseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Back, Course Info, and Review buttons
+        JButton backButton = new JButton("Back");
+        JButton courseInfoButton = new JButton("Course Info");
+        JButton reviewButton = new JButton("Review");
+
+        // Align buttons in a horizontal layout
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT)); // Align buttons to the left
+        buttonPanel.add(backButton);
+        buttonPanel.add(courseInfoButton);
+        buttonPanel.add(reviewButton);
+
+        // Add components to the panel
+        courseSelectionPanel.add(selectionLabel); // Header
+        courseSelectionPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
+        courseSelectionPanel.add(course1);
+        courseSelectionPanel.add(course2);
+        courseSelectionPanel.add(course3);
+        courseSelectionPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
+        courseSelectionPanel.add(addCourseButton);
+        courseSelectionPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
+        courseSelectionPanel.add(buttonPanel);
+
+        // Back button action
+        backButton.addActionListener(e -> showAddCourseView(mainPanel, frame));
+
+        // Course Info button action
+        courseInfoButton.addActionListener(e -> {
+            if (course1.isSelected()) {
+                showCourseInfoView(mainPanel, frame, "Course 1: Introduction to Java");
+            } else if (course2.isSelected()) {
+                showCourseInfoView(mainPanel, frame, "Course 2: Advanced Java Programming");
+            } else if (course3.isSelected()) {
+                showCourseInfoView(mainPanel, frame, "Course 3: Software Engineering");
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please select a course to view its info.");
+            }
+        });
+
+        // Review button action (same as the ribbon Review button at the top)
+        reviewButton.addActionListener(e -> reviewButtonClicked(mainPanel, frame));
+
+        // Add the updated panel to the main panel
+        mainPanel.removeAll();
+        mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
+        mainPanel.add(courseSelectionPanel, BorderLayout.CENTER);
+
+        // Refresh the frame
+        frame.revalidate();
+        frame.repaint();
+    }
+    //TYLER VERSION: COMMENTED OUT FOR INTEGRATION
+    /*
     private static void showCourseSelectionView(JPanel mainPanel, JFrame frame, CourseRegistry courseRegistry) {
         courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
         // Create a panel for course selection with a somewhat nice looking layout
@@ -380,7 +459,7 @@ public class Main {
         // Open the dropdown after the UI has been fully rendered
         SwingUtilities.invokeLater(() -> courseDropdown.showPopup());
     }
-
+    */
 
     private static void showCourseInfoView(JPanel mainPanel, JFrame frame, String courseName) {
         JPanel courseInfoPanel = new JPanel();
@@ -392,6 +471,7 @@ public class Main {
         headingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        //Tyler version requires instance of courseRegistry
         backButton.addActionListener(e -> showCourseSelectionView(mainPanel, frame, new CourseRegistry()));
 
         courseInfoPanel.add(Box.createVerticalStrut(50)); // Add some spacing
@@ -407,10 +487,81 @@ public class Main {
         frame.repaint();
     }
 
+    //STABLE VERSION OF REVIEW BY MICAH
     private static void showReviewView(JPanel mainPanel, JFrame frame) {
-        /*
-        Tried a few different things to get the vertical spacing between courses to fix itself but it won't work lol
-         */
+        // Main panel for the Review screen
+        JPanel reviewPanel = new JPanel();
+        reviewPanel.setLayout(new BoxLayout(reviewPanel, BoxLayout.Y_AXIS));
+
+        // Warnings panel at the top
+        JTextArea warningsTextArea = new JTextArea("Warnings will appear here.");
+        warningsTextArea.setEditable(false);
+        warningsTextArea.setBorder(BorderFactory.createTitledBorder("Warnings"));
+        //warningsTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Schedule display area
+        JTextArea scheduleTextArea = new JTextArea("Scheduled classes will appear here.");
+        scheduleTextArea.setEditable(false);
+        scheduleTextArea.setBorder(BorderFactory.createTitledBorder("Schedule"));
+        //scheduleTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Buttons panel
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT)); // Align buttons to the left
+
+        JButton removeCourseButton = new JButton("Remove Course");
+        JButton undoButton = new JButton("Undo");
+        JButton courseInfoButton = new JButton("Course Info");
+        JButton removeAllButton = new JButton("Remove All");
+
+        // Add buttons to the panel
+        buttonsPanel.add(removeCourseButton);
+        buttonsPanel.add(undoButton);
+        buttonsPanel.add(courseInfoButton);
+        buttonsPanel.add(removeAllButton);
+
+        // Button click actions
+        removeCourseButton.addActionListener(e -> {
+            System.out.println("Remove Course button clicked.");
+            // TODO: Add logic to remove the selected course from the schedule
+        });
+
+        undoButton.addActionListener(e -> {
+            System.out.println("Undo button clicked.");
+            // TODO: Add logic to undo the last change (if any exists)
+        });
+
+        courseInfoButton.addActionListener(e -> {
+            System.out.println("Course Info button clicked.");
+            // TODO: Add logic to show information about a specific course
+        });
+
+        removeAllButton.addActionListener(e -> {
+            System.out.println("Remove All button clicked.");
+            // TODO: Add logic to remove all courses from the schedule
+        });
+
+        // Add components to the review panel
+        reviewPanel.add(warningsTextArea, BorderLayout.NORTH); // Warnings section
+        reviewPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
+        reviewPanel.add(scheduleTextArea, BorderLayout.CENTER); // Schedule section
+        reviewPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
+        reviewPanel.add(buttonsPanel); // Buttons section
+
+        // Add the review panel to the main panel
+        mainPanel.removeAll();
+        mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
+        mainPanel.add(reviewPanel, BorderLayout.CENTER);
+
+        // Refresh the frame
+        frame.revalidate();
+        frame.repaint();
+    }
+    //TYLER VERSION: COMMENTED OUT FOR INTEGRATION
+    /*
+    private static void showReviewView(JPanel mainPanel, JFrame frame) {
+        //Tried a few different things to get the vertical spacing between courses to fix itself but it won't work lol
+
         JPanel reviewPanel = new JPanel();
         reviewPanel.setLayout(new BoxLayout(reviewPanel, BoxLayout.Y_AXIS));
 
@@ -456,6 +607,7 @@ public class Main {
         frame.revalidate();
         frame.repaint();
     }
+    */
 
     private static List<String> generateTimeOptions() {
         List<String> times = new ArrayList<>();
