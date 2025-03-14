@@ -79,4 +79,20 @@ public class Core {
     //END CONFLICTING SCHEDULES
     //-------------------------------------------------------------------------------------------------------------
 
+
+
+    public void addCourse(Course course) {
+        if (selectedSchedule < schedules.size()) {
+            Schedule schedule = schedules.get(selectedSchedule);
+            schedule.addCourse(course);
+
+        }
+    }
+
+    public void removeCourse(Course course) {
+        if (selectedSchedule < schedules.size()) {
+            Schedule schedule = schedules.get(selectedSchedule);
+            schedule.removeCourse(course);
+        }
+    }
 }

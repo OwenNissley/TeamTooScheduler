@@ -15,28 +15,56 @@ public class Schedule
     //used for undo and redo
     private ScheduleHistory history;
 
+    private static int idCounter = 1; // Unique ID generator for schedules  //Micah -  not sure if we need this
 
     public Schedule(){
-        courses = new ArrayList<Course>();
-        // set schedule ID here
-        history = new ScheduleHistory(courses);
+        this.courses = new ArrayList<>();
+        this.scheduleID = idCounter++;
+        this.history = new ScheduleHistory(courses);
         isConflict = false;
     }
 
+    public int getScheduleID() {
+        return scheduleID;
+    }
+
+    public ArrayList<Course> getCourses() {
+        return new ArrayList<>(courses);
+    }
+
+    public boolean hasCourse(Course course) {
+        return courses.contains(course);
+    }
 
     public void loadSchedule() {}
     public void saveSchedule() {}
-    public void printSchedule() {}
-    public void removeCourse() {
-        //do all of the needed stuff
-        history.updateHistory(courses); //call this at the end
+    public void printSchedule() {
+        if (courses.isEmpty()) {
+            System.out.println("Schedule ID: " + scheduleID + " is empty.");
+        } else {
+            System.out.println("Schedule ID: " + scheduleID + " contains:");
+            for (Course c : courses) {
+                System.out.println("- " + c.getName());
+            }
+        }
     }
-    public void addCourse() {
-        //do all of the needed stuff
-        history.updateHistory(courses); //call this at the end
+    public boolean hasConflict() {
+        return false;
+    }
+    public void removeCourse(Course course) {
+        if (courses.remove(course)) {
+            history.updateHistory(courses); // call this at the end
+        }
+    }
+    public void addCourse(Course course) {
+        if (!hasCourse(course)) {
+            courses.add(course);
+            history.updateHistory(courses); // call this at the end
+        }
     }
     public void setSchedule(ArrayList<Course> newCourses){
-        courses = newCourses;
+        this.courses = newCourses;
+        history.updateHistory(courses);
     }
     public void undoAction() {history.getPrev(courses);}
     public void redoAction() {history.getNext(courses);}
