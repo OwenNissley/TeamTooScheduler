@@ -253,6 +253,9 @@ public class Main {
         generalSearchButton.addActionListener(e -> {
             if (/*!semesterCheckBox.isSelected() || */semesterCombo.getSelectedItem() == null || yearCombo.getSelectedItem() == null) {
                 errorLabel.setText("You must select a semester and year.");
+            }
+            else if (searchField.getText().trim().isEmpty()) {
+                errorLabel.setText("Search field cannot be empty.");
             } else {
                 System.out.println("General Search executed: " + searchField.getText());
 
@@ -393,6 +396,7 @@ public class Main {
 
         // Course options as radio buttons (only one can be selected)
         ButtonGroup courseGroup = new ButtonGroup(); // Ensures single selection
+        /*
         JRadioButton course1 = new JRadioButton("Course 1: Introduction to Java");
         JRadioButton course2 = new JRadioButton("Course 2: Advanced Java Programming");
         JRadioButton course3 = new JRadioButton("Course 3: Software Engineering");
@@ -403,6 +407,24 @@ public class Main {
         courseGroup.add(course1);
         courseGroup.add(course2);
         courseGroup.add(course3);
+        */
+
+        // Update displayed courses
+        ArrayList<JRadioButton> courseButtons = new ArrayList<>();
+        if (core.getSearchResults().isEmpty()) {
+            JRadioButton courseButton = new JRadioButton("No courses meet search requirements.");
+            courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            courseGroup.add(courseButton);
+        } else {
+            for (Course course : core.getSearchResults()) {
+                JRadioButton courseButton = new JRadioButton(course.toString());
+                courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                courseGroup.add(courseButton);
+                courseButtons.add(courseButton);
+                //courseSelectionPanel.add(courseButton);
+            }
+        }
+
 
         // Add Selected Course button aligned to the left
         JButton addCourseButton = new JButton("Add Selected Course");
@@ -423,19 +445,53 @@ public class Main {
         // Add components to the panel
         courseSelectionPanel.add(selectionLabel); // Header
         courseSelectionPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
-        courseSelectionPanel.add(course1);
-        courseSelectionPanel.add(course2);
-        courseSelectionPanel.add(course3);
+
+        // Create a scrollable panel for the course buttons
+        JPanel courseButtonPanel = new JPanel();
+        courseButtonPanel.setLayout(new BoxLayout(courseButtonPanel, BoxLayout.Y_AXIS));
+        for (JRadioButton courseButton : courseButtons) {
+            courseButtonPanel.add(courseButton);
+        }
+        JScrollPane scrollPane = new JScrollPane(courseButtonPanel);
+        scrollPane.setPreferredSize(new Dimension(400, 200)); // Set fixed size for the scroll pane
+
+        courseSelectionPanel.add(scrollPane);
         courseSelectionPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
         courseSelectionPanel.add(addCourseButton);
         courseSelectionPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
         courseSelectionPanel.add(buttonPanel);
+
+        // AddCourse button action
+        addCourseButton.addActionListener(e -> {
+            for (JRadioButton courseButton : courseButtons) {
+                if (courseButton.isSelected()) {
+                    core.addCourse(courseButtons.indexOf(courseButton));
+                    courseButtons.remove(courseButton);
+                    //refresh page
+                    showCourseSelectionView(mainPanel, frame);
+                    break;
+                }
+                //else {
+                //    JOptionPane.showMessageDialog(frame, "Please select a course to add.");
+                //}
+            }
+        });
 
         // Back button action
         backButton.addActionListener(e -> showAddCourseView(mainPanel, frame));
 
         // Course Info button action
         courseInfoButton.addActionListener(e -> {
+            for (JRadioButton courseButton : courseButtons) {
+                if (courseButton.isSelected()) {
+                    showCourseInfoView(mainPanel, frame, courseButton.getText());//NEED TO CHANGE THIS TO COURSE OBJECT OR SOMETHING
+                    break;
+                }
+                //else {
+                //    JOptionPane.showMessageDialog(frame, "Please select a course to view its info.");
+                //}
+            }
+            /*
             if (course1.isSelected()) {
                 showCourseInfoView(mainPanel, frame, "Course 1: Introduction to Java");
             } else if (course2.isSelected()) {
@@ -444,7 +500,7 @@ public class Main {
                 showCourseInfoView(mainPanel, frame, "Course 3: Software Engineering");
             } else {
                 JOptionPane.showMessageDialog(frame, "Please select a course to view its info.");
-            }
+            }*/
         });
 
         // Review button action (same as the ribbon Review button at the top)
@@ -572,10 +628,29 @@ public class Main {
         //warningsTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Schedule display area
-        JTextArea scheduleTextArea = new JTextArea("Scheduled classes will appear here.");
-        scheduleTextArea.setEditable(false);
-        scheduleTextArea.setBorder(BorderFactory.createTitledBorder("Schedule"));
+        //JTextArea scheduleTextArea = new JTextArea("Scheduled classes will appear here.");
+        //scheduleTextArea.setEditable(false);
+        //scheduleTextArea.setBorder(BorderFactory.createTitledBorder("Schedule"));
         //scheduleTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel scheduleLabel = new JLabel("Scheduled Classes: ");
+        scheduleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Update displayed courses in buttons
+        ButtonGroup courseGroup = new ButtonGroup(); // Ensures single selection
+        ArrayList<JRadioButton> courseButtons = new ArrayList<>();
+        if (core.getSchedule().isEmpty()) {
+            JRadioButton courseButton = new JRadioButton("No courses added yet.");
+            courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            courseGroup.add(courseButton);
+        } else {
+            for (Course course : core.getSchedule()) {
+                JRadioButton courseButton = new JRadioButton(course.toString());
+                courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                courseGroup.add(courseButton);
+                courseButtons.add(courseButton);
+                //reviewPanel.add(courseButton);
+            }
+        }
 
         // Buttons panel
         JPanel buttonsPanel = new JPanel();
@@ -595,7 +670,18 @@ public class Main {
         // Button click actions
         removeCourseButton.addActionListener(e -> {
             System.out.println("Remove Course button clicked.");
-            // TODO: Add logic to remove the selected course from the schedule
+            for (JRadioButton courseButton : courseButtons) {
+                if (courseButton.isSelected()) {
+                    core.removeCourse(courseButtons.indexOf(courseButton));
+                    courseButtons.remove(courseButton);
+                    //refresh page
+                    showReviewView(mainPanel, frame);
+                    break;
+                }
+                //else {
+                //    JOptionPane.showMessageDialog(frame, "Please select a course to remove.");
+                //}
+            }
         });
 
         undoButton.addActionListener(e -> {
@@ -605,18 +691,39 @@ public class Main {
 
         courseInfoButton.addActionListener(e -> {
             System.out.println("Course Info button clicked.");
-            // TODO: Add logic to show information about a specific course
+            //this should do the same as the courseInfoButton elsewhere
+            for (JRadioButton courseButton : courseButtons) {
+                if (courseButton.isSelected()) {
+                    showCourseInfoView(mainPanel, frame, courseButton.getText());//NEED TO CHANGE THIS TO COURSE OBJECT OR SOMETHING
+                    break;
+                }
+                //else {
+                //    JOptionPane.showMessageDialog(frame, "Please select a course to view its info.");
+                //}
+            }
         });
 
         removeAllButton.addActionListener(e -> {
             System.out.println("Remove All button clicked.");
-            // TODO: Add logic to remove all courses from the schedule
+            core.removeAllCourses();
+            showReviewView(mainPanel, frame);
         });
 
         // Add components to the review panel
         reviewPanel.add(warningsTextArea, BorderLayout.NORTH); // Warnings section
         reviewPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
-        reviewPanel.add(scheduleTextArea, BorderLayout.CENTER); // Schedule section
+        reviewPanel.add(scheduleLabel);//, BorderLayout.WEST); // Schedule section
+
+        //add course buttons in scrollable window
+        JPanel courseButtonPanel = new JPanel();
+        courseButtonPanel.setLayout(new BoxLayout(courseButtonPanel, BoxLayout.Y_AXIS));
+        for (JRadioButton courseButton : courseButtons) {
+            courseButtonPanel.add(courseButton);
+        }
+        JScrollPane scrollPane = new JScrollPane(courseButtonPanel);
+        scrollPane.setPreferredSize(new Dimension(400, 200)); // Set fixed size for the scroll pane
+        reviewPanel.add(scrollPane);
+
         reviewPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
         reviewPanel.add(buttonsPanel); // Buttons section
 

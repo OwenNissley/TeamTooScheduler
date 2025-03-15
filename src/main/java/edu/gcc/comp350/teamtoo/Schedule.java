@@ -56,6 +56,12 @@ public class Schedule
             history.updateHistory(courses); // call this at the end
         }
     }
+    public void removeCourse(int index) {
+        if (index >= 0 && index < courses.size()) {
+            courses.remove(index);
+            history.updateHistory(courses); // call this at the end
+        }
+    }
     public void addCourse(Course course) {
         if (!hasCourse(course)) {
             courses.add(course);

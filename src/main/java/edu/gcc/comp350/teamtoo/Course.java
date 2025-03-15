@@ -59,7 +59,17 @@ public class Course {
     //to string method - returns string with name of course, number of credits, the times and days of week
     @Override
     public String toString() {
-        return name + " " + credits + " credits " + daysString() + " " + times.toString();
+        if (times.isEmpty())
+            return name + " (" + credits + " credits) -- " + daysString() + " -- No time specified";
+        else
+        {
+            StringBuilder timesString = new StringBuilder();
+            for (TimeSlot time : times) {
+                timesString.append(time.toString()).append("; ");
+            }
+            return name + " (" + credits + " credits) -- " + daysString() + " -- " + timesString.toString().trim();
+        }
+            //return name + " (" + credits + " credits) -- " + daysString() + ") -- " + times.get(0).toString();
     }
 
     // Getters, May note be needed
@@ -108,6 +118,11 @@ public class Course {
         public String getStartTime() { return convertTo12HourFormat(start_time);}
 
         public String getEndTime() { return convertTo12HourFormat(end_time); }
+
+        @Override
+        public String toString() {
+            return /*day + " " + */convertTo12HourFormat(start_time) + " - " + convertTo12HourFormat(end_time);
+        }
 
     }
 
