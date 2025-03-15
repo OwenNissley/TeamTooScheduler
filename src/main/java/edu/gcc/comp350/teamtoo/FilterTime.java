@@ -12,7 +12,7 @@ public class FilterTime extends Filter {
     public FilterTime( String startTime, String endTime) {
         super(FilterType.TIME);
         if (startTime.matches("\\d{1,2}:\\d{2} (AM|PM)")) {
-            System.out.println("Valid format");
+            //System.out.println("Valid format");
         } else {
            throw new RuntimeException("Invalid format, need hour:minute AM/PM");
         }
@@ -20,17 +20,38 @@ public class FilterTime extends Filter {
         this.endTime = endTime;
     }
 
- //   @Override
+    //this is not right, it should not compare the string, but the int, using the parse int method
+    //tried to fix it, it didn't work all the way
+    @Override
     public boolean filtersCourse(Course course) {
-       boolean didFilterFit = false;
+        //boolean didFilterFit = false;
         ArrayList<Course.TimeSlot> times = course.getTimes();
         for(Course.TimeSlot timeSlot : times){
-            if (timeSlot.getStartTime().equals(startTime) && timeSlot.getEndTime().equals(endTime)){
-                didFilterFit =true;
+            if (parseTimeToMinutes(timeSlot.getStartTime()) >= parseTimeToMinutes(startTime) && parseTimeToMinutes(timeSlot.getEndTime()) <= parseTimeToMinutes(endTime))
+            {
+                return true;//didFilterFit =true;
             }
         }
-        return didFilterFit;
+        return false;//return didFilterFit;
     }
+
+    private static int parseTimeToMinutes(String time) {
+        // Example format: "1:30 PM"
+        String[] parts = time.split(" ");
+        String[] timeParts = parts[0].split(":");
+        int hour = Integer.parseInt(timeParts[0]);
+        int minute = Integer.parseInt(timeParts[1]);
+
+        // Adjust for AM/PM
+        if (parts[1].equals("PM") && hour != 12) {
+            hour += 12;
+        } else if (parts[1].equals("AM") && hour == 12) {
+            hour = 0;
+        }
+
+        return hour * 60 + minute; // Convert to total minutes
+    }
+
 
     public static void main(String[] args) {
         ArrayList<Course> filteredCourses = new ArrayList<>();
@@ -42,6 +63,8 @@ public class FilterTime extends Filter {
                 filteredCourses.add(course);
             }
         }
+
+
       /*  for(Course course: filteredCourses){
             for(Course.TimeSlot timeSlot: course.getTimes()){
                 System.out.println(course.getName() + "--" +timeSlot.getDay() + ":" + timeSlot.getStartTime() + "-" + timeSlot.getEndTime());

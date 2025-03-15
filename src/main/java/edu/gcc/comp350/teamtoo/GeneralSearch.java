@@ -95,7 +95,7 @@ public class GeneralSearch {
 
         // N-Gram Similarity Matching (Only for the specified term)
         int n = 2; // Bi-grams
-        double threshold = 0.25; // Adjust for sensitivity
+        double threshold = 0.1; // Adjust for sensitivity
 
         Map<Course, Double> similarityScores = new HashMap<>();
 
@@ -153,7 +153,7 @@ public class GeneralSearch {
         CourseRegistry courseRegistry = new CourseRegistry();
         courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
         GeneralSearch genSearch = new GeneralSearch(courseRegistry);
-        ArrayList<Course> results = genSearch.searchCourses("Differantail Eqations", "2025_Spring");
+        ArrayList<Course> results = genSearch.searchCourses("Comp");
         for (Course course : results) {
             System.out.println(course.getName() + " - " + course.getSection() + " - " + course.getSemester());
         }

@@ -8,15 +8,21 @@ public class Schedule
     private ArrayList<Course> courses;
     private int scheduleID;
 
+    //used for course conflicts
+    private boolean isConflict; //true if two or more courses conflict
+    private ArrayList<Course> conflictingCourses; //list of courses that conflict
+
     //used for undo and redo
     private ScheduleHistory history;
 
-    private static int idCounter = 1; // Unique ID generator for schedules
+    private static int idCounter = 1; // Unique ID generator for schedules  //Micah -  not sure if we need this
 
     public Schedule(){
         this.courses = new ArrayList<>();
         this.scheduleID = idCounter++;
         this.history = new ScheduleHistory(courses);
+        isConflict = false;
+        conflictingCourses = new ArrayList<>();
     }
 
     public int getScheduleID() {
@@ -49,11 +55,20 @@ public class Schedule
     public void removeCourse(Course course) {
         if (courses.remove(course)) {
             history.updateHistory(courses); // call this at the end
+            checkConflict();
+        }
+    }
+    public void removeCourse(int index) {
+        if (index >= 0 && index < courses.size()) {
+            courses.remove(index);
+            history.updateHistory(courses); // call this at the end
+            checkConflict();
         }
     }
     public void addCourse(Course course) {
         if (!hasCourse(course)) {
             courses.add(course);
+            checkConflict(course);
             history.updateHistory(courses); // call this at the end
         }
     }
@@ -63,6 +78,70 @@ public class Schedule
     }
     public void undoAction() {history.getPrev(courses);}
     public void redoAction() {history.getNext(courses);}
+
+
+    //-------------------------------------------------------------------------------------------------------------
+    //THE FOLLOWING IS FOR COURSE CONFLICTS
+
+    //check if course conflicts with any other course in the schedule
+    //used with adding (NOTE: course should still be added to schedule)
+    public void checkConflict(Course course)
+    {
+        for (Course c : courses)
+        {
+            //if course conflicts with c and c is not the same course
+            if (course.hasConflict(c) && !course.equals(c))
+            {
+                isConflict = true;
+                conflictingCourses.add(c);
+                //if course not in conflictingCourses, add it
+                if (!conflictingCourses.contains(course))
+                {
+                    conflictingCourses.add(course);
+                }
+            }
+        }
+    }
+
+    //check if any course conflicts with any other course in the schedule
+    //used anywhere
+    public void checkConflict()
+    {
+        isConflict = false;
+        conflictingCourses.clear();
+
+        for (Course c1 : courses)
+        {
+            for (Course c2 : courses)
+            {
+                //if c1 and c2 are the same course, skip
+                if (c1.hasConflict(c2) && !c1.equals(c2))
+                {
+                    isConflict = true;
+
+                    //if course is not in conflictingCourses, add it
+                    if (!conflictingCourses.contains(c1))
+                    {
+                        conflictingCourses.add(c1);
+                    }
+                    if (!conflictingCourses.contains(c2))
+                    {
+                        conflictingCourses.add(c2);
+                    }
+                }
+            }
+        }
+    }
+
+    //getters
+    public boolean getIsConflict() {return isConflict;}
+
+    //get conflicting courses
+    public ArrayList<Course> getConflictingCourses() {return conflictingCourses;}
+
+    //END COURSE CONFLICTS
+    //-------------------------------------------------------------------------------------------------------------
+
 }
 
 
