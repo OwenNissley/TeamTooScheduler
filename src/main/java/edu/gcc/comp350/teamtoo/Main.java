@@ -83,7 +83,7 @@ public class Main {
         if (core.getConflictingCourses().isEmpty()) {
             warningText.append("No conflicts found.");
         } else {
-            warningText.append("Conflicting courses found: ");
+            warningText.append("Conflicting courses found: \n");
             for (Course course : core.getConflictingCourses()) {
                 warningText.append(course).append("\n");
             }
@@ -643,7 +643,7 @@ public class Main {
         if (core.getConflictingCourses().isEmpty()) {
             warningText.append("No conflicts found.");
         } else {
-            warningText.append("Conflicting courses found: ");
+            warningText.append("Conflicting courses found: \n");
             for (Course course : core.getConflictingCourses()) {
                 warningText.append(course).append("\n");
             }

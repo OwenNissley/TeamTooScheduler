@@ -150,13 +150,18 @@ public class Course {
 
     //Not quite done yet, still needs some work, and probably some better logic
     // Check if the course has a conflict with another course
+    //should be working now
     public boolean hasConflict(Course course) {
         for (TimeSlot time : times) {
             for (TimeSlot otherTime : course.getTimes()) {
                 if (time.getDay().equals(otherTime.getDay()))
                 {
-                    Filter filter = new FilterTime(time.getStartTime(), time.getEndTime());
-                    if (filter.filtersCourse(course)) {
+                    //compare parsed times and return true if there is an overlap in times
+                    if (parseTimeToMinutes(time.getStartTime()) >= parseTimeToMinutes(otherTime.getStartTime()) &&
+                            parseTimeToMinutes(time.getStartTime()) <= parseTimeToMinutes(otherTime.getEndTime()) ||
+                            parseTimeToMinutes(time.getEndTime()) >= parseTimeToMinutes(otherTime.getStartTime()) &&
+                            parseTimeToMinutes(time.getEndTime()) <= parseTimeToMinutes(otherTime.getEndTime()))
+                    {
                         return true;
                     }
                 }
@@ -165,6 +170,23 @@ public class Course {
         return false;
     }
 
+    // Parse time to minutes
+    private static int parseTimeToMinutes(String time) {
+        // Example format: "1:30 PM"
+        String[] parts = time.split(" ");
+        String[] timeParts = parts[0].split(":");
+        int hour = Integer.parseInt(timeParts[0]);
+        int minute = Integer.parseInt(timeParts[1]);
+
+        // Adjust for AM/PM
+        if (parts[1].equals("PM") && hour != 12) {
+            hour += 12;
+        } else if (parts[1].equals("AM") && hour == 12) {
+            hour = 0;
+        }
+
+        return hour * 60 + minute; // Convert to total minutes
+    }
 }
 
 /*
