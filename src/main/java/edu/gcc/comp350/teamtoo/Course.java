@@ -148,12 +148,15 @@ public class Course {
         return String.format("%d:%02d %s", hours, minutes, period);
     }
 
+    //Not quite done yet, still needs some work, and probably some better logic
+    // Check if the course has a conflict with another course
     public boolean hasConflict(Course course) {
         for (TimeSlot time : times) {
             for (TimeSlot otherTime : course.getTimes()) {
-                if (time.getDay().equals(otherTime.getDay())) {
-                    if (time.getStartTime().equals(otherTime.getStartTime()) ||
-                            time.getEndTime().equals(otherTime.getEndTime())) {
+                if (time.getDay().equals(otherTime.getDay()))
+                {
+                    Filter filter = new FilterTime(time.getStartTime(), time.getEndTime());
+                    if (filter.filtersCourse(course)) {
                         return true;
                     }
                 }
@@ -164,3 +167,11 @@ public class Course {
 
 }
 
+/*
+if (time.getDay().equals(otherTime.getDay())) {
+                    if (time.getStartTime().equals(otherTime.getStartTime()) ||
+                            time.getEndTime().equals(otherTime.getEndTime())) {
+                        return true;
+                    }
+                }
+ */

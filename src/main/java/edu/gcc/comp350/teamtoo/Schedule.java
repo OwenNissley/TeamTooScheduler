@@ -22,6 +22,7 @@ public class Schedule
         this.scheduleID = idCounter++;
         this.history = new ScheduleHistory(courses);
         isConflict = false;
+        conflictingCourses = new ArrayList<>();
     }
 
     public int getScheduleID() {
@@ -54,17 +55,20 @@ public class Schedule
     public void removeCourse(Course course) {
         if (courses.remove(course)) {
             history.updateHistory(courses); // call this at the end
+            checkConflict();
         }
     }
     public void removeCourse(int index) {
         if (index >= 0 && index < courses.size()) {
             courses.remove(index);
             history.updateHistory(courses); // call this at the end
+            checkConflict();
         }
     }
     public void addCourse(Course course) {
         if (!hasCourse(course)) {
             courses.add(course);
+            checkConflict(course);
             history.updateHistory(courses); // call this at the end
         }
     }
@@ -131,6 +135,9 @@ public class Schedule
 
     //getters
     public boolean getIsConflict() {return isConflict;}
+
+    //get conflicting courses
+    public ArrayList<Course> getConflictingCourses() {return conflictingCourses;}
 
     //END COURSE CONFLICTS
     //-------------------------------------------------------------------------------------------------------------

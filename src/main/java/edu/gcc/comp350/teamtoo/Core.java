@@ -65,6 +65,10 @@ public class Core {
         }
     }
 
+    public ArrayList<Course> getConflictingCourses() {
+        return schedules.get(selectedSchedule).getConflictingCourses();
+    }
+
     //write code to return current schedule
     public ArrayList<Course> getSchedule() {
         return schedules.get(selectedSchedule).getCourses();

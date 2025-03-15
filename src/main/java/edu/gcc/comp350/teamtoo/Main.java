@@ -78,6 +78,18 @@ public class Main {
         warningsTextArea.setEditable(false);
         warningsTextArea.setBorder(BorderFactory.createTitledBorder("Warnings"));
 
+        //display conflicting courses
+        StringBuilder warningText = new StringBuilder();
+        if (core.getConflictingCourses().isEmpty()) {
+            warningText.append("No conflicts found.");
+        } else {
+            warningText.append("Conflicting courses found: ");
+            for (Course course : core.getConflictingCourses()) {
+                warningText.append(course).append("\n");
+            }
+        }
+        warningsTextArea.setText(warningText.toString());
+
         JTextArea courseListTextArea = new JTextArea("Available courses will appear here.");
         courseListTextArea.setEditable(false);
         courseListTextArea.setBorder(BorderFactory.createTitledBorder("Course List"));
@@ -626,6 +638,19 @@ public class Main {
         warningsTextArea.setEditable(false);
         warningsTextArea.setBorder(BorderFactory.createTitledBorder("Warnings"));
         //warningsTextArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //display conflicting courses
+        StringBuilder warningText = new StringBuilder();
+        if (core.getConflictingCourses().isEmpty()) {
+            warningText.append("No conflicts found.");
+        } else {
+            warningText.append("Conflicting courses found: ");
+            for (Course course : core.getConflictingCourses()) {
+                warningText.append(course).append("\n");
+            }
+        }
+        warningsTextArea.setText(warningText.toString());
+
+        //POSSIBLY NEED TO ADD STUFF HERE
 
         // Schedule display area
         //JTextArea scheduleTextArea = new JTextArea("Scheduled classes will appear here.");
