@@ -138,4 +138,27 @@ public class Core {
     //END CONFLICTING SCHEDULES
     //-------------------------------------------------------------------------------------------------------------
 
+
+
+    //-------------------------------------------------------------------------------------------------------------
+    //THE FOLLOWING IS FOR UNDO/REDO
+    public void undoAdd() {
+        schedules.get(selectedSchedule).undoAdd();
+    }
+
+    public void undoRemove() {
+        schedules.get(selectedSchedule).undoRemove();
+    }
+
+    public void redoAdd() {
+        schedules.get(selectedSchedule).redoAdd();
+    }
+
+    public void redoRemove() {
+        schedules.get(selectedSchedule).redoRemove();
+    }
+
+    //END UNDO/REDO
+    //-------------------------------------------------------------------------------------------------------------
+
 }
