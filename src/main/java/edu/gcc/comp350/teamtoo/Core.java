@@ -26,9 +26,9 @@ public class Core {
         search = new Search(courseRegistry.getCourses());
 
         //For testing
-        schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(0));
-        schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
-        schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
+        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(0));
+        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
+        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
     }
 
 
