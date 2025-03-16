@@ -12,13 +12,16 @@ public class Main {
 
     public static void main(String[] args) {
         core = new Core();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            saveSchedulesIntoFile();
-        }));
         run();
     }
 
     public static void run() {
+        // Add shutdown hook to save schedules when the program exits
+        //automatically runs when the program is closed
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            saveSchedulesIntoFile();
+        }));
+
         JFrame frame = new JFrame("Course Management");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 600);
@@ -483,7 +486,7 @@ public class Main {
         // Undo button action
         undoButton.addActionListener(e -> {
             System.out.println("Undo button clicked.");
-            core.undoAction();
+            core.undoAdd();
             //refresh
             showCourseSelectionView(mainPanel, frame);
         });
@@ -695,7 +698,7 @@ public class Main {
 
         undoButton.addActionListener(e -> {
             System.out.println("Undo button clicked.");
-            core.undoAction();
+            core.undoRemove();
             //refresh
             showReviewView(mainPanel, frame);
         });

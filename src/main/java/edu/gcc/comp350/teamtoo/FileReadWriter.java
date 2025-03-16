@@ -20,10 +20,15 @@ public class FileReadWriter {
     }
 
     /**
-     * Reads the schedule from the file and returns the number of courses.
-     *
+     * Reads the schedule from the specified file into a
+     * ArrayList with objects of type 'Schedule'
+     * Important Notes:
+     * 1: Courses are indexed from the file by their Subject, then Number
+     * then section. For example, the course "Software Engineering" section A
+     * would be represented in the file as 'COMP350A'
+     * 2: A series of ten *'s is used to separate schedules in the file
      * @param fileName the name of the file to read from
-     * @return the a list of schedules from the specified file
+     * @return the ArrayList of schedules from the specified file
      */
     public ArrayList<Schedule> readScheduleFromFile(String fileName) {
         ArrayList<Schedule> schedules = new ArrayList<>();
@@ -57,10 +62,10 @@ public class FileReadWriter {
     }
 
     /**
-     * Writes the schedule to the file.
+     * Writes an array of objects with type Schedule to a specified file.
      *
      * @param fileName the name of the file to write to
-     * @param schedules  the list of schedules to write to the file
+     * @param schedules an ArrayList of schedules to write to the file
      */
     public void readScheduleIntoFile(String fileName, ArrayList<Schedule> schedules) {
         if (schedules.isEmpty()) {

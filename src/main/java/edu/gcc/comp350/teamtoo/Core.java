@@ -10,9 +10,11 @@ public class Core {
     private FileReadWriter FRW;
 
     public Core() {
+
+        //initializes 'schedules' from the file 'Schedule.txt' if it exists,
+        // otherwise initializes it as empty.
         FRW = new FileReadWriter();
         try{
-//            ArrayList<Schedule> temp = FRW.readScheduleFromFile("Schedule.txt");
             schedules = FRW.readScheduleFromFile("Schedule.txt");
         }
         catch(Exception e){
@@ -42,6 +44,8 @@ public class Core {
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
     }
+    //writes 'schedules' into the file 'Schedule.txt'
+    //saving the current schedules the user has
     public void saveSchedulesIntoFile(){
         FRW.readScheduleIntoFile("Schedule.txt", schedules);
     }
@@ -74,9 +78,7 @@ public class Core {
     }
 
     public void removeAllCourses() {
-        for (Course course : schedules.get(selectedSchedule).getCourses()) {
-            schedules.get(selectedSchedule).removeCourse(course);
-        }
+        schedules.get(selectedSchedule).clearSchedule();
     }
 
     public ArrayList<Course> getConflictingCourses() {

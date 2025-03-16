@@ -85,6 +85,16 @@ public class Schedule
         history.updateHistory(courses);
     }
 
+    public void clearSchedule() {
+        courses.clear();
+        history.updateHistory(courses); // call this at the end
+    }
+
+    public void printHistory(){
+        history.printHistory();
+    }
+
+
 
 
     //-------------------------------------------------------------------------------------------------------------
@@ -93,34 +103,34 @@ public class Schedule
     public void undoAdd()
     {
         history.getPrev(courses);
-        courses = history.getCurrentNodeData(); //I anticipate this not working
+        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
     }
 
     public void undoRemove()
     {
         history.getPrev(courses);
-        courses = history.getCurrentNodeData(); //I anticipate this not working
+        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
     }
 
     public void redoAdd()
     {
         history.getNext(courses);
-        courses = history.getCurrentNodeData(); //I anticipate this not working
+        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
     }
 
     public void redoRemove()
     {
         history.getNext(courses);
-        courses = history.getCurrentNodeData(); //I anticipate this not working
+        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
     }
 
     public void undoAction() {
         history.getPrev(courses);
-        courses = history.getCurPosition();
+        courses = new ArrayList<>(history.getCurrentNodeData());
     }
     public void redoAction() {
         history.getNext(courses);
-        courses = history.getCurPosition();
+        courses = new ArrayList<>(history.getCurrentNodeData());
     }
 
     //END UNDO AND REDO
