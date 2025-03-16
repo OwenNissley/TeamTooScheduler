@@ -480,7 +480,7 @@ public class Main {
         // Undo button action
         undoButton.addActionListener(e -> {
             System.out.println("Undo button clicked.");
-            core.undoAdd();
+            core.undoAction();
             //refresh
             showCourseSelectionView(mainPanel, frame);
         });
@@ -692,7 +692,7 @@ public class Main {
 
         undoButton.addActionListener(e -> {
             System.out.println("Undo button clicked.");
-            core.undoRemove();
+            core.undoAction();
             //refresh
             showReviewView(mainPanel, frame);
         });
