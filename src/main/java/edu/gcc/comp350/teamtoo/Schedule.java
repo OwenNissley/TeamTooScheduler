@@ -25,6 +25,12 @@ public class Schedule
         conflictingCourses = new ArrayList<>();
     }
 
+    public Schedule(ArrayList<Course> courses){
+        this.courses = new ArrayList<>(courses);
+        this.scheduleID = idCounter++;
+        this.history = new ScheduleHistory(courses);
+    }
+
     public int getScheduleID() {
         return scheduleID;
     }
@@ -84,26 +90,36 @@ public class Schedule
 
     public void undoAdd()
     {
-        undoAction(); //I anticipate this not working
+        history.getPrev(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
     }
 
     public void undoRemove()
     {
-        undoAction(); //I anticipate this not working
+        history.getPrev(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
     }
 
     public void redoAdd()
     {
-        redoAction(); //I anticipate this not working
+        history.getNext(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
     }
 
     public void redoRemove()
     {
-        redoAction(); //I anticipate this not working
+        history.getNext(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
     }
 
-    public void undoAction() {history.getPrev(courses);}
-    public void redoAction() {history.getNext(courses);}
+    public void undoAction() {
+        history.getPrev(courses);
+        courses = history.getCurrentNodeData();
+    }
+    public void redoAction() {
+        history.getNext(courses);
+        courses = history.getCurrentNodeData();
+    }
 
     //END UNDO AND REDO
     //-------------------------------------------------------------------------------------------------------------

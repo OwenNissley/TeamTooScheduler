@@ -11,7 +11,6 @@ public class Core {
     public Core() {
         schedules = new ArrayList<>();
 
-
         //eventually this will be replaced with a method to load schedules from a file if they exist, otherwise create a new schedule
         schedules.add(new Schedule());
 
@@ -30,8 +29,6 @@ public class Core {
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
     }
-
-
     public void addCourse(Course course) {
         if (selectedSchedule < schedules.size()) {
             Schedule schedule = schedules.get(selectedSchedule);
