@@ -11,7 +11,15 @@ public class Core {
 
     public Core() {
         FRW = new FileReadWriter();
-        schedules = FRW.readScheduleFromFile("Schedule.txt");
+        try{
+//            ArrayList<Schedule> temp = FRW.readScheduleFromFile("Schedule.txt");
+            schedules = FRW.readScheduleFromFile("Schedule.txt");
+        }
+        catch(Exception e){
+            schedules = new ArrayList<>();
+        }
+
+
 
 
         //eventually this will be replaced with a method to load schedules from a file if they exist, otherwise create a new schedule

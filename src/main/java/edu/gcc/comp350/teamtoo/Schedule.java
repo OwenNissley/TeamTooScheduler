@@ -29,6 +29,8 @@ public class Schedule
         this.courses = new ArrayList<>(courses);
         this.scheduleID = idCounter++;
         this.history = new ScheduleHistory(courses);
+        isConflict = false;
+        conflictingCourses = new ArrayList<>();
     }
 
     public int getScheduleID() {

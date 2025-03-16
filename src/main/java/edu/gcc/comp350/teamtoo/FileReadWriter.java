@@ -10,40 +10,40 @@ import java.util.ArrayList;
  * @author Team Too
  */
 public class FileReadWriter {
-    CourseRegistry CR = new CourseRegistry();
-    ArrayList<Course> directory = CR.getCourses();
+    CourseRegistry CR;
+    ArrayList<Course> directory;
+
+    public FileReadWriter(){
+        CR = new CourseRegistry();
+        CR.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
+        directory = CR.getCourses();
+    }
 
     /**
      * Reads the schedule from the file and returns the number of courses.
      *
      * @param fileName the name of the file to read from
-     * @return the number of courses in the schedule
+     * @return the a list of schedules from the specified file
      */
     public ArrayList<Schedule> readScheduleFromFile(String fileName) {
         ArrayList<Schedule> schedules = new ArrayList<>();
+        ArrayList<Course> courses = new ArrayList<>();
         int courseCount = 0;
-        File file;
-        try {
-            file = new File(fileName);
-            if (!file.exists()) {
-                System.out.println("File not found.");
-                return schedules;
-            }
-        } catch (Exception e) {
-            System.out.println("File not found.");
-            return schedules;
-        }
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
-            ArrayList<Course> courses = new ArrayList<>();
             while ((line = br.readLine()) != null) {
+                System.out.println(line);
                 if(line.equals("**********")){
+                    System.out.println("Runs");
                     schedules.add(new Schedule(courses));
                     courses.clear();
                     courseCount = 0;
                 }
                 else{
+                    System.out.println("Other runs");
                     Course course = getCourseByID(line);
+                    System.out.println(course.getName());
                     if(course != null){
                         courses.add(course);
                         courseCount++;
@@ -67,17 +67,11 @@ public class FileReadWriter {
             System.out.println("No schedules to save.");
             return;
         }
-        File file;
-        try {
-            file = new File(fileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-        try (FileWriter writer = new FileWriter(file)) {
+
+        try (FileWriter writer = new FileWriter(fileName)) {
             for(Schedule schedule : schedules){
                 for (Course course : schedule.getCourses()) {
-                    writer.write(course.getSubject() + course.getNumber() + "\n");
+                    writer.write(course.getSubject() + course.getNumber() + course.getSection() + "\n");
                 }
                 writer.write("**********\n");
             }
@@ -88,8 +82,8 @@ public class FileReadWriter {
 
 
     public Course getCourseByID(String ID){
-        for(Course course : directory){
-            if(("" + course.getSubject() + course.getNumber()).equals(ID)){
+        for(Course course : directory) {
+            if (("" + course.getSubject() + course.getNumber() + course.getSection()).equals(ID)) {
                 return course;
             }
         }
