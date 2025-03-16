@@ -31,6 +31,10 @@ public class ScheduleHistory {
         tail = curPosition;
     }
 
+    public ArrayList<Course> getCurPosition(){
+        return curPosition.data;
+    }
+
     /**
      * Slides the pointer in history to one instance earlier. Essentially undoes one action
      *

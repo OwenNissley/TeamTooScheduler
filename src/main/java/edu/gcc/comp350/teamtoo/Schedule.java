@@ -36,7 +36,7 @@ public class Schedule
     }
 
     public ArrayList<Course> getCourses() {
-        return new ArrayList<>(courses);
+        return courses;
     }
 
     public boolean hasCourse(Course course) {
@@ -89,8 +89,14 @@ public class Schedule
     //THE FOLLOWING IS FOR UNDO AND REDO
 
 
-    public void undoAction() {history.getPrev(courses);}
-    public void redoAction() {history.getNext(courses);}
+    public void undoAction() {
+        history.getPrev(courses);
+        courses = history.getCurPosition();
+    }
+    public void redoAction() {
+        history.getNext(courses);
+        courses = history.getCurPosition();
+    }
 
     //END UNDO AND REDO
     //-------------------------------------------------------------------------------------------------------------
