@@ -56,6 +56,22 @@ public class Course {
         this.totalSeats = totalSeats;
     }
 
+    //to string method - returns string with name of course, number of credits, the times and days of week
+    @Override
+    public String toString() {
+        if (times.isEmpty())
+            return name + " (" + credits + " credits) -- " + daysString() + " -- No time specified";
+        else
+        {
+            StringBuilder timesString = new StringBuilder();
+            for (TimeSlot time : times) {
+                timesString.append(time.toString()).append("; ");
+            }
+            return name + " (" + credits + " credits) -- " + daysString() + " -- " + timesString.toString().trim();
+        }
+            //return name + " (" + credits + " credits) -- " + daysString() + ") -- " + times.get(0).toString();
+    }
+
     // Getters, May note be needed
     public int getCredits() { return credits; }
     public String getFaculty() {
@@ -103,6 +119,11 @@ public class Course {
 
         public String getEndTime() { return convertTo12HourFormat(end_time); }
 
+        @Override
+        public String toString() {
+            return /*day + " " + */convertTo12HourFormat(start_time) + " - " + convertTo12HourFormat(end_time);
+        }
+
     }
 
     public String daysString() {
@@ -127,7 +148,52 @@ public class Course {
         return String.format("%d:%02d %s", hours, minutes, period);
     }
 
+    //Not quite done yet, still needs some work, and probably some better logic
+    // Check if the course has a conflict with another course
+    //should be working now
+    public boolean hasConflict(Course course) {
+        for (TimeSlot time : times) {
+            for (TimeSlot otherTime : course.getTimes()) {
+                if (time.getDay().equals(otherTime.getDay()))
+                {
+                    //compare parsed times and return true if there is an overlap in times
+                    if (parseTimeToMinutes(time.getStartTime()) >= parseTimeToMinutes(otherTime.getStartTime()) &&
+                            parseTimeToMinutes(time.getStartTime()) <= parseTimeToMinutes(otherTime.getEndTime()) ||
+                            parseTimeToMinutes(time.getEndTime()) >= parseTimeToMinutes(otherTime.getStartTime()) &&
+                            parseTimeToMinutes(time.getEndTime()) <= parseTimeToMinutes(otherTime.getEndTime()))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
+    // Parse time to minutes
+    private static int parseTimeToMinutes(String time) {
+        // Example format: "1:30 PM"
+        String[] parts = time.split(" ");
+        String[] timeParts = parts[0].split(":");
+        int hour = Integer.parseInt(timeParts[0]);
+        int minute = Integer.parseInt(timeParts[1]);
 
+        // Adjust for AM/PM
+        if (parts[1].equals("PM") && hour != 12) {
+            hour += 12;
+        } else if (parts[1].equals("AM") && hour == 12) {
+            hour = 0;
+        }
+
+        return hour * 60 + minute; // Convert to total minutes
+    }
 }
 
+/*
+if (time.getDay().equals(otherTime.getDay())) {
+                    if (time.getStartTime().equals(otherTime.getStartTime()) ||
+                            time.getEndTime().equals(otherTime.getEndTime())) {
+                        return true;
+                    }
+                }
+ */

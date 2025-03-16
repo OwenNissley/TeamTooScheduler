@@ -2,10 +2,14 @@ package edu.gcc.comp350.teamtoo;
 
 public class FilterSemester extends Filter {
 
-    private final String term; // year_Spring/Fall
+    private String term; // year_Spring/Fall
+    //private final String year;
+    //private final String semester;
 
-    public FilterSemester(String term) {
+    public FilterSemester(String year, String semester) {
         super(FilterType.SEMESTER);
+        this.term = year + "_" + semester;
+
         if (!term.matches("\\d{4}_(Fall|Spring)")) {
             throw new IllegalArgumentException("Invalid term format. Expected format: YYYY_Season (e.g., 2023_Fall)");
         }

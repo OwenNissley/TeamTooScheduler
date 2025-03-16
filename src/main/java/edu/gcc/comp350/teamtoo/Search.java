@@ -1,5 +1,6 @@
 package edu.gcc.comp350.teamtoo;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 //Note: filters are created "above" this class
@@ -10,27 +11,42 @@ public class Search
     private ArrayList<Course> generalFilteredCourses;
     private final ArrayList<Course> allCourses;
 
+    //constructor for empty
+    public Search () {
+        this.allCourses = new ArrayList<>();
+        this.semesterFilteredCourses = new ArrayList<>();
+        this.activeFilters = new ArrayList<>();
+        this.generalFilteredCourses = new ArrayList<>();
+    }
+
     public Search(ArrayList<Course> allCourses) {
         this.allCourses = allCourses;
 
         this.semesterFilteredCourses = new ArrayList<>();
         this.activeFilters = new ArrayList<>();
         this.generalFilteredCourses = new ArrayList<>();
+
+        //TESTING PURPOSES ONLY
+        System.out.println("All Course Size: " + allCourses.size());
     }
 
     //add classes to define semesterFilteredCourses right away (before other searches can be doen)
     //add checks to make sure term is selected prior to other searches
-    public void filterBasedOnSemester(String term)
+    public void filterBasedOnSemester(Filter semesterFilter)
     {
-        Filter termFilter = new FilterSemester(term);
+        semesterFilteredCourses.clear();
+        //Filter termFilter = new FilterSemester(semesterFilter);
         for (Course course : allCourses) {
-            if (termFilter.filtersCourse(course))
+            if (semesterFilter.filtersCourse(course))
                 semesterFilteredCourses.add(course);
         }
+
+        //TESTING PERPOSES ONLY
+        System.out.println("Semester Filtered Size: " + semesterFilteredCourses.size());
     }
 
     //clear generalFilteredCourses
-    public void clearGeneralFilteredCourses() {
+    private void clearGeneralFilteredCourses() {
         generalFilteredCourses.clear();
     }
 
@@ -40,7 +56,7 @@ public class Search
     }
 
     //clears all filters
-    public void clearFilters() {
+    private void clearFilters() {
         activeFilters.clear();
     }
 
@@ -52,7 +68,7 @@ public class Search
     //removed, SearchAdvanced will always be called to return filter courses
     //public ArrayList<Course> getFilteredCourses() { return filteredCourses; }
 
-    public ArrayList<Course> SearchAdvanced()
+    public ArrayList<Course> searchAdvanced()
     {
         ArrayList<Course> advancedFilteredCourses = new ArrayList<>();
         ArrayList<Course> pointer = generalFilteredCourses;
@@ -68,26 +84,58 @@ public class Search
 
         if (activeFilters.isEmpty())
         {
-            return generalFilteredCourses;
+            //TESTING PURPOSES ONLY
+            System.out.println("NO FILTERS...Size: " + pointer.size());
+
+            //the following is to prevent error
+            //deep copy pointer to advancedFilteredCourses
+            for (Course course : pointer) {
+                advancedFilteredCourses.add(course);
+            }
+            clearGeneralFilteredCourses();
+
+            return advancedFilteredCourses;
         }
 
+        boolean firstFilter = true;
         for(Filter filter : activeFilters)
         {
-            for(Course course : pointer)
-            {
-                //filtersCourse returns true if the course is valid
-                if (filter.filtersCourse(course))
-                {
-                    advancedFilteredCourses.add(course);
+            if (firstFilter) {
+                firstFilter = false;
+
+                for (Course course : pointer) {
+                    //filtersCourse returns true if the course is valid
+                    if (filter.filtersCourse(course)) {
+                        advancedFilteredCourses.add(course);
+                    }
                 }
             }
+            else
+            {
+                ArrayList<Course> tempFilteredCourses = new ArrayList<>();
+                for (Course course : advancedFilteredCourses) {
+                    if (filter.filtersCourse(course)) {
+                        tempFilteredCourses.add(course);
+                    }
+                }
+                advancedFilteredCourses = tempFilteredCourses;
+            }
         }
+
+        //for now, may be changed later
+        clearFilters();
+
+        //the following is for errors
+        clearGeneralFilteredCourses();
+
+        //TESTING PURPOSES ONLY
+        System.out.println("Advanced Search Size: " + advancedFilteredCourses.size());
 
         return advancedFilteredCourses;
     }
 
     //does not return, only updates generalFilteredCourses from semesterFilteredCourses
-    public void SearchGeneral(String searchTerm)
+    public void searchGeneral(String searchTerm)
     {
         generalFilteredCourses.clear();
         //fill generalFilteredCourses.add() based on searchTerm
@@ -100,6 +148,9 @@ public class Search
                 generalFilteredCourses.add(course);
             }
         }
+
+        //TESTING PURPOSES ONLY
+        System.out.println("General Search Size: " + generalFilteredCourses.size());
     }
 
 }
