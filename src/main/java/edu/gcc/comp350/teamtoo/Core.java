@@ -22,9 +22,7 @@ public class Core {
         }
 
 
-
-
-        //eventually this will be replaced with a method to load schedules from a file if they exist, otherwise create a new schedule
+        //if schedules is empty, add a new schedule
         if(schedules.isEmpty()){
             schedules.add(new Schedule());
         }
