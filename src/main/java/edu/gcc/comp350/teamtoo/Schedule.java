@@ -38,7 +38,7 @@ public class Schedule
     }
 
     public ArrayList<Course> getCourses() {
-        return courses;
+        return new ArrayList<>(courses);
     }
 
     public boolean hasCourse(Course course) {
