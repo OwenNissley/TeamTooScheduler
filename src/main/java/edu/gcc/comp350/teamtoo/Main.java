@@ -83,7 +83,7 @@ public class Main {
         if (core.getConflictingCourses().isEmpty()) {
             warningText.append("No conflicts found.");
         } else {
-            warningText.append("Conflicting courses found: ");
+            warningText.append("Conflicting courses found: \n");
             for (Course course : core.getConflictingCourses()) {
                 warningText.append(course).append("\n");
             }
@@ -408,18 +408,6 @@ public class Main {
 
         // Course options as radio buttons (only one can be selected)
         ButtonGroup courseGroup = new ButtonGroup(); // Ensures single selection
-        /*
-        JRadioButton course1 = new JRadioButton("Course 1: Introduction to Java");
-        JRadioButton course2 = new JRadioButton("Course 2: Advanced Java Programming");
-        JRadioButton course3 = new JRadioButton("Course 3: Software Engineering");
-        course1.setAlignmentX(Component.LEFT_ALIGNMENT);
-        course2.setAlignmentX(Component.LEFT_ALIGNMENT);
-        course3.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        courseGroup.add(course1);
-        courseGroup.add(course2);
-        courseGroup.add(course3);
-        */
 
         // Update displayed courses
         ArrayList<JRadioButton> courseButtons = new ArrayList<>();
@@ -433,17 +421,16 @@ public class Main {
                 courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
                 courseGroup.add(courseButton);
                 courseButtons.add(courseButton);
-                //courseSelectionPanel.add(courseButton);
             }
         }
-
 
         // Add Selected Course button aligned to the left
         JButton addCourseButton = new JButton("Add Selected Course");
         addCourseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Back, Course Info, and Review buttons
+        // Back, Undo, Course Info, and Review buttons
         JButton backButton = new JButton("Back");
+        JButton undoButton = new JButton("Undo");
         JButton courseInfoButton = new JButton("Course Info");
         JButton reviewButton = new JButton("Review");
 
@@ -451,6 +438,7 @@ public class Main {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT)); // Align buttons to the left
         buttonPanel.add(backButton);
+        buttonPanel.add(undoButton);
         buttonPanel.add(courseInfoButton);
         buttonPanel.add(reviewButton);
 
@@ -483,36 +471,28 @@ public class Main {
                     showCourseSelectionView(mainPanel, frame);
                     break;
                 }
-                //else {
-                //    JOptionPane.showMessageDialog(frame, "Please select a course to add.");
-                //}
             }
         });
 
         // Back button action
         backButton.addActionListener(e -> showAddCourseView(mainPanel, frame));
 
+        // Undo button action
+        undoButton.addActionListener(e -> {
+            System.out.println("Undo button clicked.");
+            core.undoAdd();
+            //refresh
+            showCourseSelectionView(mainPanel, frame);
+        });
+
         // Course Info button action
         courseInfoButton.addActionListener(e -> {
             for (JRadioButton courseButton : courseButtons) {
                 if (courseButton.isSelected()) {
-                    showCourseInfoView(mainPanel, frame, courseButton.getText());//NEED TO CHANGE THIS TO COURSE OBJECT OR SOMETHING
+                    showCourseInfoView(mainPanel, frame, courseButton.getText());
                     break;
                 }
-                //else {
-                //    JOptionPane.showMessageDialog(frame, "Please select a course to view its info.");
-                //}
             }
-            /*
-            if (course1.isSelected()) {
-                showCourseInfoView(mainPanel, frame, "Course 1: Introduction to Java");
-            } else if (course2.isSelected()) {
-                showCourseInfoView(mainPanel, frame, "Course 2: Advanced Java Programming");
-            } else if (course3.isSelected()) {
-                showCourseInfoView(mainPanel, frame, "Course 3: Software Engineering");
-            } else {
-                JOptionPane.showMessageDialog(frame, "Please select a course to view its info.");
-            }*/
         });
 
         // Review button action (same as the ribbon Review button at the top)
@@ -527,6 +507,7 @@ public class Main {
         frame.revalidate();
         frame.repaint();
     }
+
     //TYLER VERSION: COMMENTED OUT FOR INTEGRATION
     /*
     private static void showCourseSelectionView(JPanel mainPanel, JFrame frame, CourseRegistry courseRegistry) {
@@ -643,7 +624,7 @@ public class Main {
         if (core.getConflictingCourses().isEmpty()) {
             warningText.append("No conflicts found.");
         } else {
-            warningText.append("Conflicting courses found: ");
+            warningText.append("Conflicting courses found: \n");
             for (Course course : core.getConflictingCourses()) {
                 warningText.append(course).append("\n");
             }
@@ -711,7 +692,9 @@ public class Main {
 
         undoButton.addActionListener(e -> {
             System.out.println("Undo button clicked.");
-            // TODO: Add logic to undo the last change (if any exists)
+            core.undoRemove();
+            //refresh
+            showReviewView(mainPanel, frame);
         });
 
         courseInfoButton.addActionListener(e -> {

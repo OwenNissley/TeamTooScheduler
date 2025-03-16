@@ -87,23 +87,46 @@ public class Search
             //TESTING PURPOSES ONLY
             System.out.println("NO FILTERS...Size: " + pointer.size());
 
-            return pointer;
+            //the following is to prevent error
+            //deep copy pointer to advancedFilteredCourses
+            for (Course course : pointer) {
+                advancedFilteredCourses.add(course);
+            }
+            clearGeneralFilteredCourses();
+
+            return advancedFilteredCourses;
         }
 
+        boolean firstFilter = true;
         for(Filter filter : activeFilters)
         {
-            for(Course course : pointer)
-            {
-                //filtersCourse returns true if the course is valid
-                if (filter.filtersCourse(course))
-                {
-                    advancedFilteredCourses.add(course);
+            if (firstFilter) {
+                firstFilter = false;
+
+                for (Course course : pointer) {
+                    //filtersCourse returns true if the course is valid
+                    if (filter.filtersCourse(course)) {
+                        advancedFilteredCourses.add(course);
+                    }
                 }
+            }
+            else
+            {
+                ArrayList<Course> tempFilteredCourses = new ArrayList<>();
+                for (Course course : advancedFilteredCourses) {
+                    if (filter.filtersCourse(course)) {
+                        tempFilteredCourses.add(course);
+                    }
+                }
+                advancedFilteredCourses = tempFilteredCourses;
             }
         }
 
         //for now, may be changed later
         clearFilters();
+
+        //the following is for errors
+        clearGeneralFilteredCourses();
 
         //TESTING PURPOSES ONLY
         System.out.println("Advanced Search Size: " + advancedFilteredCourses.size());

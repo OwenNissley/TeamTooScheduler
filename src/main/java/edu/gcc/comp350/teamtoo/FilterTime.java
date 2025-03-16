@@ -22,6 +22,7 @@ public class FilterTime extends Filter {
 
     //this is not right, it should not compare the string, but the int, using the parse int method
     //tried to fix it, it didn't work all the way
+    //I think it is working now
     @Override
     public boolean filtersCourse(Course course) {
         //boolean didFilterFit = false;

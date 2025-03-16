@@ -26,9 +26,9 @@ public class Core {
         search = new Search(courseRegistry.getCourses());
 
         //For testing
-        schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(0));
-        schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
-        schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
+        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(0));
+        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
+        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
     }
 
 
@@ -136,6 +136,29 @@ public class Core {
 
 
     //END CONFLICTING SCHEDULES
+    //-------------------------------------------------------------------------------------------------------------
+
+
+
+    //-------------------------------------------------------------------------------------------------------------
+    //THE FOLLOWING IS FOR UNDO/REDO
+    public void undoAdd() {
+        schedules.get(selectedSchedule).undoAdd();
+    }
+
+    public void undoRemove() {
+        schedules.get(selectedSchedule).undoRemove();
+    }
+
+    public void redoAdd() {
+        schedules.get(selectedSchedule).redoAdd();
+    }
+
+    public void redoRemove() {
+        schedules.get(selectedSchedule).redoRemove();
+    }
+
+    //END UNDO/REDO
     //-------------------------------------------------------------------------------------------------------------
 
 }

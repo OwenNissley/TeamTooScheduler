@@ -76,8 +76,39 @@ public class Schedule
         this.courses = newCourses;
         history.updateHistory(courses);
     }
+
+
+
+    //-------------------------------------------------------------------------------------------------------------
+    //THE FOLLOWING IS FOR UNDO AND REDO
+
+    public void undoAdd()
+    {
+        undoAction(); //I anticipate this not working
+    }
+
+    public void undoRemove()
+    {
+        undoAction(); //I anticipate this not working
+    }
+
+    public void redoAdd()
+    {
+        redoAction(); //I anticipate this not working
+    }
+
+    public void redoRemove()
+    {
+        redoAction(); //I anticipate this not working
+    }
+
     public void undoAction() {history.getPrev(courses);}
     public void redoAction() {history.getNext(courses);}
+
+    //END UNDO AND REDO
+    //-------------------------------------------------------------------------------------------------------------
+
+
 
 
     //-------------------------------------------------------------------------------------------------------------
