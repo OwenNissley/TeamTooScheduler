@@ -19,6 +19,11 @@ public class ScheduleHistory {
         curPosition = head;
     }
 
+    public ArrayList<Course> getCurrentNodeData(){
+        return curPosition.data;
+    }
+
+
     /**
      * Adds any changes to the current schedule as the next Node from where
      * ScheduleHistory currently points, and then moves the pointer to that new node
