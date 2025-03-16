@@ -156,10 +156,21 @@ public class Core {
 
     //-------------------------------------------------------------------------------------------------------------
     //THE FOLLOWING IS FOR UNDO/REDO
-    public void undoAction() {
-        schedules.get(selectedSchedule).undoAction();
+    public void undoAdd() {
+        schedules.get(selectedSchedule).undoAdd();
     }
 
+    public void undoRemove() {
+        schedules.get(selectedSchedule).undoRemove();
+    }
+
+    public void redoAdd() {
+        schedules.get(selectedSchedule).redoAdd();
+    }
+
+    public void redoRemove() {
+        schedules.get(selectedSchedule).redoRemove();
+    }
     //END UNDO/REDO
     //-------------------------------------------------------------------------------------------------------------
 
