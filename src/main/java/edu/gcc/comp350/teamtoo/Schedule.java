@@ -90,30 +90,36 @@ public class Schedule
 
     public void undoAdd()
     {
-        undoAction(); //I anticipate this not working
+        history.getPrev(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
     }
 
     public void undoRemove()
     {
-        undoAction(); //I anticipate this not working
+        history.getPrev(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
     }
 
     public void redoAdd()
     {
-        redoAction(); //I anticipate this not working
+        history.getNext(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
     }
 
     public void redoRemove()
     {
-        redoAction(); //I anticipate this not working
+        history.getNext(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
     }
 
     public void undoAction() {
         history.getPrev(courses);
-        history.getCurrentNodeData();}
+        courses = history.getCurrentNodeData();
+    }
     public void redoAction() {
         history.getNext(courses);
-        history.getCurrentNodeData();}
+        courses = history.getCurrentNodeData();
+    }
 
     //END UNDO AND REDO
     //-------------------------------------------------------------------------------------------------------------

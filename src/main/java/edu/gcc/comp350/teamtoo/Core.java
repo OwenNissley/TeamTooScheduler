@@ -7,15 +7,9 @@ public class Core {
     private int selectedSchedule;
     private CourseRegistry courseRegistry;
     private ArrayList<Course> searchResults;
-    FileReadWriter FRW;
 
     public Core() {
-        FRW = new FileReadWriter();
-        schedules = FRW.readScheduleFromFile("schedules.txt");
-        if(schedules.isEmpty()){
-            schedules.add(new Schedule());
-        }
-
+        schedules = new ArrayList<>();
 
         //eventually this will be replaced with a method to load schedules from a file if they exist, otherwise create a new schedule
         schedules.add(new Schedule());
@@ -35,10 +29,6 @@ public class Core {
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
     }
-    public void saveCurrentSchedule(){
-        FRW.readScheduleIntoFile("schedules.txt", schedules);
-    }
-
     public void addCourse(Course course) {
         if (selectedSchedule < schedules.size()) {
             Schedule schedule = schedules.get(selectedSchedule);
