@@ -90,10 +90,6 @@ public class Schedule
         history.updateHistory(courses); // call this at the end
     }
 
-    public void printHistory(){
-        history.printHistory();
-    }
-
 
 
 

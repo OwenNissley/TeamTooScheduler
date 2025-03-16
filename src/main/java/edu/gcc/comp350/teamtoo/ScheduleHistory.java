@@ -19,14 +19,6 @@ public class ScheduleHistory {
         curPosition = head;
     }
 
-    public void printHistory(){
-        Node temp = head;
-        System.out.println(temp.data.toString());
-        while(temp.next != null){
-            temp = temp.next;
-            System.out.println(temp.data.toString());
-        }
-    }
 
     public Node getHead(){
         return head;
