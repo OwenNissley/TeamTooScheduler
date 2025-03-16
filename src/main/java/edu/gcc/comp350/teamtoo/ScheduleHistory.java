@@ -1,6 +1,5 @@
 package edu.gcc.comp350.teamtoo;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -85,25 +84,26 @@ public class ScheduleHistory {
             }
         }
 
-        /**
-         * This is a helper class. This is where each individual Schedule instance will be kept
-         * alongside pointers to the next and previous Schedule instance in history.
-         */
-        private class Node {
-            public ArrayList<Course> data;
-            private Node next;
-            private Node prev;
-            public Node(ArrayList<Course> courses){
-                data = courses;
-                next = null;
-                prev = null;
-            }
 
-            public Node update(ArrayList<Course> currentCourses){
-                next = new Node(new ArrayList<Course>(currentCourses));
-                next.prev = this;
-                return next;
-            }
-        }
+/**
+ * This is a helper class. This is where each individual Schedule instance will be kept
+ * alongside pointers to the next and previous Schedule instance in history.
+ */
+private class Node {
+    public ArrayList<Course> data;
+    public Node next;
+    public Node prev;
+    public Node(ArrayList<Course> courses){
+        data = courses;
+        next = null;
+        prev = null;
     }
+
+    public Node update(ArrayList<Course> currentCourses){
+        next = new Node(new ArrayList<Course>(currentCourses));
+        next.prev = this;
+        return next;
+    }
+}
+}
 
