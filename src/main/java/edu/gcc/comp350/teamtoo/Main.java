@@ -12,6 +12,9 @@ public class Main {
 
     public static void main(String[] args) {
         core = new Core();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            saveSchedulesIntoFile();
+        }));
         run();
     }
 
@@ -820,5 +823,9 @@ public class Main {
         }
 
         return hour * 60 + minute; // Convert to total minutes
+    }
+
+    private static void saveSchedulesIntoFile(){
+        core.saveSchedulesIntoFile();
     }
 }

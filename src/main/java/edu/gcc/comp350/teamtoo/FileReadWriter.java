@@ -1,9 +1,6 @@
 package edu.gcc.comp350.teamtoo;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -25,8 +22,18 @@ public class FileReadWriter {
     public ArrayList<Schedule> readScheduleFromFile(String fileName) {
         ArrayList<Schedule> schedules = new ArrayList<>();
         int courseCount = 0;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        File file;
+        try {
+            file = new File(fileName);
+            if (!file.exists()) {
+                System.out.println("File not found.");
+                return schedules;
+            }
+        } catch (Exception e) {
+            System.out.println("File not found.");
+            return schedules;
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             ArrayList<Course> courses = new ArrayList<>();
             while ((line = br.readLine()) != null) {
@@ -56,7 +63,18 @@ public class FileReadWriter {
      * @param schedules  the list of schedules to write to the file
      */
     public void readScheduleIntoFile(String fileName, ArrayList<Schedule> schedules) {
-        try (FileWriter writer = new FileWriter(fileName)) {
+        if (schedules.isEmpty()) {
+            System.out.println("No schedules to save.");
+            return;
+        }
+        File file;
+        try {
+            file = new File(fileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        try (FileWriter writer = new FileWriter(file)) {
             for(Schedule schedule : schedules){
                 for (Course course : schedule.getCourses()) {
                     writer.write(course.getSubject() + course.getNumber() + "\n");
