@@ -108,8 +108,12 @@ public class Schedule
         redoAction(); //I anticipate this not working
     }
 
-    public void undoAction() {history.getPrev(courses);}
-    public void redoAction() {history.getNext(courses);}
+    public void undoAction() {
+        history.getPrev(courses);
+        history.getCurrentNodeData();}
+    public void redoAction() {
+        history.getNext(courses);
+        history.getCurrentNodeData();}
 
     //END UNDO AND REDO
     //-------------------------------------------------------------------------------------------------------------
