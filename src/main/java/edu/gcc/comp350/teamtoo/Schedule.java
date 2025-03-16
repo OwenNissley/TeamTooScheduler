@@ -90,6 +90,29 @@ public class Schedule
     //-------------------------------------------------------------------------------------------------------------
     //THE FOLLOWING IS FOR UNDO AND REDO
 
+    public void undoAdd()
+    {
+        history.getPrev(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
+    }
+
+    public void undoRemove()
+    {
+        history.getPrev(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
+    }
+
+    public void redoAdd()
+    {
+        history.getNext(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
+    }
+
+    public void redoRemove()
+    {
+        history.getNext(courses);
+        courses = history.getCurrentNodeData(); //I anticipate this not working
+    }
 
     public void undoAction() {
         history.getPrev(courses);
