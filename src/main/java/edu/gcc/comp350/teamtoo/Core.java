@@ -21,11 +21,11 @@ public class Core {
             schedules = new ArrayList<>();
         }
 
-
         //if schedules is empty, add a new schedule
         if(schedules.isEmpty()){
             schedules.add(new Schedule());
         }
+
 
 
         selectedSchedule = 0;
@@ -88,12 +88,16 @@ public class Core {
         return schedules.get(selectedSchedule).getCourses();
     }
 
+    //creates a new Schedule for the user to work with leaves
+    //the old on in a separate spot in 'schedules' effectively saving it
     public void newSchedule() {
         Schedule newSchedule = new Schedule();
         schedules.add(newSchedule);
         selectedSchedule = schedules.indexOf(newSchedule);
     }
 
+    //deletes the currently selected schedule
+    //from the list of schedules
     public int deleteSchedule() {
         if(schedules.size() == 1){
             return 1;
@@ -103,6 +107,18 @@ public class Core {
             selectedSchedule = schedules.size() - 1;
         }
         return 0;
+    }
+
+    public void loadSchedule(Schedule schedule){
+        selectedSchedule = schedules.indexOf(schedule);
+    }
+
+    public Schedule getCurrentSchedule() {
+        return schedules.get(selectedSchedule);
+    }
+
+    public ArrayList<Schedule> getSavedSchedules() {
+        return schedules;
     }
 
 
