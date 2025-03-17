@@ -673,8 +673,8 @@ public class Main {
         JButton courseInfoButton = new JButton("Course Info");
         JButton removeAllButton = new JButton("Remove All");
 
-        JComboBox<String> loadSavedSchedules = new JComboBox<>();
-        addScheduleItems(loadSavedSchedules);
+        JComboBox<String> selectSavedSchedules = new JComboBox<>();
+        addScheduleItems(selectSavedSchedules);
         JButton loadSavedScheduleButton = new JButton("<- Load Schedule");
         JButton newScheduleButton = new JButton("New Schedule");
         JButton deleteSavedScheduleButton = new JButton("Delete Current Schedule");
@@ -688,9 +688,9 @@ public class Main {
         buttonsPanel.add(courseInfoButton);
         buttonsPanel.add(removeAllButton);
 
-        buttonsPanel.add(newScheduleButton);
-        buttonsPanel.add(loadSavedSchedules);
+        buttonsPanel.add(selectSavedSchedules);
         buttonsPanel.add(loadSavedScheduleButton);
+        buttonsPanel.add(newScheduleButton);
         buttonsPanel.add(deleteSavedScheduleButton);
 
         // Button click actions
@@ -755,7 +755,7 @@ public class Main {
             }
             else{
                 for(Schedule schedule : core.getSavedSchedules()){
-                    if(loadSavedSchedules.getSelectedItem().toString().equals("Schedule " + schedule.getScheduleID())){
+                    if(selectSavedSchedules.getSelectedItem().toString().equals("Schedule " + schedule.getScheduleID())){
                         core.loadSchedule(schedule);
                         break;
                     }
