@@ -16,6 +16,12 @@ public class Main {
     }
 
     public static void run() {
+        // Add shutdown hook to save schedules when the program exits
+        //automatically runs when the program is closed
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            saveSchedulesIntoFile();
+        }));
+
         JFrame frame = new JFrame("Course Management");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 600);
@@ -667,11 +673,25 @@ public class Main {
         JButton courseInfoButton = new JButton("Course Info");
         JButton removeAllButton = new JButton("Remove All");
 
+        JComboBox<String> selectSavedSchedules = new JComboBox<>();
+        addScheduleItems(selectSavedSchedules);
+        JButton loadSavedScheduleButton = new JButton("<- Load Schedule");
+        JButton newScheduleButton = new JButton("New Schedule");
+        JButton deleteSavedScheduleButton = new JButton("Delete Current Schedule");
+
+
+
+
         // Add buttons to the panel
         buttonsPanel.add(removeCourseButton);
         buttonsPanel.add(undoButton);
         buttonsPanel.add(courseInfoButton);
         buttonsPanel.add(removeAllButton);
+
+        buttonsPanel.add(selectSavedSchedules);
+        buttonsPanel.add(loadSavedScheduleButton);
+        buttonsPanel.add(newScheduleButton);
+        buttonsPanel.add(deleteSavedScheduleButton);
 
         // Button click actions
         removeCourseButton.addActionListener(e -> {
@@ -715,6 +735,44 @@ public class Main {
             System.out.println("Remove All button clicked.");
             core.removeAllCourses();
             showReviewView(mainPanel, frame);
+        });
+
+        newScheduleButton.addActionListener(e -> {
+            System.out.println("New Schedule button clicked.");
+            if(core.checkConflicts()){
+                JOptionPane.showMessageDialog(frame, "You must resolve all conflicts before creating or loading a new schedule.");
+            }
+            else{
+                core.newSchedule();
+                showReviewView(mainPanel, frame);
+            }
+        });
+
+        loadSavedScheduleButton.addActionListener(e -> {
+            System.out.println("Load Saved Schedule button clicked.");
+            if(core.checkConflicts()){
+                JOptionPane.showMessageDialog(frame, "You must resolve all conflicts before creating or loading a new schedule.");
+            }
+            else{
+                for(Schedule schedule : core.getSavedSchedules()){
+                    if(selectSavedSchedules.getSelectedItem().toString().equals("Schedule " + schedule.getScheduleID())){
+                        core.loadSchedule(schedule);
+                        break;
+                    }
+                }
+                showReviewView(mainPanel, frame);
+            }
+        });
+
+        deleteSavedScheduleButton.addActionListener(e -> {
+            System.out.println("Delete Saved Schedule button clicked.");
+            int result = core.deleteSchedule();
+            if(result == 1){
+                JOptionPane.showMessageDialog(frame, "You must have at least one schedule");
+            }
+            else{
+                showReviewView(mainPanel, frame);
+            }
         });
 
         // Add components to the review panel
@@ -820,5 +878,19 @@ public class Main {
         }
 
         return hour * 60 + minute; // Convert to total minutes
+    }
+
+    private static void saveSchedulesIntoFile(){
+        core.saveSchedulesIntoFile();
+    }
+
+    private static void addScheduleItems(JComboBox<String> loadSavedSchedules){
+        loadSavedSchedules.addItem("Schedule " + core.getCurrentSchedule().getScheduleID());
+        for(Schedule schedule : core.getSavedSchedules()){
+            if(schedule.equals(core.getCurrentSchedule())){
+                continue;
+            }
+            loadSavedSchedules.addItem("Schedule " + schedule.getScheduleID());
+        }
     }
 }

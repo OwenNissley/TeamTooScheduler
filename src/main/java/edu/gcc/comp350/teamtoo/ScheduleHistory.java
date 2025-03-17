@@ -19,6 +19,11 @@ public class ScheduleHistory {
         curPosition = head;
     }
 
+
+    public Node getHead(){
+        return head;
+    }
+
     public ArrayList<Course> getCurrentNodeData(){
         return curPosition.data;
     }
@@ -36,6 +41,10 @@ public class ScheduleHistory {
         tail = curPosition;
     }
 
+    public ArrayList<Course> getCurPosition(){
+        return curPosition.data;
+    }
+
     /**
      * Slides the pointer in history to one instance earlier. Essentially undoes one action
      *
@@ -44,7 +53,6 @@ public class ScheduleHistory {
     public int getPrev(ArrayList<Course> currentCourses) {
         if (curPosition.prev != null) {
             curPosition = curPosition.prev;
-            currentCourses = curPosition.data;
             return 0;
         } else {
             return 1;
@@ -72,7 +80,6 @@ public class ScheduleHistory {
     public int getNext(ArrayList<Course> currentCourses) {
         if (curPosition.next != null) {
             curPosition = curPosition.next;
-            currentCourses = curPosition.data;
             return 0;
         } else {
             return 1;
@@ -103,7 +110,7 @@ public class ScheduleHistory {
         public Node prev;
 
         public Node(ArrayList<Course> courses) {
-            data = courses;
+            data = new ArrayList<>(courses);
             next = null;
             prev = null;
         }

@@ -7,12 +7,25 @@ public class Core {
     private int selectedSchedule;
     private CourseRegistry courseRegistry;
     private ArrayList<Course> searchResults;
+    private FileReadWriter FRW;
 
     public Core() {
-        schedules = new ArrayList<>();
 
-        //eventually this will be replaced with a method to load schedules from a file if they exist, otherwise create a new schedule
-        schedules.add(new Schedule());
+        //initializes 'schedules' from the file 'StoredSchedules.txt' if it exists,
+        // otherwise initializes it as empty.
+        FRW = new FileReadWriter();
+        try{
+            schedules = FRW.readScheduleFromFile("StoredSchedules.txt");
+        }
+        catch(Exception e){
+            schedules = new ArrayList<>();
+        }
+
+        //if schedules is empty, add a new schedule
+        if(schedules.isEmpty()){
+            schedules.add(new Schedule());
+        }
+
 
 
         selectedSchedule = 0;
@@ -29,6 +42,12 @@ public class Core {
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
     }
+    //writes 'schedules' into the file 'StoredSchedules.txt'
+    //saving the current schedules the user has
+    public void saveSchedulesIntoFile(){
+        FRW.readScheduleIntoFile("StoredSchedules.txt", schedules);
+    }
+
     public void addCourse(Course course) {
         if (selectedSchedule < schedules.size()) {
             Schedule schedule = schedules.get(selectedSchedule);
@@ -57,9 +76,7 @@ public class Core {
     }
 
     public void removeAllCourses() {
-        for (Course course : schedules.get(selectedSchedule).getCourses()) {
-            schedules.get(selectedSchedule).removeCourse(course);
-        }
+        schedules.get(selectedSchedule).clearSchedule();
     }
 
     public ArrayList<Course> getConflictingCourses() {
@@ -70,6 +87,40 @@ public class Core {
     public ArrayList<Course> getSchedule() {
         return schedules.get(selectedSchedule).getCourses();
     }
+
+    //creates a new Schedule for the user to work with leaves
+    //the old on in a separate spot in 'schedules' effectively saving it
+    public void newSchedule() {
+        Schedule newSchedule = new Schedule();
+        schedules.add(newSchedule);
+        selectedSchedule = schedules.indexOf(newSchedule);
+    }
+
+    //deletes the currently selected schedule
+    //from the list of schedules
+    public int deleteSchedule() {
+        if(schedules.size() == 1){
+            return 1;
+        }
+        schedules.remove(selectedSchedule);
+        if(selectedSchedule >= schedules.size()){
+            selectedSchedule = schedules.size() - 1;
+        }
+        return 0;
+    }
+
+    public void loadSchedule(Schedule schedule){
+        selectedSchedule = schedules.indexOf(schedule);
+    }
+
+    public Schedule getCurrentSchedule() {
+        return schedules.get(selectedSchedule);
+    }
+
+    public ArrayList<Schedule> getSavedSchedules() {
+        return schedules;
+    }
+
 
     public void quickSchedule() {}
 
@@ -154,7 +205,6 @@ public class Core {
     public void redoRemove() {
         schedules.get(selectedSchedule).redoRemove();
     }
-
     //END UNDO/REDO
     //-------------------------------------------------------------------------------------------------------------
 

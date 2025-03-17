@@ -29,10 +29,16 @@ public class Schedule
         this.courses = new ArrayList<>(courses);
         this.scheduleID = idCounter++;
         this.history = new ScheduleHistory(courses);
+        isConflict = false;
+        conflictingCourses = new ArrayList<>();
     }
 
     public int getScheduleID() {
         return scheduleID;
+    }
+
+    public void setIdCounter(int value) {
+        idCounter = value;
     }
 
     public ArrayList<Course> getCourses() {
@@ -83,6 +89,12 @@ public class Schedule
         history.updateHistory(courses);
     }
 
+    public void clearSchedule() {
+        courses.clear();
+        history.updateHistory(courses); // call this at the end
+    }
+
+
 
 
     //-------------------------------------------------------------------------------------------------------------
@@ -91,34 +103,34 @@ public class Schedule
     public void undoAdd()
     {
         history.getPrev(courses);
-        courses = history.getCurrentNodeData(); //I anticipate this not working
+        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
     }
 
     public void undoRemove()
     {
         history.getPrev(courses);
-        courses = history.getCurrentNodeData(); //I anticipate this not working
+        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
     }
 
     public void redoAdd()
     {
         history.getNext(courses);
-        courses = history.getCurrentNodeData(); //I anticipate this not working
+        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
     }
 
     public void redoRemove()
     {
         history.getNext(courses);
-        courses = history.getCurrentNodeData(); //I anticipate this not working
+        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
     }
 
     public void undoAction() {
         history.getPrev(courses);
-        courses = history.getCurrentNodeData();
+        courses = new ArrayList<>(history.getCurrentNodeData());
     }
     public void redoAction() {
         history.getNext(courses);
-        courses = history.getCurrentNodeData();
+        courses = new ArrayList<>(history.getCurrentNodeData());
     }
 
     //END UNDO AND REDO
