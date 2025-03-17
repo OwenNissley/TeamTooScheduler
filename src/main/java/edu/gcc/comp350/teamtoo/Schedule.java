@@ -37,6 +37,10 @@ public class Schedule
         return scheduleID;
     }
 
+    public void setIdCounter(int value) {
+        idCounter = value;
+    }
+
     public ArrayList<Course> getCourses() {
         return new ArrayList<>(courses);
     }

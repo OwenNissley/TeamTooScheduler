@@ -11,11 +11,11 @@ public class Core {
 
     public Core() {
 
-        //initializes 'schedules' from the file 'Schedule.txt' if it exists,
+        //initializes 'schedules' from the file 'StoredSchedules.txt' if it exists,
         // otherwise initializes it as empty.
         FRW = new FileReadWriter();
         try{
-            schedules = FRW.readScheduleFromFile("Schedule.txt");
+            schedules = FRW.readScheduleFromFile("StoredSchedules.txt");
         }
         catch(Exception e){
             schedules = new ArrayList<>();
@@ -42,10 +42,10 @@ public class Core {
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
         //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
     }
-    //writes 'schedules' into the file 'Schedule.txt'
+    //writes 'schedules' into the file 'StoredSchedules.txt'
     //saving the current schedules the user has
     public void saveSchedulesIntoFile(){
-        FRW.readScheduleIntoFile("Schedule.txt", schedules);
+        FRW.readScheduleIntoFile("StoredSchedules.txt", schedules);
     }
 
     public void addCourse(Course course) {
@@ -87,6 +87,24 @@ public class Core {
     public ArrayList<Course> getSchedule() {
         return schedules.get(selectedSchedule).getCourses();
     }
+
+    public void newSchedule() {
+        Schedule newSchedule = new Schedule();
+        schedules.add(newSchedule);
+        selectedSchedule = schedules.indexOf(newSchedule);
+    }
+
+    public int deleteSchedule() {
+        if(schedules.size() == 1){
+            return 1;
+        }
+        schedules.remove(selectedSchedule);
+        if(selectedSchedule >= schedules.size()){
+            selectedSchedule = schedules.size() - 1;
+        }
+        return 0;
+    }
+
 
     public void quickSchedule() {}
 

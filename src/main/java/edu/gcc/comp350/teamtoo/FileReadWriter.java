@@ -61,6 +61,8 @@ public class FileReadWriter {
         return schedules;
     }
 
+
+
     /**
      * Writes an array of objects with type Schedule to a specified file.
      *
