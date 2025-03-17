@@ -21,6 +21,10 @@ class ScheduleTableModel extends AbstractTableModel {
                 if (dayIndex != -1) {
                     int startIndex = (startMinutes - 480) / 60 + 1; // 480 minutes = 8 AM
                     int endIndex = (endMinutes - 480) / 60 + 1;
+                    if (endMinutes % 60 != 0) {
+                        endIndex++; // Include the last block if the end time is not exactly on the hour
+                    }
+                    System.out.println("here?");
                     for (int timeIndex = startIndex; timeIndex < endIndex; timeIndex++) {
                         if (timeIndex >= 1 && timeIndex < 15) {
                             data[dayIndex][timeIndex] = course.getName();
