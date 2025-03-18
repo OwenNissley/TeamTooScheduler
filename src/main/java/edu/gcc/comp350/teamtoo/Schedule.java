@@ -78,10 +78,12 @@ public class Schedule
         }
     }
     public void addCourse(Course course) {
-        if (!hasCourse(course)) {
-            courses.add(course);
-            checkConflict(course);
-            history.updateHistory(courses); // call this at the end
+        for (Course c : courses) {
+            if (c.equals(course)) {
+                courses.add(course);
+                checkConflict(course);
+                history.updateHistory(courses); // call this at the end
+            }
         }
     }
     public void setSchedule(ArrayList<Course> newCourses){

@@ -97,8 +97,17 @@ public class Main {
         }
         warningsTextArea.setText(warningText.toString());
 
+        //only add non-conflicting courses to the schedule
+        ArrayList<Course> nonConflictingCourses = new ArrayList<>();
+        for (Course course : core.getSchedule()) {
+            if (!core.getConflictingCourses().contains(course)) {
+                nonConflictingCourses.add(course);
+            }
+        }
+
+
        // Create the table and scroll pane
-       JTable scheduleTable = new JTable(new ScheduleTableModel(core.getSchedule()));
+       JTable scheduleTable = new JTable(new ScheduleTableModel(nonConflictingCourses));
        scheduleTable.setRowHeight(50); // Set row height
 
        // Set column width

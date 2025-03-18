@@ -38,17 +38,17 @@ public class FileReadWriter {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
+                //System.out.println(line);
                 if(line.equals("**********")){
-                    System.out.println("Runs");
+                    //System.out.println("Runs");
                     schedules.add(new Schedule(courses));
                     courses.clear();
                     courseCount = 0;
                 }
                 else{
-                    System.out.println("Other runs");
+                    //System.out.println("Other runs");
                     Course course = getCourseByID(line);
-                    System.out.println(course.getName());
+                    //System.out.println(course.getName());
                     if(course != null){
                         courses.add(course);
                         courseCount++;

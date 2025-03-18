@@ -37,11 +37,12 @@ public class Core {
         //init search
         search = new Search(courseRegistry.getCourses());
 
-        //For testing
-        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(0));
-        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
-        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
+        //check for conflicts in every schedule
+        for(Schedule s : schedules){
+            s.checkConflict();
+        }
     }
+
     //writes 'schedules' into the file 'StoredSchedules.txt'
     //saving the current schedules the user has
     public void saveSchedulesIntoFile(){
@@ -160,6 +161,8 @@ public class Core {
     public void searchAdvanced()
     {
         searchResults = search.searchAdvanced();
+        //remove courses that are already in the schedule
+        //CANT DO THIS
     }
 
     public ArrayList<Course> getSearchResults() {

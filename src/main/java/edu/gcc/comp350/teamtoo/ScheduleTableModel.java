@@ -24,7 +24,7 @@ class ScheduleTableModel extends AbstractTableModel {
                     if (endMinutes % 60 != 0) {
                         endIndex++; // Include the last block if the end time is not exactly on the hour
                     }
-                    System.out.println("here?");
+                    //System.out.println("here?");
                     for (int timeIndex = startIndex; timeIndex < endIndex; timeIndex++) {
                         if (timeIndex >= 1 && timeIndex < 15) {
                             data[dayIndex][timeIndex] = course.getName();
