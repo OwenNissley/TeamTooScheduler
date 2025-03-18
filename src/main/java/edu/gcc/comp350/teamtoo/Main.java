@@ -672,11 +672,19 @@ public class Main {
             courseGroup.add(courseButton);
         } else {
             for (Course course : core.getSchedule()) {
-                JRadioButton courseButton = new JRadioButton(course.toString());
-                courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-                courseGroup.add(courseButton);
-                courseButtons.add(courseButton);
-                //reviewPanel.add(courseButton);
+                //if course has conflict, make the button text red
+                if (core.getConflictingCourses().contains(course)) {
+                    JRadioButton courseButton = new JRadioButton("<html><font color='red'>" + course.toString() + "</font></html>");
+                    courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    courseGroup.add(courseButton);
+                    courseButtons.add(courseButton);
+                } else {
+                    JRadioButton courseButton = new JRadioButton(course.toString());
+                    courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    courseGroup.add(courseButton);
+                    courseButtons.add(courseButton);
+                    //reviewPanel.add(courseButton);
+                }
             }
         }
 
