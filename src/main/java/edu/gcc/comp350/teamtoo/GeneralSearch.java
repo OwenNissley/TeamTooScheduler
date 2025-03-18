@@ -101,9 +101,9 @@ public class GeneralSearch {
 
 
         if (searchInput.length() <= 4) {
-            threshold = .60;
-        } else {
             threshold = .35;
+        } else {
+            threshold = .30;
         }
         System.out.println(threshold);
         // Cap the threshold for more selective fuzzy matching
@@ -117,7 +117,7 @@ public class GeneralSearch {
             String courseName = course.getName().toLowerCase();
 
             // Check for exact match first
-            boolean isExactMatch = courseName.startsWith(searchLower) || containsSubstring(courseName,searchLower);
+            boolean isExactMatch = courseName.startsWith(searchLower) || containsSubstringInWords(courseName,searchLower);
 
             if (isExactMatch) {
                 exactMatches.add(course);
@@ -142,19 +142,27 @@ public class GeneralSearch {
     }
 
 
-    public static boolean containsSubstring(String mainString, String subString) {
+    public static boolean containsSubstringInWords(String mainString, String subString) {
         if (subString == null || subString.isEmpty()) {
             throw new IllegalArgumentException("The substring cannot be null or empty.");
         }
 
-        // Normalize both strings by removing whitespace and converting to lowercase
-        String normalizedMainString = mainString.replaceAll("\\s+", "").toLowerCase();
+        // Normalize the substring by removing whitespace and converting to lowercase
         String normalizedSubString = subString.replaceAll("\\s+", "").toLowerCase();
 
-        // Check if the normalized substring appears in the normalized main string
-        return normalizedMainString.contains(normalizedSubString);
-    }
+        // Split the main string into words
+        String[] words = mainString.split("\\s+");
 
+        // Check each word individually
+        for (String word : words) {
+            String normalizedWord = word.toLowerCase();
+            if (normalizedWord.contains(normalizedSubString)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Computes N-Gram similarity between two strings.
