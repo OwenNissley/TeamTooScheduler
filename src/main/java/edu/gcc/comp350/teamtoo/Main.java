@@ -1,6 +1,7 @@
 package edu.gcc.comp350.teamtoo;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,24 +97,22 @@ public class Main {
         }
         warningsTextArea.setText(warningText.toString());
 
-        JTextArea courseListTextArea = new JTextArea("Available courses will appear here.");
-        courseListTextArea.setEditable(false);
-        courseListTextArea.setBorder(BorderFactory.createTitledBorder("Course List"));
+       // Create the table and scroll pane
+       JTable scheduleTable = new JTable(new ScheduleTableModel(core.getSchedule()));
+       scheduleTable.setRowHeight(50); // Set row height
 
-        // Update displayed courses
-        StringBuilder courseText = new StringBuilder();
-        if (core.getSchedule().isEmpty()) {
-            courseText.append("No courses added yet.");
-        } else {
-            for (Course course : core.getSchedule()) {
-                courseText.append(course).append("\n");
-            }
-        }
-        courseListTextArea.setText(courseText.toString());
+       // Set column width
+       for (int i = 0; i < scheduleTable.getColumnCount(); i++) {
+           TableColumn column = scheduleTable.getColumnModel().getColumn(i);
+           column.setPreferredWidth(150);
+       }
 
-        homePanel.add(warningsTextArea, BorderLayout.NORTH);
-        homePanel.add(courseListTextArea, BorderLayout.CENTER);
+       JScrollPane scrollPane = new JScrollPane(scheduleTable);
+       scheduleTable.setFillsViewportHeight(true);
 
+       // Add components to the home panel
+       homePanel.add(warningsTextArea, BorderLayout.NORTH);
+       homePanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.removeAll();
         mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
         mainPanel.add(homePanel, BorderLayout.CENTER);
