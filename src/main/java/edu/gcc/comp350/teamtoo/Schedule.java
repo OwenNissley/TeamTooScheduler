@@ -109,26 +109,22 @@ public class Schedule
 
     public void undoAdd()
     {
-        history.getPrev(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
+        undoAction();  //I anticipate this not working
     }
 
     public void undoRemove()
     {
-        history.getPrev(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
+        undoAction();  //I anticipate this not working
     }
 
     public void redoAdd()
     {
-        history.getNext(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
+        redoAction();  //I anticipate this not working
     }
 
     public void redoRemove()
     {
-        history.getNext(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
+        redoAction();  //I anticipate this not working
     }
 
     public void undoAction() {
