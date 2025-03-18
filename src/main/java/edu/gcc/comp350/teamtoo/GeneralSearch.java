@@ -97,15 +97,16 @@ public class GeneralSearch {
         double lengthFactor = 0.03; // Increase threshold with search length
 
         // Adjust threshold dynamically
-        double threshold = baseThreshold + (searchInput.length() * lengthFactor);
+        double threshold = 0;
 
-        // If the input is long (>= 6), increase the threshold to reduce false matches
-        if (searchInput.length() >= 6) {
-            threshold = Math.max(0.7, threshold);
-        } else if (searchInput.length() <= 4) {
-            threshold = Math.max(0.75, threshold); // Stricter for short words like "Econ"
+
+        if (searchInput.length() <= 4) {
+            threshold = .60;
+        } else {
+            threshold = .35;
         }
-        threshold = Math.min(0.85, threshold); // Cap the threshold for more selective fuzzy matching
+        System.out.println(threshold);
+        // Cap the threshold for more selective fuzzy matching
 
         Map<Course, Double> similarityScores = new HashMap<>();
         ArrayList<Course> exactMatches = new ArrayList<>();
@@ -116,17 +117,11 @@ public class GeneralSearch {
             String courseName = course.getName().toLowerCase();
 
             // Check for exact match first
-            boolean isExactMatch = courseName.startsWith(searchLower) || courseName.contains(" " + searchLower + " ");
+            boolean isExactMatch = courseName.startsWith(searchLower) || containsSubstring(courseName,searchLower);
 
             if (isExactMatch) {
                 exactMatches.add(course);
-            }
-
-            // Word boundary check for short search inputs to reduce accidental partial matches
-            boolean hasWholeWordMatch = courseName.matches(".*\\b" + searchLower + "\\b.*");
-
-            // Always check for fuzzy matches, but make sure the match is relevant enough
-            if (searchInput.length() <= 4 || hasWholeWordMatch) {
+            } else  {
                 double similarity = nGramSimilarity(searchInput, courseName, n);
                 if (similarity >= threshold) {
                     similarityScores.put(course, similarity);
@@ -146,6 +141,19 @@ public class GeneralSearch {
         return searchResults;
     }
 
+
+    public static boolean containsSubstring(String mainString, String subString) {
+        if (subString == null || subString.isEmpty()) {
+            throw new IllegalArgumentException("The substring cannot be null or empty.");
+        }
+
+        // Normalize both strings by removing whitespace and converting to lowercase
+        String normalizedMainString = mainString.replaceAll("\\s+", "").toLowerCase();
+        String normalizedSubString = subString.replaceAll("\\s+", "").toLowerCase();
+
+        // Check if the normalized substring appears in the normalized main string
+        return normalizedMainString.contains(normalizedSubString);
+    }
 
 
     /**
