@@ -78,11 +78,14 @@ public class Schedule
         }
     }
     public void addCourse(Course course) {
-        if (!hasCourse(course)) {
-            courses.add(course);
-            checkConflict(course);
-            history.updateHistory(courses); // call this at the end
-        }
+        //for (Course c : courses) {
+            //if (!c.equals(course)) {
+            if (!courses.contains(course)) {
+                courses.add(course);
+                checkConflict(course);
+                history.updateHistory(courses); // call this at the end
+            }
+        //}
     }
     public void setSchedule(ArrayList<Course> newCourses){
         this.courses = newCourses;
@@ -91,6 +94,10 @@ public class Schedule
 
     public void clearSchedule() {
         courses.clear();
+
+        // recheck conflicts
+        checkConflict();
+
         history.updateHistory(courses); // call this at the end
     }
 
@@ -102,26 +109,22 @@ public class Schedule
 
     public void undoAdd()
     {
-        history.getPrev(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
+        undoAction();  //I anticipate this not working
     }
 
     public void undoRemove()
     {
-        history.getPrev(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
+        undoAction();  //I anticipate this not working
     }
 
     public void redoAdd()
     {
-        history.getNext(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
+        redoAction();  //I anticipate this not working
     }
 
     public void redoRemove()
     {
-        history.getNext(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData()); //I anticipate this not working
+        redoAction();  //I anticipate this not working
     }
 
     public void undoAction() {

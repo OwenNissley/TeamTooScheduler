@@ -152,6 +152,12 @@ public class Course {
     // Check if the course has a conflict with another course
     //should be working now
     public boolean hasConflict(Course course) {
+        //if course names are the same, return true
+        if (name.equals(course.getName())) {
+            return true;
+        }
+
+        //if times overlapping, return true
         for (TimeSlot time : times) {
             for (TimeSlot otherTime : course.getTimes()) {
                 if (time.getDay().equals(otherTime.getDay()))
@@ -186,6 +192,36 @@ public class Course {
         }
 
         return hour * 60 + minute; // Convert to total minutes
+    }
+
+    // Check if the course is equal to another course
+    // check whether the courses have the same name, times, and days
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Course)) {
+            return false;
+        }
+
+        Course course = (Course) obj;
+        if (!name.equals(course.getName())){ return false; }
+
+        if (times.size() != course.getTimes().size()) {
+            return false;
+        }
+
+
+        for (TimeSlot time : times) {
+            if (!course.getTimes().contains(time)) {
+                return false;
+            }
+        }
+
+
+        return true;
     }
 }
 

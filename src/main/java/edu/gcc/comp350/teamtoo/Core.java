@@ -11,9 +11,15 @@ public class Core {
 
     public Core() {
 
+
+
+        //init course registry
+        courseRegistry = new CourseRegistry();
+        courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
+
         //initializes 'schedules' from the file 'StoredSchedules.txt' if it exists,
         // otherwise initializes it as empty.
-        FRW = new FileReadWriter();
+        FRW = new FileReadWriter(courseRegistry.getCourses());
         try{
             schedules = FRW.readScheduleFromFile("StoredSchedules.txt");
         }
@@ -26,22 +32,18 @@ public class Core {
             schedules.add(new Schedule());
         }
 
-
-
+        //set selected schedule to the first schedule
         selectedSchedule = 0;
-
-        //init course registry
-        courseRegistry = new CourseRegistry();
-        courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
 
         //init search
         search = new Search(courseRegistry.getCourses());
 
-        //For testing
-        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(0));
-        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(1));
-        //schedules.get(selectedSchedule).addCourse(courseRegistry.getCourses().get(2));
+        //check for conflicts in every schedule
+        for(Schedule s : schedules){
+            s.checkConflict();
+        }
     }
+
     //writes 'schedules' into the file 'StoredSchedules.txt'
     //saving the current schedules the user has
     public void saveSchedulesIntoFile(){
@@ -160,6 +162,8 @@ public class Core {
     public void searchAdvanced()
     {
         searchResults = search.searchAdvanced();
+        //remove courses that are already in the schedule
+        //CANT DO THIS
     }
 
     public ArrayList<Course> getSearchResults() {

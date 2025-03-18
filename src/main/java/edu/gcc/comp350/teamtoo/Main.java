@@ -97,8 +97,17 @@ public class Main {
         }
         warningsTextArea.setText(warningText.toString());
 
+        //only add non-conflicting courses to the schedule
+        ArrayList<Course> nonConflictingCourses = new ArrayList<>();
+        for (Course course : core.getSchedule()) {
+            if (!core.getConflictingCourses().contains(course)) {
+                nonConflictingCourses.add(course);
+            }
+        }
+
+
        // Create the table and scroll pane
-       JTable scheduleTable = new JTable(new ScheduleTableModel(core.getSchedule()));
+       JTable scheduleTable = new JTable(new ScheduleTableModel(nonConflictingCourses));
        scheduleTable.setRowHeight(50); // Set row height
 
        // Set column width
@@ -422,10 +431,18 @@ public class Main {
             courseGroup.add(courseButton);
         } else {
             for (Course course : core.getSearchResults()) {
-                JRadioButton courseButton = new JRadioButton(course.toString());
-                courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-                courseGroup.add(courseButton);
-                courseButtons.add(courseButton);
+                    //if course in schedule, make the button text red
+                    if (core.getSchedule().contains(course)) {
+                        JRadioButton courseButton = new JRadioButton("<html><font color='red'>" + course.toString() + "</font></html>");
+                        courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                        courseGroup.add(courseButton);
+                        courseButtons.add(courseButton);
+                    } else {
+                        JRadioButton courseButton = new JRadioButton(course.toString());
+                        courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                        courseGroup.add(courseButton);
+                        courseButtons.add(courseButton);
+                    }
             }
         }
 
@@ -655,11 +672,19 @@ public class Main {
             courseGroup.add(courseButton);
         } else {
             for (Course course : core.getSchedule()) {
-                JRadioButton courseButton = new JRadioButton(course.toString());
-                courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-                courseGroup.add(courseButton);
-                courseButtons.add(courseButton);
-                //reviewPanel.add(courseButton);
+                //if course has conflict, make the button text red
+                if (core.getConflictingCourses().contains(course)) {
+                    JRadioButton courseButton = new JRadioButton("<html><font color='red'>" + course.toString() + "</font></html>");
+                    courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    courseGroup.add(courseButton);
+                    courseButtons.add(courseButton);
+                } else {
+                    JRadioButton courseButton = new JRadioButton(course.toString());
+                    courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    courseGroup.add(courseButton);
+                    courseButtons.add(courseButton);
+                    //reviewPanel.add(courseButton);
+                }
             }
         }
 
