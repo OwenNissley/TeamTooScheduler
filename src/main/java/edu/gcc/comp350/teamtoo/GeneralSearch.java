@@ -84,7 +84,6 @@ public class GeneralSearch {
         return searchResults;
     }
 
-
     public ArrayList<Course> searchCourses(String searchInput) {
         searchResults.clear();
 
@@ -93,20 +92,52 @@ public class GeneralSearch {
             throw new IllegalArgumentException("Search input cannot be null or empty.");
         }
 
-        // N-Gram Similarity Matching (Only for the specified term)
         int n = 2; // Bi-grams
-        double threshold = 0.1; // Adjust for sensitivity
+        double baseThreshold = 0.2; // Base threshold
+        double lengthFactor = 0.03; // Increase threshold with search length
+
+        // Adjust threshold dynamically
+        double threshold = baseThreshold + (searchInput.length() * lengthFactor);
+
+        // If the input is long (>= 6), increase the threshold to reduce false matches
+        if (searchInput.length() >= 6) {
+            threshold = Math.max(0.7, threshold);
+        } else if (searchInput.length() <= 4) {
+            threshold = Math.max(0.75, threshold); // Stricter for short words like "Econ"
+        }
+        threshold = Math.min(0.85, threshold); // Cap the threshold for more selective fuzzy matching
 
         Map<Course, Double> similarityScores = new HashMap<>();
+        ArrayList<Course> exactMatches = new ArrayList<>();
+
+        String searchLower = searchInput.toLowerCase();
 
         for (Course course : courses) {
-                double similarity = nGramSimilarity(searchInput, course.getName(), n);
+            String courseName = course.getName().toLowerCase();
+
+            // Check for exact match first
+            boolean isExactMatch = courseName.startsWith(searchLower) || courseName.contains(" " + searchLower + " ");
+
+            if (isExactMatch) {
+                exactMatches.add(course);
+            }
+
+            // Word boundary check for short search inputs to reduce accidental partial matches
+            boolean hasWholeWordMatch = courseName.matches(".*\\b" + searchLower + "\\b.*");
+
+            // Always check for fuzzy matches, but make sure the match is relevant enough
+            if (searchInput.length() <= 4 || hasWholeWordMatch) {
+                double similarity = nGramSimilarity(searchInput, courseName, n);
                 if (similarity >= threshold) {
                     similarityScores.put(course, similarity);
                 }
+            }
         }
 
-        // Sort by similarity score (highest first)
+        // Sort exact matches first (best matches)
+        searchResults.addAll(exactMatches);
+
+        // Then sort similarity-based matches
         similarityScores.entrySet()
                 .stream()
                 .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
