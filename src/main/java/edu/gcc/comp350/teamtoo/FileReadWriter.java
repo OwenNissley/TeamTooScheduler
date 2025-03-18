@@ -10,13 +10,10 @@ import java.util.ArrayList;
  * @author Team Too
  */
 public class FileReadWriter {
-    CourseRegistry CR;
     ArrayList<Course> directory;
 
-    public FileReadWriter(){
-        CR = new CourseRegistry();
-        CR.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
-        directory = CR.getCourses();
+    public FileReadWriter(ArrayList<Course> courses) {
+        directory = courses;
     }
 
     /**

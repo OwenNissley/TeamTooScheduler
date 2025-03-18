@@ -206,12 +206,14 @@ public class Course {
         if (times.size() != course.getTimes().size()) {
             return false;
         }
-        
+
+
         for (TimeSlot time : times) {
             if (!course.getTimes().contains(time)) {
                 return false;
             }
         }
+
 
         return true;
     }

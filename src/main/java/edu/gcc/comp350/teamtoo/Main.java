@@ -431,10 +431,18 @@ public class Main {
             courseGroup.add(courseButton);
         } else {
             for (Course course : core.getSearchResults()) {
-                JRadioButton courseButton = new JRadioButton(course.toString());
-                courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-                courseGroup.add(courseButton);
-                courseButtons.add(courseButton);
+                    //if course in schedule, make the button text red
+                    if (core.getSchedule().contains(course)) {
+                        JRadioButton courseButton = new JRadioButton("<html><font color='red'>" + course.toString() + "</font></html>");
+                        courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                        courseGroup.add(courseButton);
+                        courseButtons.add(courseButton);
+                    } else {
+                        JRadioButton courseButton = new JRadioButton(course.toString());
+                        courseButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+                        courseGroup.add(courseButton);
+                        courseButtons.add(courseButton);
+                    }
             }
         }
 
