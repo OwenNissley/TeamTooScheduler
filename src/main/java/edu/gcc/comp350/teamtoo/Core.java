@@ -27,7 +27,7 @@ public class Core {
         // otherwise initializes it as empty.
         FRW = new FileReadWriter(courseRegistry.getCourses());
         try{
-            //semesterSchedules = FRW.readScheduleFromFile("StoredSchedules.txt");
+            semesterSchedules = FRW.readScheduleFromFile("StoredSchedules.txt");
 
             //check for conflicts in every schedule
             for (Map.Entry<String, ArrayList<Schedule>> entry : semesterSchedules.entrySet()) {
@@ -59,7 +59,7 @@ public class Core {
     //writes 'schedules' into the file 'StoredSchedules.txt'
     //saving the current schedules the user has
     public void saveSchedulesIntoFile(){
-        FRW.readScheduleIntoFile("StoredSchedules.txt", schedules);
+        FRW.readScheduleIntoFile("StoredSchedules.txt", semesterSchedules);
     }
 
     public void addCourse(Course course) {
