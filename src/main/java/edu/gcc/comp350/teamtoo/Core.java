@@ -1,6 +1,8 @@
 package edu.gcc.comp350.teamtoo;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Core {
     private ArrayList<Schedule> schedules;
@@ -9,9 +11,13 @@ public class Core {
     private ArrayList<Course> searchResults;
     private FileReadWriter FRW;
 
+    //fixing schedules
+    private String semester;
+    //make a  map of semester to an arraylist of schedules
+    private Map<String, ArrayList<Schedule>> semesterSchedules;
+
+
     public Core() {
-
-
 
         //init course registry
         courseRegistry = new CourseRegistry();
@@ -21,16 +27,25 @@ public class Core {
         // otherwise initializes it as empty.
         FRW = new FileReadWriter(courseRegistry.getCourses());
         try{
-            schedules = FRW.readScheduleFromFile("StoredSchedules.txt");
+            //semesterSchedules = FRW.readScheduleFromFile("StoredSchedules.txt");
+
+            //check for conflicts in every schedule
+            for (Map.Entry<String, ArrayList<Schedule>> entry : semesterSchedules.entrySet()) {
+                String semesterKey = entry.getKey();
+                ArrayList<Schedule> schedules = entry.getValue();
+                for (Schedule s : schedules) {
+                    s.checkConflict();
+                }
+            }
         }
         catch(Exception e){
-            schedules = new ArrayList<>();
+            //make an empty semesterSchedule
+            semesterSchedules = new HashMap<>();
         }
 
-        //if schedules is empty, add a new schedule
-        if(schedules.isEmpty()){
-            schedules.add(new Schedule());
-        }
+        //initialize semester
+        semester = "2023_Fall"; //default semester
+        updateSemester(semester);
 
         //set selected schedule to the first schedule
         selectedSchedule = 0;
@@ -38,10 +53,7 @@ public class Core {
         //init search
         search = new Search(courseRegistry.getCourses());
 
-        //check for conflicts in every schedule
-        for(Schedule s : schedules){
-            s.checkConflict();
-        }
+
     }
 
     //writes 'schedules' into the file 'StoredSchedules.txt'
@@ -122,6 +134,26 @@ public class Core {
     public ArrayList<Schedule> getSavedSchedules() {
         return schedules;
     }
+
+    //update the semester
+    //semester is a String such as "2023_Fall"
+    public void updateSemester(String semester) {
+        this.semester = semester;
+
+        //if the semester is not already in the map, create a new entry
+        if (!semesterSchedules.containsKey(semester)) {
+            semesterSchedules.put(semester, new ArrayList<>());
+        }
+        schedules = semesterSchedules.get(semester);
+
+        //if schedules is empty, add a new schedule
+        if(schedules.isEmpty()){
+            schedules.add(new Schedule());
+        }
+
+        selectedSchedule = 0; //reset selected schedule to the first one
+    }
+
 
 
     public void quickSchedule() {}

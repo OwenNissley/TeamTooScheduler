@@ -10,6 +10,7 @@ public class Search
     private ArrayList<Course> semesterFilteredCourses;
     private ArrayList<Course> generalFilteredCourses;
     private final ArrayList<Course> allCourses;
+    private boolean generalSearchExecuted; //used to determine if general search has been executed
 
     //constructor for empty
     public Search () {
@@ -17,6 +18,7 @@ public class Search
         this.semesterFilteredCourses = new ArrayList<>();
         this.activeFilters = new ArrayList<>();
         this.generalFilteredCourses = new ArrayList<>();
+        this.generalSearchExecuted = false; //set to false since no search has been executed
     }
 
     public Search(ArrayList<Course> allCourses) {
@@ -74,7 +76,7 @@ public class Search
         ArrayList<Course> pointer = generalFilteredCourses;
 
         //this is inefficient and needs changed at some point
-        if (generalFilteredCourses.isEmpty())
+        if (generalFilteredCourses.isEmpty() && !generalSearchExecuted)
         {
             //for (Course course : semesterFilteredCourses) {
             //    generalFilteredCourses.add(course); // we don't need to deep copy course, since they don't change
@@ -122,6 +124,9 @@ public class Search
             }
         }
 
+        //clear generalSearchExecuted so that it can be used for the next search
+        generalSearchExecuted = false;
+
         //for now, may be changed later
         clearFilters();
 
@@ -148,6 +153,8 @@ public class Search
                 generalFilteredCourses.add(course);
             }
         }
+
+        generalSearchExecuted = true; //set to true so that searchAdvanced can use generalFilteredCourses
 
         //TESTING PURPOSES ONLY
         System.out.println("General Search Size: " + generalFilteredCourses.size());

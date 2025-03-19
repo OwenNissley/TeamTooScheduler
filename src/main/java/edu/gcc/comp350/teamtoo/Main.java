@@ -9,7 +9,9 @@ import java.util.List;
 public class Main {
     private static Core core;
 
-    //private static final List<String> selectedCourses = new ArrayList<>();
+    //for semester stuff
+    private static JComboBox<String> semesterCombo;
+    private static JComboBox<Integer> yearCombo;
 
     public static void main(String[] args) {
         core = new Core();
@@ -30,6 +32,13 @@ public class Main {
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel ribbonPanel = createRibbonPanel(mainPanel, frame);
         mainPanel.add(ribbonPanel, BorderLayout.NORTH);
+
+        //initialize semester stuff
+        semesterCombo = new JComboBox<>(new String[]{"Fall", "Spring"});
+        yearCombo = new JComboBox<>();
+        for (int year = 2023; year <= 2025; year++) {
+            yearCombo.addItem(year);
+        }
 
         showHomeView(mainPanel, frame);
 
@@ -80,7 +89,12 @@ public class Main {
 
     private static void showHomeView(JPanel mainPanel, JFrame frame) {
         JPanel homePanel = new JPanel(new BorderLayout());
+        homePanel.setName("HomePanel");
 
+        //create semester panel
+        homePanel.add(createSemesterPanel(), BorderLayout.NORTH);
+
+        //display warnings
         JTextArea warningsTextArea = new JTextArea("Warnings will appear here.");
         warningsTextArea.setEditable(false);
         warningsTextArea.setBorder(BorderFactory.createTitledBorder("Warnings"));
@@ -120,8 +134,8 @@ public class Main {
        scheduleTable.setFillsViewportHeight(true);
 
        // Add components to the home panel
-       homePanel.add(warningsTextArea, BorderLayout.NORTH);
-       homePanel.add(scrollPane, BorderLayout.CENTER);
+        homePanel.add(warningsTextArea, BorderLayout.CENTER);
+        homePanel.add(scrollPane, BorderLayout.SOUTH);
         mainPanel.removeAll();
         mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
         mainPanel.add(homePanel, BorderLayout.CENTER);
@@ -132,6 +146,8 @@ public class Main {
 
     private static void showCourseDirectoryView(JPanel mainPanel, JFrame frame) {
         JPanel courseDirectoryPanel = new JPanel();
+        courseDirectoryPanel.setName("CourseDirectoryPanel");
+
         courseDirectoryPanel.setLayout(new BoxLayout(courseDirectoryPanel, BoxLayout.Y_AXIS));
 
         mainPanel.removeAll();
@@ -144,37 +160,18 @@ public class Main {
 
     private static void showAddCourseView(JPanel mainPanel, JFrame frame) {
         JPanel addCoursePanel = new JPanel();
-        addCoursePanel.setLayout(new BoxLayout(addCoursePanel, BoxLayout.Y_AXIS));
+        addCoursePanel.setName("AddCoursePanel");
+        //addCoursePanel.setLayout(new BoxLayout(addCoursePanel, BoxLayout.Y_AXIS));
 
-        // Align Semester to the left
-        JPanel semesterWrapper = new JPanel();
-        semesterWrapper.setLayout(new BoxLayout(semesterWrapper, BoxLayout.Y_AXIS));
-        semesterWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel semesterLabel = new JLabel("Semester");
-        semesterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        //JCheckBox semesterCheckBox = new JCheckBox("Semester");
-        JComboBox<String> semesterCombo = new JComboBox<>(new String[]{"Fall", "Spring"});
-        JComboBox<Integer> yearCombo = new JComboBox<>();
-        for (int year = 2023; year <= 2025; year++) {
-            yearCombo.addItem(year);
-        }
-        JPanel semesterPanel = new JPanel(new FlowLayout());
-        semesterPanel.add(semesterCombo);
-        semesterPanel.add(yearCombo);
+        // Create semester panel
+        addCoursePanel.add(createSemesterPanel(), BorderLayout.NORTH);
 
         //instantly sort based on semester
         core.addFilter(new FilterSemester(yearCombo.getSelectedItem().toString(), semesterCombo.getSelectedItem().toString()));
 
-        semesterWrapper.add(semesterLabel);
-        //semesterWrapper.add(semesterCheckBox);
-        semesterWrapper.add(semesterPanel);
-
-        addCoursePanel.add(semesterWrapper);
-
         // Align General Search to the left
         JPanel generalSearchWrapper = new JPanel();
-        generalSearchWrapper.setLayout(new BoxLayout(generalSearchWrapper, BoxLayout.Y_AXIS));
+        //generalSearchWrapper.setLayout(new BoxLayout(generalSearchWrapper, BoxLayout.Y_AXIS));
         generalSearchWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel generalSearchLabel = new JLabel("General Search");
@@ -187,10 +184,10 @@ public class Main {
         generalSearchPanel.add(searchField);
         generalSearchPanel.add(generalSearchButton);
 
-        generalSearchWrapper.add(generalSearchLabel);
-        generalSearchWrapper.add(generalSearchPanel);
+        generalSearchWrapper.add(generalSearchLabel, BorderLayout.NORTH);
+        generalSearchWrapper.add(generalSearchPanel, BorderLayout.SOUTH);
 
-        addCoursePanel.add(generalSearchWrapper);
+        addCoursePanel.add(generalSearchWrapper, BorderLayout.CENTER);
 
         // Align Advanced Search to the left
         JPanel advancedSearchWrapper = new JPanel();
@@ -264,7 +261,7 @@ public class Main {
         */
 
         advancedSearchWrapper.add(advancedSearchLabel);
-        advancedSearchWrapper.add(advancedSearchPanel); // No Space Now!
+        advancedSearchWrapper.add(advancedSearchPanel);
 
         addCoursePanel.add(advancedSearchWrapper);
 
@@ -273,7 +270,8 @@ public class Main {
         errorLabel.setForeground(Color.RED);
         JButton advancedSearchButton = new JButton("Search");
         addCoursePanel.add(errorLabel);
-        addCoursePanel.add(advancedSearchButton);
+
+        addCoursePanel.add(advancedSearchButton, BorderLayout.SOUTH);
 
         // Action Listeners
         generalSearchButton.addActionListener(e -> {
@@ -347,14 +345,17 @@ public class Main {
             }
         });
 
+        /*
         //when the semester or year fields are updated, call core.addFilter() with the new filter
         semesterCombo.addActionListener(e -> {
             core.addFilter(new FilterSemester(yearCombo.getSelectedItem().toString(), semesterCombo.getSelectedItem().toString()));
+            core.updateSemester(yearCombo.getSelectedItem().toString() + "_" + semesterCombo.getSelectedItem().toString());
         });
         yearCombo.addActionListener(e -> {
             core.addFilter(new FilterSemester(yearCombo.getSelectedItem().toString(), semesterCombo.getSelectedItem().toString()));
+            core.updateSemester(yearCombo.getSelectedItem().toString() + "_" + semesterCombo.getSelectedItem().toString());
         });
-
+        */
 
         mainPanel.removeAll();
         mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
@@ -414,6 +415,7 @@ public class Main {
 
     private static void showCourseSelectionView(JPanel mainPanel, JFrame frame) {
         JPanel courseSelectionPanel = new JPanel();
+        courseSelectionPanel.setName("CourseSelcectionPanel");
         courseSelectionPanel.setLayout(new BoxLayout(courseSelectionPanel, BoxLayout.Y_AXIS));
 
         // Header label aligned to the left
@@ -608,6 +610,7 @@ public class Main {
 
     private static void showCourseInfoView(JPanel mainPanel, JFrame frame, String courseName) {
         JPanel courseInfoPanel = new JPanel();
+        courseInfoPanel.setName("CourseInfoPanel");
         courseInfoPanel.setLayout(new BoxLayout(courseInfoPanel, BoxLayout.Y_AXIS));
 
         JLabel headingLabel = new JLabel(courseName); // Displays the course name
@@ -634,7 +637,11 @@ public class Main {
     private static void showReviewView(JPanel mainPanel, JFrame frame) {
         // Main panel for the Review screen
         JPanel reviewPanel = new JPanel();
+        reviewPanel.setName("ReviewPanel");
         reviewPanel.setLayout(new BoxLayout(reviewPanel, BoxLayout.Y_AXIS));
+
+        //create semester panel
+        reviewPanel.add(createSemesterPanel(), BorderLayout.NORTH);
 
         // Warnings panel at the top
         JTextArea warningsTextArea = new JTextArea("Warnings will appear here.");
@@ -800,7 +807,7 @@ public class Main {
         });
 
         // Add components to the review panel
-        reviewPanel.add(warningsTextArea, BorderLayout.NORTH); // Warnings section
+        reviewPanel.add(warningsTextArea, BorderLayout.CENTER); // Warnings section
         reviewPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spacer
         reviewPanel.add(scheduleLabel);//, BorderLayout.WEST); // Schedule section
 
@@ -916,5 +923,111 @@ public class Main {
             }
             loadSavedSchedules.addItem("Schedule " + schedule.getScheduleID());
         }
+    }
+
+    //display semesters
+    public static JPanel createSemesterPanel()
+    {
+        JPanel semesterWrapper = new JPanel();
+        //semesterWrapper.setLayout(new BoxLayout(semesterWrapper, BoxLayout.Y_AXIS));
+        //semesterWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel semesterLabel = new JLabel("Semester");
+        semesterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //JCheckBox semesterCheckBox = new JCheckBox("Semester");
+        /*
+        JComboBox<String> semesterCombo = new JComboBox<>(new String[]{"Fall", "Spring"});
+        JComboBox<Integer> yearCombo = new JComboBox<>();
+        for (int year = 2023; year <= 2025; year++) {
+            yearCombo.addItem(year);
+        }
+        */
+        JPanel semesterPanel = new JPanel(new FlowLayout());
+        semesterPanel.add(semesterCombo);
+        semesterPanel.add(yearCombo);
+
+        core.updateSemester(yearCombo.getSelectedItem().toString() + "_" + semesterCombo.getSelectedItem().toString());
+
+        semesterWrapper.add(semesterLabel);
+        //semesterWrapper.add(semesterCheckBox);
+        semesterWrapper.add(semesterPanel);
+
+        // add action listeners to semesterCombo and yearCombo
+        // action listener for yearCombo
+        semesterCombo.addActionListener(e -> {
+            //update semester
+            core.updateSemester(yearCombo.getSelectedItem().toString() + "_" + semesterCombo.getSelectedItem().toString());
+
+            /*
+            //if the current panel is the addCoursePanel, update the filters
+            if (semesterWrapper.getParent() != null && semesterWrapper.getParent().getParent() instanceof JPanel) {
+                JPanel parentPanel = (JPanel) semesterWrapper.getParent().getParent();
+                if (parentPanel.getComponent(1) instanceof JPanel) {
+                     core.addFilter(new FilterSemester(yearCombo.getSelectedItem().toString(), semesterCombo.getSelectedItem().toString()));
+                 }
+            }
+            */
+
+
+            // Refresh the current panel based on what panel is currently showing
+            if (semesterWrapper.getParent() != null) {
+                Component parent = semesterWrapper.getParent().getParent();
+                if (parent instanceof JPanel) {
+                    JPanel parentPanel = (JPanel) parent;
+                    if (parentPanel.getComponent(1) instanceof JPanel) {
+                        JPanel currentPanel = (JPanel) parentPanel.getComponent(1);
+                        if (currentPanel.getName().equals("CourseInfoPanel")) {
+                            showCourseInfoView(parentPanel, (JFrame) SwingUtilities.getWindowAncestor(parentPanel), "Course Name");
+                        } else if (currentPanel.getName().equals("AddCoursePanel")) {
+                            showAddCourseView(parentPanel, (JFrame) SwingUtilities.getWindowAncestor(parentPanel));
+                        } else if (currentPanel.getName().equals("ReviewPanel")) {
+                            showReviewView(parentPanel, (JFrame) SwingUtilities.getWindowAncestor(parentPanel));
+                        } else if (currentPanel.getName().equals("HomePanel")) {
+                            showHomeView(parentPanel, (JFrame) SwingUtilities.getWindowAncestor(parentPanel));
+                        }
+                    }
+                }
+            }
+        });
+
+        // action listener for semesterCombo
+        yearCombo.addActionListener(e -> {
+            //update semester
+            core.updateSemester(yearCombo.getSelectedItem().toString() + "_" + semesterCombo.getSelectedItem().toString());
+
+            /*
+            //if the current panel is the addCoursePanel, update the filters
+            if (semesterWrapper.getParent() != null && semesterWrapper.getParent().getParent() instanceof JPanel) {
+                JPanel parentPanel = (JPanel) semesterWrapper.getParent().getParent();
+                if (parentPanel.getComponent(1) instanceof JPanel) {
+                    core.addFilter(new FilterSemester(yearCombo.getSelectedItem().toString(), semesterCombo.getSelectedItem().toString()));
+                }
+            }
+            */
+
+            // Refresh the current panel based on what panel is currently showing
+            if (semesterWrapper.getParent() != null) {
+                Component parent = semesterWrapper.getParent().getParent();
+                if (parent instanceof JPanel) {
+                    JPanel parentPanel = (JPanel) parent;
+                    if (parentPanel.getComponent(1) instanceof JPanel) {
+                        JPanel currentPanel = (JPanel) parentPanel.getComponent(1);
+                        if (currentPanel.getName().equals("CourseInfoPanel")) {
+                            showCourseInfoView(parentPanel, (JFrame) SwingUtilities.getWindowAncestor(parentPanel), "Course Name");
+                        } else if (currentPanel.getName().equals("AddCoursePanel")) {
+                            showAddCourseView(parentPanel, (JFrame) SwingUtilities.getWindowAncestor(parentPanel));
+                        } else if (currentPanel.getName().equals("ReviewPanel")) {
+                            showReviewView(parentPanel, (JFrame) SwingUtilities.getWindowAncestor(parentPanel));
+                        } else if (currentPanel.getName().equals("HomePanel")) {
+                            showHomeView(parentPanel, (JFrame) SwingUtilities.getWindowAncestor(parentPanel));
+                        }
+                    }
+                }
+            }
+        });
+
+        
+
+        return semesterWrapper;
     }
 }
