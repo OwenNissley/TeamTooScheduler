@@ -1,6 +1,8 @@
 package edu.gcc.comp350.teamtoo;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
@@ -146,55 +148,122 @@ public class Main {
     }
 
     private static void showCourseDirectoryView(JPanel mainPanel, JFrame frame) {
-        // Create a panel for displaying all courses
-        JPanel allCoursesPanel = new JPanel();
-        allCoursesPanel.setName("AllCoursesPanel");
-        allCoursesPanel.setLayout(new BoxLayout(allCoursesPanel, BoxLayout.Y_AXIS));
+        mainPanel.removeAll(); // Clear only the content area (keeps the ribbon)
+        mainPanel.setLayout(new BorderLayout());
 
-        // Header label
-        JLabel headerLabel = new JLabel("All Courses:");
-        headerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        allCoursesPanel.add(headerLabel);
+        // Load courses from JSON
+        CourseRegistry registry = new CourseRegistry();
+        registry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
 
-        // Load courses from JSON file using the existing core object
-        CourseRegistry courseRegistry = new CourseRegistry();
-        courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
-
-        // Get and sort courses alphabetically
-        List<Course> courses = new ArrayList<>(courseRegistry.getCourses());
-        courses.sort(Comparator.comparing(Course::getName));
-
-        // Display each course
+        // Extract course names for JList
+        ArrayList<Course> courses = registry.getCourses();
+        DefaultListModel<String> courseListModel = new DefaultListModel<>();
         for (Course course : courses) {
-            JLabel courseLabel = new JLabel(course.toString());
-            courseLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            allCoursesPanel.add(courseLabel);
+            courseListModel.addElement(course.getName());
         }
 
-        // Wrap the allCoursesPanel in a scroll pane
-        JScrollPane scrollPane = new JScrollPane(allCoursesPanel);
-        scrollPane.setPreferredSize(new Dimension(400, 300)); // Set preferred size for the scroll pane
+        // Course list in a scrollable pane
+        JList<String> courseList = new JList<>(courseListModel);
+        JScrollPane scrollPane = new JScrollPane(courseList);
+        scrollPane.setPreferredSize(new Dimension(250, 500));
 
-        // Add a home button
-        JButton homeButton = new JButton("Home");
-        homeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        homeButton.addActionListener(e -> showHomeView(mainPanel, frame));
+        // Course details area
+        JTextArea courseDetails = new JTextArea();
+        courseDetails.setEditable(false);
+        courseDetails.setLineWrap(true);
+        courseDetails.setWrapStyleWord(true);
+        JScrollPane detailsScrollPane = new JScrollPane(courseDetails);
 
-        // Create a container panel to hold the scroll pane and home button
-        JPanel containerPanel = new JPanel();
-        containerPanel.setLayout(new BoxLayout(containerPanel, BoxLayout.Y_AXIS));
-        containerPanel.add(scrollPane);
-        containerPanel.add(homeButton);
+        // When a course is selected, show its details
+        courseList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int index = courseList.getSelectedIndex();
+                if (index >= 0) {
+                    Course selectedCourse = courses.get(index);
+                    courseDetails.setText(formatCourseDetails(selectedCourse));
+                }
+            }
+        });
 
-        // Add the container panel to the main panel
-        mainPanel.removeAll();
-        mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
-        mainPanel.add(containerPanel, BorderLayout.CENTER);
+        // Layout: List on the left, details on the right
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(scrollPane, BorderLayout.WEST);
+        contentPanel.add(detailsScrollPane, BorderLayout.CENTER);
 
-        // Refresh the frame
-        frame.revalidate();
-        frame.repaint();
+        // Create return button
+        JButton returnButton = new JButton("Return to Home");
+        returnButton.addActionListener(e -> showHomeView(mainPanel, frame));
+
+        // Search field
+        JTextField searchField = new JTextField(15);
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            private void filterList() {
+                String searchText = searchField.getText().toLowerCase();
+                courseListModel.clear();
+                for (Course course : courses) {
+                    if (course.getName().toLowerCase().contains(searchText)) {
+                        courseListModel.addElement(course.getName());
+                    }
+                }
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filterList();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterList();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filterList();
+            }
+        });
+
+        // Panel for search bar and return button
+        JPanel controlPanel = new JPanel();
+        controlPanel.add(new JLabel("Search: "));
+        controlPanel.add(searchField);
+        controlPanel.add(returnButton);
+
+        // Add components to main panel
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        mainPanel.add(controlPanel, BorderLayout.SOUTH);
+
+        // Refresh UI
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
+
+    // Helper method to format course details; this is here because it's commented out in CourseRegistry and I didn't want to touch that class.
+    private static String formatCourseDetails(Course course) {
+        StringBuilder details = new StringBuilder();
+        details.append("Name: ").append(course.getName()).append("\n");
+        details.append("Number: ").append(course.getNumber()).append("\n");
+        details.append("Credits: ").append(course.getCredits()).append("\n");
+        details.append("Faculty: ").append(course.getFaculty()).append("\n");
+        details.append("Location: ").append(course.getLocation()).append("\n");
+        details.append("Semester: ").append(course.getSemester()).append("\n");
+        details.append("Section: ").append(course.getSection()).append("\n");
+        details.append("Subject: ").append(course.getSubject()).append("\n");
+        details.append("Seats: ").append(course.getOpenSeats()).append("/").append(course.getTotalSeats()).append("\n");
+        details.append("Lab: ").append(course.isLab() ? "Yes" : "No").append("\n");
+        details.append("Status: ").append(course.isOpen() ? "Open" : "Closed").append("\n");
+
+        // Add time slots
+        details.append("\nSchedule:\n");
+        for (Course.TimeSlot slot : course.getTimes()) {
+            details.append("  ").append(slot.getDay()).append(": ")
+                    .append(slot.getStartTime()).append(" - ")
+                    .append(slot.getEndTime()).append("\n");
+        }
+
+        return details.toString();
+    }
+
     private static void showAddCourseView(JPanel mainPanel, JFrame frame) {
         JPanel addCoursePanel = new JPanel();
         addCoursePanel.setName("AddCoursePanel");
