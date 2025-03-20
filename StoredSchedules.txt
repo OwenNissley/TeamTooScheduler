@@ -1,15 +1,1 @@
-SEMESTER: 2024_Spring
-COMP350A
-**********
-SEMESTER: 2025_Fall
-**********
-SEMESTER: 2025_Spring
-**********
-SEMESTER: 2023_Spring
-**********
-SEMESTER: 2023_Fall
-**********
-SEMESTER: 2024_Fall
-ACCT201C
-ART103A
-**********
+
