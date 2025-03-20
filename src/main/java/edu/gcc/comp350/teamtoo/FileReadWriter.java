@@ -92,7 +92,7 @@ public class FileReadWriter {
                 writer.write("SEMESTER: " + key + "\n");
                 for (Schedule schedule : schedules) {
                     for (Course course : schedule.getCourses()) {
-                        writer.write(course.getSubject() + course.getNumber() + course.getSection() + "\n");
+                        writer.write(course.getSubject() + course.getNumber() + course.getSection() + course.getSemester() + "\n");
                     }
                     writer.write("**********\n");
                 }
@@ -106,10 +106,11 @@ public class FileReadWriter {
 
     public Course getCourseByID(String ID){
         for(Course course : directory) {
-            if (("" + course.getSubject() + course.getNumber() + course.getSection()).equals(ID)) {
+            if (("" + course.getSubject() + course.getNumber() + course.getSection() + course.getSemester()).equals(ID)) {
                 return course;
             }
         }
         return null;
     }
+
 }
