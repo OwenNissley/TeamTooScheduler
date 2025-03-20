@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Main {
@@ -145,19 +146,55 @@ public class Main {
     }
 
     private static void showCourseDirectoryView(JPanel mainPanel, JFrame frame) {
-        JPanel courseDirectoryPanel = new JPanel();
-        courseDirectoryPanel.setName("CourseDirectoryPanel");
+        // Create a panel for displaying all courses
+        JPanel allCoursesPanel = new JPanel();
+        allCoursesPanel.setName("AllCoursesPanel");
+        allCoursesPanel.setLayout(new BoxLayout(allCoursesPanel, BoxLayout.Y_AXIS));
 
-        courseDirectoryPanel.setLayout(new BoxLayout(courseDirectoryPanel, BoxLayout.Y_AXIS));
+        // Header label
+        JLabel headerLabel = new JLabel("All Courses:");
+        headerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        allCoursesPanel.add(headerLabel);
 
+        // Load courses from JSON file using the existing core object
+        CourseRegistry courseRegistry = new CourseRegistry();
+        courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
+
+        // Get and sort courses alphabetically
+        List<Course> courses = new ArrayList<>(courseRegistry.getCourses());
+        courses.sort(Comparator.comparing(Course::getName));
+
+        // Display each course
+        for (Course course : courses) {
+            JLabel courseLabel = new JLabel(course.toString());
+            courseLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            allCoursesPanel.add(courseLabel);
+        }
+
+        // Wrap the allCoursesPanel in a scroll pane
+        JScrollPane scrollPane = new JScrollPane(allCoursesPanel);
+        scrollPane.setPreferredSize(new Dimension(400, 300)); // Set preferred size for the scroll pane
+
+        // Add a home button
+        JButton homeButton = new JButton("Home");
+        homeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        homeButton.addActionListener(e -> showHomeView(mainPanel, frame));
+
+        // Create a container panel to hold the scroll pane and home button
+        JPanel containerPanel = new JPanel();
+        containerPanel.setLayout(new BoxLayout(containerPanel, BoxLayout.Y_AXIS));
+        containerPanel.add(scrollPane);
+        containerPanel.add(homeButton);
+
+        // Add the container panel to the main panel
         mainPanel.removeAll();
         mainPanel.add(createRibbonPanel(mainPanel, frame), BorderLayout.NORTH);
-        mainPanel.add(courseDirectoryPanel, BorderLayout.CENTER);
+        mainPanel.add(containerPanel, BorderLayout.CENTER);
 
+        // Refresh the frame
         frame.revalidate();
         frame.repaint();
     }
-
     private static void showAddCourseView(JPanel mainPanel, JFrame frame) {
         JPanel addCoursePanel = new JPanel();
         addCoursePanel.setName("AddCoursePanel");
