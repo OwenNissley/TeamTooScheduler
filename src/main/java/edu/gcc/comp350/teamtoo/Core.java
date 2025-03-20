@@ -1,5 +1,6 @@
 package edu.gcc.comp350.teamtoo;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -30,9 +31,10 @@ public class Core {
             semesterSchedules = FRW.readScheduleFromFile("StoredSchedules.txt");
 
             //check for conflicts in every schedule
-            for (Map.Entry<String, ArrayList<Schedule>> entry : semesterSchedules.entrySet()) {
-                String semesterKey = entry.getKey();
-                ArrayList<Schedule> schedules = entry.getValue();
+            //for (Map.Entry<String, ArrayList<Schedule>> entry : semesterSchedules.entrySet()) {
+            for (String semesterKey : semesterSchedules.keySet()) {
+                //String semesterKey = entry.getKey();
+                schedules = semesterSchedules.get(semesterKey);
                 for (Schedule s : schedules) {
                     s.checkConflict();
                 }
@@ -40,6 +42,7 @@ public class Core {
         }
         catch(Exception e){
             //make an empty semesterSchedule
+            System.out.println("StoredSchedules.txt not found, creating new schedules.");
             semesterSchedules = new HashMap<>();
         }
 
