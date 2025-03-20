@@ -25,12 +25,14 @@ public class Schedule
         conflictingCourses = new ArrayList<>();
     }
 
+    //this should be deleted and not be used at all
     public Schedule(ArrayList<Course> courses){
         this.courses = new ArrayList<>(courses);
         this.scheduleID = idCounter++;
         this.history = new ScheduleHistory(courses);
         isConflict = false;
         conflictingCourses = new ArrayList<>();
+        checkConflict(); // check for conflicts when schedule is created
     }
 
     public int getScheduleID() {
@@ -130,10 +132,13 @@ public class Schedule
     public void undoAction() {
         history.getPrev(courses);
         courses = new ArrayList<>(history.getCurrentNodeData());
+        //addCourse(hirstory.getCurrentNodeDate)
+        checkConflict(); // recheck conflicts after undo
     }
     public void redoAction() {
         history.getNext(courses);
         courses = new ArrayList<>(history.getCurrentNodeData());
+        checkConflict(); // recheck conflicts after redo
     }
 
     //END UNDO AND REDO
@@ -155,8 +160,11 @@ public class Schedule
             if (course.hasConflict(c) && !course.equals(c))
             {
                 isConflict = true;
-                conflictingCourses.add(c);
-                //if course not in conflictingCourses, add it
+                //if course is not in conflictingCourses, add it
+                if (!conflictingCourses.contains(c))
+                {
+                    conflictingCourses.add(c);
+                }
                 if (!conflictingCourses.contains(course))
                 {
                     conflictingCourses.add(course);

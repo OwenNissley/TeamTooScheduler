@@ -194,6 +194,8 @@ public class Course {
         return hour * 60 + minute; // Convert to total minutes
     }
 
+    /*
+    // I think I can get rid of this (Problem solved elsewhere [from multiple CourseRegistry objects])
     // Check if the course is equal to another course
     // check whether the courses have the same name, times, and days
     @Override
@@ -223,6 +225,7 @@ public class Course {
 
         return true;
     }
+    */
 }
 
 /*
