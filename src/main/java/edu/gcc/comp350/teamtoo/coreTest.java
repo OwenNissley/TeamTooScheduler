@@ -103,14 +103,14 @@ public class coreTest {
 
     public int getNumOfSchedules() {
         return schedules.size();
-    }
+    } //addded
 
     public void setSelectedSchedule(int selectedSchedule) {
         this.selectedSchedule = selectedSchedule;
-    }
+    } //added
     public int getSelectedSchedule() {
         return selectedSchedule;
-    }
+    } //added
 
     public void removeCourse(int courseIndex) {
         schedules.get(selectedSchedule).removeCourse(courseIndex);
@@ -141,13 +141,19 @@ public class coreTest {
     //from the list of schedules
     public int deleteSchedule() {
         if(schedules.size() == 1){
-            return 1;
+            schedules.remove(0);
+            newSchedule();
+            return 0; //changed 1 -> 0
+        }else {
+            int oldSelectedSchedule = selectedSchedule; //added
+            schedules.remove(selectedSchedule);
+                if (oldSelectedSchedule ==0){
+                    selectedSchedule = 0; //added
+                }else {
+                    selectedSchedule = oldSelectedSchedule - 1; //added
+                }
         }
-        schedules.remove(selectedSchedule);
-        if(selectedSchedule >= schedules.size()){
-            selectedSchedule = schedules.size() - 1;
-        }
-        return 0;
+        return selectedSchedule; //added
     }
 
     public void loadSchedule(Schedule schedule){

@@ -33,6 +33,7 @@ public class reactController {
         core.addCourse(0);
         core.addCourse(1);
        // core.addCourse(2);
+
     }
 
     public void registerRoutes(Javalin app) {

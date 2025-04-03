@@ -18,10 +18,14 @@ public class calendarControllor {
         app.post("/updateTerm", this::updateTerm);
         app.post("/selectSchedule", this::selectSchedule);
         app.post("/newSchedule", this::createNewSchedule);
-        // app.delete("/courseReg", this::removeItem);
+        app.post("/deleteSchedule", this::deleteSchedule);
     }
 
 
+    private void deleteSchedule(Context ctx) {
+        int scheduleIndex = core.deleteSchedule();
+        ctx.json(scheduleIndex);
+    }
     private void createNewSchedule(Context ctx) {
         core.newSchedule();
         //ctx.status(200).result("New schedule created.");

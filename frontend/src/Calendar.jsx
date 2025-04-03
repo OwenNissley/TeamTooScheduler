@@ -119,11 +119,10 @@ const Calendar = () => {
 
   const handleDeleteSchedule = async () => {
     try {
-      await axios.post("http://localhost:7000/deleteSchedule", null, {
-        params: { scheduleIndex: selectedSchedule },
-      });
+      const response = await axios.post("http://localhost:7000/deleteSchedule");
+      const newScheduleIndex = response.data;
       setNumOfSchedules((prev) => (prev > 1 ? prev - 1 : 1));
-      setSelectedSchedule(1);
+      setSelectedSchedule(newScheduleIndex + 1);
       fetchCourses();
     } catch (error) {
       console.error("Error deleting schedule:", error);
@@ -187,7 +186,7 @@ const Calendar = () => {
         <select value={selectedSchedule} onChange={handleScheduleChange}>
           {Array.from({ length: numOfSchedules }, (_, index) => (
             <option key={index + 1} value={index + 1}>
-              {index + 1}
+              Schedule {index + 1}
             </option>
           ))}
         </select>
