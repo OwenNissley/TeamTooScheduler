@@ -4,6 +4,16 @@ import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 import { useNavigate } from "react-router-dom";
 import "./Calendar.css";
 
+const dayToNumber = (day) => {
+  const dayMap = { M: 1, T: 2, W: 3, R: 4, F: 5 };
+  return dayMap[day] ?? 1; // Default to Monday
+};
+
+const parseTime = (timeStr) => {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours + minutes / 60;
+};
+
 const Calendar = () => {
   const [calendar, setCalendar] = useState(null);
   const [events, setEvents] = useState([]);
@@ -13,291 +23,190 @@ const Calendar = () => {
   const [selectedYear, setSelectedYear] = useState("2023");
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const navigate = useNavigate();
-/*
-const config = {
-  viewType: "Week",
-  durationBarVisible: false,
-  timeRangeSelectedHandling: "Disabled",
-  weekStarts: 1, // Start on Monday
-  businessBeginsHour: 8,
-  businessEndsHour: 19,
-  heightSpec: "BusinessHours",
-  days: 5, // Show only Monday to Friday
-  headerDateFormat: "dddd", // Show full weekday names
-  scrollingEnabled: false,
-  visibleRange: { start: "Monday", days: 5 }, // Ensure only Mon-Fri are visible
-};
-*/
 
-  const config = {
-    viewType: "Week",
-    durationBarVisible: false,
-    timeRangeSelectedHandling: "Disabled",
-     weekStarts: 1,
-    businessBeginsHour: 8,
-    businessEndsHour: 19,
-    heightSpec: "BusinessHours",
-    days: 5, // Monday–Friday
-    headerDateFormat: "dddd", // Show full weekday names
-    scrollingEnabled: false, // Remove scrollbars
-        eventMoveHandling: "Disabled",
-        eventResizeHandling: "Disabled",
-    visibleRange: { start: "Monday", days: 5 },
-     //days: 7,  // Keep 7 days but manually hide Sat/Sun
-      onBeforeCellRender: (args) => {
-        const day = args.cell.start.getDay(); // 0 = Sunday, 6 = Saturday
-        if (day === 0 || day === 4) {
-          args.cell.hidden = true;  // Hide Sat & Sun
-        }
-      },// Ensure only Mon-Fri are visible
-    onEventClick: async (args) => {
-      await editEvent(args.e);
-    },
-    contextMenu: new DayPilot.Menu({
-      items: [
-        {
-          text: "Delete",
-          onClick: async (args) => {
-            calendar.events.remove(args.source);
-          },
-        },
-        {
-          text: "Edit...",
-          onClick: async (args) => {
-            await editEvent(args.source);
-          },
-        },
-      ],
-    }),
+  const courseColors = {};
+  const usedColors = new Set();
+  const getUniqueColor = () => {
+    const colors = ["#3c78d8", "#6aa84f", "#f1c232", "#cc4125", "#ff5733", "#33ff57", "#3357ff", "#ff33a8"];
+    let color;
+    do {
+      color = colors[Math.floor(Math.random() * colors.length)];
+    } while (usedColors.has(color));
+    usedColors.add(color);
+    return color;
   };
 
-const handleScheduleChange = async (e) => {
-  const newSchedule = Number(e.target.value);
-  setSelectedSchedule(newSchedule);
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.get("http://localhost:7000/updateSchedule");
+      const courses = response.data;
+      setCourses(courses);
+        console.log("Fetched courses:", courses);
 
- /* try {
-    await axios.post("http://localhost:7000/selectSchedule", null, {
-      params: { scheduleNumber: newSchedule }, // Send new schedule number
-    });
-    console.log(`Schedule updated to ${newSchedule}`);
-  } catch (error) {
-    console.error("Error updating schedule:", error);
-  }
 
-  */
-};
+      const newEvents = courses.flatMap((course) =>
+        course.times.map((timeSlot) => {
+          const dayOffset = dayToNumber(timeSlot.day);
+          const startDate = DayPilot.Date.today().firstDayOfWeek().addDays(dayOffset);
 
-  const editEvent = async (e) => {
-    const modal = await DayPilot.Modal.prompt("Update event text:", e.text());
-    if (!modal.result) return;
-    e.data.text = modal.result;
-    calendar.events.update(e);
+          if (!courseColors[course.number]) {
+            courseColors[course.number] = getUniqueColor();
+          }
+
+          return {
+            id: `${course.number}-${timeSlot.day}-${timeSlot.start_time}`,
+            text: course.name,
+            start: startDate.addHours(parseTime(timeSlot.start_time)),
+            end: startDate.addHours(parseTime(timeSlot.end_time)),
+            resource: dayOffset.toString(),
+            backColor: courseColors[course.number],
+          };
+        })
+      );
+
+      setEvents(newEvents);
+      if (calendar) {
+        calendar.update({ events: newEvents });
+      }
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
   };
-
-const courseColors = {};
-const usedColors = new Set(); // Track assigned colors
-
-const getUniqueColor = () => {
-  const colors = ["#3c78d8", "#6aa84f", "#f1c232", "#cc4125", "#ff5733", "#33ff57", "#3357ff", "#ff33a8"];
-  let color;
-  do {
-    color = colors[Math.floor(Math.random() * colors.length)];
-  } while (usedColors.has(color)); // Keep picking until unique
-
-  usedColors.add(color); // Mark this color as used
-  return color;
-};
-
- useEffect(() => {
-    const getNumberOfSchudules = async () => {
-        const response = await axios.get("http://localhost:7000/getNumOfSchedules");
-        const numOfSchedules = response.data;
-        console.log("Number of schedules:", numOfSchedules);
-        setNumOfSchedules(numOfSchedules);
-     }
-      getNumberOfSchudules();
-}, [selectedYear, selectedTerm, calendar]);
-
-// Set selectedSchedule
-
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await axios.get("http://localhost:7000/updateSchedule");
-        const courses = response.data;
-         setCourses(courses);
-
-        console.log("Fetched courses:", courses);
-        // Convert courses into events
-        const newEvents = courses.flatMap((course) =>
-          course.times.map((timeSlot) => {
-            const dayOffset = dayToNumber(timeSlot.day); // Convert to weekday index
-            const startDate = DayPilot.Date.today().firstDayOfWeek().addDays(dayOffset); // Get correct day
-
-             if (!courseColors[course.number]) {
-               courseColors[course.number] = getUniqueColor(); // Assign unique color
-             }
-             const courseColor = courseColors[course.number];
-            const event = {
-              id: `${course.number}-${timeSlot.day}-${timeSlot.start_time}`,
-              text: course.name, // Course name
-              start: startDate.addHours(parseTime(timeSlot.start_time)), // Adjust start time
-              end: startDate.addHours(parseTime(timeSlot.end_time)), // Adjust end time
-              resource: dayOffset.toString(), // Assign to correct weekday
-              backColor: courseColor,
-            };
-            console.log("Mapped event:", event);
-            return event;
-          })
-        );
-
-        setEvents(newEvents);
-
-        if (calendar) {
-          calendar.update({ events: newEvents });
-        }
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-      }
-    };
-
     fetchCourses();
-  },[selectedYear, selectedTerm, selectedSchedule,calendar]);
+  }, [selectedYear, selectedTerm, selectedSchedule]);
 
-  // Convert day letter to weekday offset (Monday = 0, Friday = 4)
-  const dayToNumber = (day) => {
-    const dayMap = { M: 1, T: 2, W: 3, R: 4, F: 5 }; // Shift everything by +1
-    return dayMap[day] ?? 1; // Default to Monday
-  };
-
-  // Convert "HH:MM:SS" to hours as a float (e.g., "15:30:00" -> 15.5)
-  const parseTime = (timeStr) => {
-    const [hours, minutes] = timeStr.split(":").map(Number);
-    return hours + minutes / 60;
-  };
-
-  // Generate random colors for events
-  const getRandomColor = () => {
-    const colors = ["#3c78d8", "#6aa84f", "#f1c232", "#cc4125"];
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
-const handleNewSchedule = async () => {
-    console.log("Creating new schedule...");
-  try {
-    const response = await axios.post("http://localhost:7000/newSchedule");
-    const newScheduleNumber = response.data;
-    console.log(`num: ${newScheduleNumber}`);
-    if (newScheduleNumber) {
-      setNumOfSchedules((prev) => prev + 1);
-      setSelectedSchedule(newScheduleNumber);
-      console.log(`New schedule created: ${newScheduleNumber}`);
-    }
-  } catch (error) {
-    console.error("Error creating new schedule:", error);
-  }
-};
-
-const handleDeleteSchedule = async () => {
-  if (numOfSchedules > 1) {
+  const getNumberOfSchedules = async () => {
     try {
-      await axios.post("http://localhost:7000/deleteSchedule", {
-        scheduleNumber: selectedSchedule,
-      });
+      const response = await axios.get("http://localhost:7000/getNumOfSchedules");
+      setNumOfSchedules(response.data);
+    } catch (error) {
+      console.error("Error fetching number of schedules:", error);
+    }
+  };
 
-      setNumOfSchedules((prev) => prev - 1);
-      setSelectedSchedule(1); // Reset to first schedule after deletion
-      console.log(`Deleted schedule: ${selectedSchedule}`);
+  useEffect(() => {
+    getNumberOfSchedules();
+  }, []);
+
+  const handleScheduleChange = async (e) => {
+    const newScheduleNum = Number(e.target.value);
+    console.log("Selected schedule:", newScheduleNum);
+    try {
+      await axios.post("http://localhost:7000/selectSchedule", null, {
+        params: { scheduleIndex: newScheduleNum-1 },
+      });
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+    }
+   setSelectedSchedule(newScheduleNum);
+   //getNumOfSchedules();
+
+  };
+
+  const handleNewSchedule = async () => {
+    try {
+      const response = await axios.post("http://localhost:7000/newSchedule");
+      const newScheduleNumber = response.data;
+      console.log("New schedule created:", newScheduleNumber);
+      setNumOfSchedules((prev) => prev + 1);
+      setSelectedSchedule(newScheduleNumber+1);
+    } catch (error) {
+      console.error("Error creating new schedule:", error);
+    }
+  };
+
+  const handleDeleteSchedule = async () => {
+    try {
+      await axios.post("http://localhost:7000/deleteSchedule", null, {
+        params: { scheduleIndex: selectedSchedule },
+      });
+      setNumOfSchedules((prev) => (prev > 1 ? prev - 1 : 1));
+      setSelectedSchedule(1);
+      fetchCourses();
     } catch (error) {
       console.error("Error deleting schedule:", error);
     }
-  } else {
-    alert("You must have at least one schedule.");
-  }
-};
-
-  const handleYearChange = async (e) => {
-      const newYear = e.target.value; // Get selected year
-      setSelectedYear(newYear); // Update state
-
-      const yearTermString = `${newYear}_${selectedTerm}`; // Format as "2023_Fall"
-
-      try {
-          await axios.post("http://localhost:7000/updateYear", null, {
-              params: { yearTermString: yearTermString } // Send as a query parameter
-          });
-
-          console.log("Updated year successfully:", yearTermString);
-      } catch (error) {
-          console.error("Error updating year:", error);
-      }
   };
 
+  const handleYearChange = async (e) => {
+    const newYear = e.target.value;
+    setSelectedYear(newYear);
+    try {
+      await axios.post("http://localhost:7000/updateYear", null, {
+        params: { yearTermString: `${newYear}_${selectedTerm}` },
+      });
+    } catch (error) {
+      console.error("Error updating year:", error);
+    }
+    getNumberOfSchedules();
+    setSelectedSchedule(1);
 
- const handleTermChange = async (e) =>   {
-         const newTerm = e.target.value; // Get selected year
-         setSelectedTerm(newTerm); // Update state
+  };
 
-         const yearTermString = `${selectedYear}_${newTerm}`; // Format as "2023_Fall"
+  const handleTermChange = async (e) => {
+    const newTerm = e.target.value;
+    setSelectedTerm(newTerm);
+    try {
+      await axios.post("http://localhost:7000/updateTerm", null, {
+        params: { yearTermString: `${selectedYear}_${newTerm}` },
+      });
+    } catch (error) {
+      console.error("Error updating term:", error);
+    }
+   getNumberOfSchedules();
+   console.log("numOfSchedules:", numOfSchedules);
+   setSelectedSchedule(1);
 
-              try {
-                  await axios.post("http://localhost:7000/updateTerm", null, {
-                      params: { yearTermString: yearTermString } // Send as a query parameter
-                  });
+  };
 
-                  console.log("Updated year successfully:", yearTermString);
-              } catch (error) {
-                  console.error("Error updating year:", error);
-              }
-    };
+  return (
+    <div className="page-container">
+      <div className="top-banner">
+        <button onClick={() => navigate("/")}>Home</button>
+        <button onClick={() => navigate("/quick-schedule")}>Quick Schedule</button>
+        <button onClick={() => navigate("/add-course")}>Add Course</button>
+        <button onClick={() => navigate("/review")}>Review</button>
+        <button onClick={() => navigate("/course-directory")}>Course Directory</button>
+        <button onClick={() => navigate("/your-info")}>Your Info</button>
+      </div>
 
+      <div className="control-banner">
+        <select value={selectedTerm} onChange={handleTermChange}>
+          <option value="Spring">Spring</option>
+          <option value="Fall">Fall</option>
+        </select>
 
-   return (
-      <div className="page-container">
-        <div className="top-banner">
-          <button onClick={() => navigate("/")}>Home</button>
-          <button onClick={() => navigate("/quick-schedule")}>Quick Schedule</button>
-          <button onClick={() => navigate("/add-course")}>Add Course</button>
-          <button onClick={() => navigate("/review")}>Review</button>
-          <button onClick={() => navigate("/course-directory")}>Course Directory</button>
-          <button onClick={() => navigate("/your-info")}>Your Info</button>
-        </div>
+        <select value={selectedYear} onChange={handleYearChange}>
+          <option value="2023">2023</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+        </select>
 
-        <div className="control-banner">
-          <select value={selectedTerm} onChange={handleTermChange}>
-            <option value="Spring">Spring</option>
-            <option value="Fall">Fall</option>
-          </select>
+        <select value={selectedSchedule} onChange={handleScheduleChange}>
+          {Array.from({ length: numOfSchedules }, (_, index) => (
+            <option key={index + 1} value={index + 1}>
+              {index + 1}
+            </option>
+          ))}
+        </select>
 
-          <select value={selectedYear} onChange={handleYearChange}>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-          </select>
+        <button onClick={handleNewSchedule}>New Schedule</button>
+        <button onClick={handleDeleteSchedule}>Delete Schedule</button>
+      </div>
 
-          <select value={selectedSchedule} onChange={handleScheduleChange}>
-            {Array.from({ length: numOfSchedules }, (_, index) => (
-              <option key={index + 1} value={index + 1}>
-                {index + 1}
-              </option>
-            ))}
-          </select>
+      <div className="warnings-section">
+        <p className="warning-text">⚠️ Course conflict warnings will appear here.</p>
+      </div>
 
-         <button onClick={handleNewSchedule}>New Schedule</button>
-         <button onClick={handleDeleteSchedule}>Delete Schedule</button>
-        </div>
-
-        <div className="warnings-section">
-          <p className="warning-text">⚠️ Course conflict warnings will appear here.</p>
-        </div>
-
-        <div className="calendar-container">
-          <div className="calendar-wrapper">
-            <DayPilotCalendar {...config} controlRef={(ref) => setCalendar(ref)} events={events} />
-          </div>
+      <div className="calendar-container">
+        <div className="calendar-wrapper">
+          <DayPilotCalendar {...{ viewType: "Week", events, controlRef: (ref) => setCalendar(ref) }} />
         </div>
       </div>
-    );
+    </div>
+  );
 };
 
 export default Calendar;

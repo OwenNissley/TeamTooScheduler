@@ -4,9 +4,9 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 public class calendarControllor {
-    private final Core core;
+    private final coreTest core;
 
-    public calendarControllor(Core core) {
+    public calendarControllor(coreTest core) {
         this.core = core;
     }
 
@@ -25,21 +25,24 @@ public class calendarControllor {
     private void createNewSchedule(Context ctx) {
         core.newSchedule();
         //ctx.status(200).result("New schedule created.");
-        ctx.json(2);
+        int index = core.getSelectedSchedule();
+        ctx.json(index);
     }
     private void getCourseList(Context ctx) {
         ctx.json(core.getSchedule());
     }
 
     private void getNumOfShecules(Context ctx) {
-        ctx.json(1);
+        int num  = core.getNumOfSchedules();
+        ctx.json(num);
     }
 
     private void selectSchedule(Context ctx) {
         String scheduleIndex = ctx.queryParam("scheduleIndex");
         if (scheduleIndex != null) {
             int index = Integer.parseInt(scheduleIndex);
-            //core.selectSchedule(index);
+            System.out.println("Selected schedule index: " + index);
+            core.setSelectedSchedule(index);
             ctx.status(200).result("Selected schedule: " + index);
         } else {
             ctx.status(400).result("Schedule index parameter is missing.");
