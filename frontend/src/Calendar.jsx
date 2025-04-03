@@ -9,7 +9,8 @@ const Calendar = () => {
   const [events, setEvents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [numOfSchedules, setNumOfSchedules] = useState(1);
-  const [selectedYear, setSelectedYear] = useState("2024");
+  const [selectedSchedule, setSelectedSchedule] = useState(1);
+  const [selectedYear, setSelectedYear] = useState("2023");
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const navigate = useNavigate();
 /*
@@ -70,6 +71,22 @@ const config = {
     }),
   };
 
+const handleScheduleChange = async (e) => {
+  const newSchedule = Number(e.target.value);
+  setSelectedSchedule(newSchedule);
+
+ /* try {
+    await axios.post("http://localhost:7000/selectSchedule", null, {
+      params: { scheduleNumber: newSchedule }, // Send new schedule number
+    });
+    console.log(`Schedule updated to ${newSchedule}`);
+  } catch (error) {
+    console.error("Error updating schedule:", error);
+  }
+
+  */
+};
+
   const editEvent = async (e) => {
     const modal = await DayPilot.Modal.prompt("Update event text:", e.text());
     if (!modal.result) return;
@@ -95,10 +112,13 @@ const getUniqueColor = () => {
     const getNumberOfSchudules = async () => {
         const response = await axios.get("http://localhost:7000/getNumOfSchedules");
         const numOfSchedules = response.data;
+        console.log("Number of schedules:", numOfSchedules);
         setNumOfSchedules(numOfSchedules);
      }
       getNumberOfSchudules();
-}, [calendar]);
+}, [selectedYear, selectedTerm, calendar]);
+
+// Set selectedSchedule
 
 
   useEffect(() => {
@@ -143,7 +163,7 @@ const getUniqueColor = () => {
     };
 
     fetchCourses();
-  }, [calendar]);
+  },[selectedYear, selectedTerm, selectedSchedule,calendar]);
 
   // Convert day letter to weekday offset (Monday = 0, Friday = 4)
   const dayToNumber = (day) => {
@@ -162,6 +182,39 @@ const getUniqueColor = () => {
     const colors = ["#3c78d8", "#6aa84f", "#f1c232", "#cc4125"];
     return colors[Math.floor(Math.random() * colors.length)];
   };
+const handleNewSchedule = async () => {
+    console.log("Creating new schedule...");
+  try {
+    const response = await axios.post("http://localhost:7000/newSchedule");
+    const newScheduleNumber = response.data;
+    console.log(`num: ${newScheduleNumber}`);
+    if (newScheduleNumber) {
+      setNumOfSchedules((prev) => prev + 1);
+      setSelectedSchedule(newScheduleNumber);
+      console.log(`New schedule created: ${newScheduleNumber}`);
+    }
+  } catch (error) {
+    console.error("Error creating new schedule:", error);
+  }
+};
+
+const handleDeleteSchedule = async () => {
+  if (numOfSchedules > 1) {
+    try {
+      await axios.post("http://localhost:7000/deleteSchedule", {
+        scheduleNumber: selectedSchedule,
+      });
+
+      setNumOfSchedules((prev) => prev - 1);
+      setSelectedSchedule(1); // Reset to first schedule after deletion
+      console.log(`Deleted schedule: ${selectedSchedule}`);
+    } catch (error) {
+      console.error("Error deleting schedule:", error);
+    }
+  } else {
+    alert("You must have at least one schedule.");
+  }
+};
 
   const handleYearChange = async (e) => {
       const newYear = e.target.value; // Get selected year
@@ -222,7 +275,7 @@ const getUniqueColor = () => {
             <option value="2025">2025</option>
           </select>
 
-          <select>
+          <select value={selectedSchedule} onChange={handleScheduleChange}>
             {Array.from({ length: numOfSchedules }, (_, index) => (
               <option key={index + 1} value={index + 1}>
                 {index + 1}
@@ -230,8 +283,8 @@ const getUniqueColor = () => {
             ))}
           </select>
 
-          <button>New Schedule</button>
-          <button>Delete Schedule</button>
+         <button onClick={handleNewSchedule}>New Schedule</button>
+         <button onClick={handleDeleteSchedule}>Delete Schedule</button>
         </div>
 
         <div className="warnings-section">

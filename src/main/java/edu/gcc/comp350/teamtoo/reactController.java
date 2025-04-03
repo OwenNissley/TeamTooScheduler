@@ -1,6 +1,7 @@
 //NOTES FOR MICAH"S RETSARTED ASSS
 //I need method to return numebr of schudules
-//
+// i need method to change the selected schedule
+// i need method to return the selected schedule
 //
 //
 //
@@ -26,6 +27,7 @@ public class reactController {
         this.core = new Core();
         calendarControllor = new calendarControllor(core);
         //Test lines
+        core.addFilter(new FilterSemester("2023", "Fall"));
         core.searchGeneral("Comp");
         core.searchAdvanced();
         core.addCourse(0);

@@ -16,16 +16,34 @@ public class calendarControllor {
         app.get("/getNumOfSchedules", this::getNumOfShecules);
         app.post("/updateYear", this::updateYear);
         app.post("/updateTerm", this::updateTerm);
-        //app.get("/getSchedules", this::getNumOfShecules);
+        app.post("/selectSchedule", this::selectSchedule);
+        app.post("/newSchedule", this::createNewSchedule);
         // app.delete("/courseReg", this::removeItem);
     }
 
+
+    private void createNewSchedule(Context ctx) {
+        core.newSchedule();
+        //ctx.status(200).result("New schedule created.");
+        ctx.json(2);
+    }
     private void getCourseList(Context ctx) {
         ctx.json(core.getSchedule());
     }
 
     private void getNumOfShecules(Context ctx) {
-       // ctx.json(core.getNumOfSchedules());
+        ctx.json(1);
+    }
+
+    private void selectSchedule(Context ctx) {
+        String scheduleIndex = ctx.queryParam("scheduleIndex");
+        if (scheduleIndex != null) {
+            int index = Integer.parseInt(scheduleIndex);
+            //core.selectSchedule(index);
+            ctx.status(200).result("Selected schedule: " + index);
+        } else {
+            ctx.status(400).result("Schedule index parameter is missing.");
+        }
     }
 
     private void updateYear(Context ctx) {
