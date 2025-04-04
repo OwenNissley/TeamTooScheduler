@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 import { useNavigate } from "react-router-dom";
+import ScheduleControls from "./ScheduleControls";
+import { ScheduleContext } from "./ScheduleContext";
 import "./Calendar.css";
 
 const dayToNumber = (day) => {
@@ -18,13 +20,15 @@ const Calendar = () => {
   const [calendar, setCalendar] = useState(null);
   const [events, setEvents] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [numOfSchedules, setNumOfSchedules] = useState(1);
-  const [selectedSchedule, setSelectedSchedule] = useState(1);
-  const [selectedYear, setSelectedYear] = useState("2023");
-  const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [hasConflict, setHasConflict] = useState(false);
   const [conflictingCourses, setConflictingCourses] = useState([]);
   const navigate = useNavigate();
+
+  const { selectedYear, selectedTerm, selectedSchedule,setSelectedYear,
+                                                           setSelectedTerm,
+                                                           setSelectedSchedule,
+                                                           handleNewSchedule,
+                                                           handleDeleteSchedule, } = useContext(ScheduleContext);
 
   const courseColors = {};
   const usedColors = new Set();
@@ -96,140 +100,14 @@ const Calendar = () => {
       }, [selectedSchedule]);
 
 
-
-  const getNumberOfSchedules = async () => {
-    try {
-      const response = await axios.get("http://localhost:7000/getNumOfSchedules");
-      setNumOfSchedules(response.data);
-    } catch (error) {
-      console.error("Error fetching number of schedules:", error);
-    }
-  };
-
-  useEffect(() => {
-    getNumberOfSchedules();
-  }, []);
-
-  const handleScheduleChange = async (e) => {
-    const newScheduleNum = Number(e.target.value);
-    console.log("Selected schedule:", newScheduleNum);
-    try {
-      await axios.post("http://localhost:7000/selectSchedule", null, {
-        params: { scheduleIndex: newScheduleNum-1 },
-      });
-    } catch (error) {
-      console.error("Error updating schedule:", error);
-    }
-   setSelectedSchedule(newScheduleNum);
-   //getNumOfSchedules();
-
-  };
-
-  const handleNewSchedule = async () => {
-    try {
-      const response = await axios.post("http://localhost:7000/newSchedule");
-      const newScheduleNumber = response.data;
-      console.log("New schedule created:", newScheduleNumber);
-      setNumOfSchedules((prev) => prev + 1);
-      setSelectedSchedule(newScheduleNumber+1);
-    } catch (error) {
-      console.error("Error creating new schedule:", error);
-    }
-  };
-
-  const handleDeleteSchedule = async () => {
-    try {
-      const response = await axios.post("http://localhost:7000/deleteSchedule");
-      const newScheduleIndex = response.data;
-      setNumOfSchedules((prev) => (prev > 1 ? prev - 1 : 1));
-      setSelectedSchedule(newScheduleIndex + 1);
-      fetchCourses();
-    } catch (error) {
-      console.error("Error deleting schedule:", error);
-    }
-  };
-
-  const handleYearChange = async (e) => {
-    const newYear = e.target.value;
-    setSelectedYear(newYear);
-    try {
-      await axios.post("http://localhost:7000/updateYear", null, {
-        params: { yearTermString: `${newYear}_${selectedTerm}` },
-      });
-    } catch (error) {
-      console.error("Error updating year:", error);
-    }
-    getNumberOfSchedules();
-    setSelectedSchedule(1);
-
-  };
-
-  const handleTermChange = async (e) => {
-    const newTerm = e.target.value;
-    setSelectedTerm(newTerm);
-    try {
-      await axios.post("http://localhost:7000/updateTerm", null, {
-        params: { yearTermString: `${selectedYear}_${newTerm}` },
-      });
-    } catch (error) {
-      console.error("Error updating term:", error);
-    }
-   getNumberOfSchedules();
-   console.log("numOfSchedules:", numOfSchedules);
-   setSelectedSchedule(1);
-
-  };
-
-
-
   return (
     <div className="page-container">
       <div className="top-banner">
         <button onClick={() => navigate("/")}>Home</button>
-        <button onClick={() => navigate("/quick-schedule")}>Quick Schedule</button>
         <button onClick={() => navigate("/addCourse")}>Add Course</button>
-        <button onClick={() => navigate("/review")}>Review</button>
-        <button onClick={() => navigate("/course-directory")}>Course Directory</button>
-        <button onClick={() => navigate("/your-info")}>Your Info</button>
       </div>
 
-      <div className="control-banner">
-        <select value={selectedTerm} onChange={handleTermChange}>
-          <option value="Spring">Spring</option>
-          <option value="Fall">Fall</option>
-        </select>
-
-        <select value={selectedYear} onChange={handleYearChange}>
-          <option value="2023">2023</option>
-          <option value="2024">2024</option>
-          <option value="2025">2025</option>
-        </select>
-
-        <select value={selectedSchedule} onChange={handleScheduleChange}>
-          {Array.from({ length: numOfSchedules }, (_, index) => (
-            <option key={index + 1} value={index + 1}>
-              Schedule {index + 1}
-            </option>
-          ))}
-        </select>
-
-        <button onClick={handleNewSchedule}>New Schedule</button>
-        <button onClick={handleDeleteSchedule}>Delete Schedule</button>
-      </div>
-
-     {hasConflict && (
-       <div className="warnings-section">
-         <p className="warning-text">⚠️ Course conflict detected!</p>
-         <ul className="conflict-list">
-           {conflictingCourses.map((course, index) => (
-             <li key={index} className="conflict-item">
-               {course.name} ({course.code}) - {course.time}
-             </li>
-           ))}
-         </ul>
-       </div>
-     )}
-
+      <ScheduleControls />
 
       <div className="calendar-container">
         <div className="calendar-wrapper">
