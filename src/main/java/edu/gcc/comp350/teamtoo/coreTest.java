@@ -94,6 +94,19 @@ public class coreTest {
         //}
     }
 
+    public ArrayList<Course> getNonConflictingCourses() {
+    ArrayList<Course> nonConflictingCourses = new ArrayList<>();
+        for (Course course : this.getSchedule()) {
+            if (!this.getConflictingCourses().contains(course)) {
+                nonConflictingCourses.add(course);
+            }
+        }
+        return nonConflictingCourses;
+    }
+
+
+    //added
+
     public void removeCourse(Course course) {
         if (selectedSchedule < schedules.size()) {
             Schedule schedule = schedules.get(selectedSchedule);

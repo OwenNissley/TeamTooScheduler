@@ -1,103 +1,33 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 import { useNavigate } from "react-router-dom";
 import "./Calendar.css";
 
-const dayToNumber = (day) => {
-  const dayMap = { M: 1, T: 2, W: 3, R: 4, F: 5 };
-  return dayMap[day] ?? 1; // Default to Monday
-};
-
-const parseTime = (timeStr) => {
-  const [hours, minutes] = timeStr.split(":").map(Number);
-  return hours + minutes / 60;
-};
-
-const Calendar = () => {
-  const [calendar, setCalendar] = useState(null);
-  const [events, setEvents] = useState([]);
-  const [courses, setCourses] = useState([]);
+const AddCourseScreen = () => {
   const [numOfSchedules, setNumOfSchedules] = useState(1);
   const [selectedSchedule, setSelectedSchedule] = useState(1);
   const [selectedYear, setSelectedYear] = useState("2023");
   const [selectedTerm, setSelectedTerm] = useState("Fall");
-  const [hasConflict, setHasConflict] = useState(false);
-  const [conflictingCourses, setConflictingCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]); // Filtered courses based on search
+  const [searchTerm, setSearchTerm] = useState(""); // Track search input
   const navigate = useNavigate();
 
-  const courseColors = {};
-  const usedColors = new Set();
-  const getUniqueColor = () => {
-    const colors = ["#3c78d8", "#6aa84f", "#f1c232", "#cc4125", "#ff5733", "#33ff57", "#3357ff", "#ff33a8"];
-    let color;
-    do {
-      color = colors[Math.floor(Math.random() * colors.length)];
-    } while (usedColors.has(color));
-    usedColors.add(color);
-    return color;
-  };
 
-  const fetchCourses = async () => {
+ const fetchSearchResults = async () => {
     try {
-      const response = await axios.get("http://localhost:7000/updateSchedule");
-      const courses = response.data;
-      setCourses(courses);
-        console.log("Fetched courses:", courses);
-
-
-      const newEvents = courses.flatMap((course) =>
-        course.times.map((timeSlot) => {
-          const dayOffset = dayToNumber(timeSlot.day);
-          const startDate = DayPilot.Date.today().firstDayOfWeek().addDays(dayOffset);
-
-          if (!courseColors[course.number]) {
-            courseColors[course.number] = getUniqueColor();
-          }
-
-          return {
-            id: `${course.number}-${timeSlot.day}-${timeSlot.start_time}`,
-            text: course.name,
-            start: startDate.addHours(parseTime(timeSlot.start_time)),
-            end: startDate.addHours(parseTime(timeSlot.end_time)),
-            resource: dayOffset.toString(),
-            backColor: courseColors[course.number],
-          };
-        })
-      );
-
-      setEvents(newEvents);
-      if (calendar) {
-        calendar.update({ events: newEvents });
-      }
+      const response = await axios.get("http://localhost:7000/getSearchResults");
+      setFilteredCourses(response.data); // assuming response.data is an array of courses
     } catch (error) {
       console.error("Error fetching courses:", error);
     }
   };
 
-  useEffect(() => {
-    fetchCourses();
-  }, [selectedYear, selectedTerm, selectedSchedule]);
+useEffect(() => {
+    fetchSearchResults();
+    fetchNumberOfSchedules();
+  }, []);
 
-  const updateConflicts = async () => {
-    try {
-      const response = await axios.get("http://localhost:7000/checkConflicts");
-      const { hasConflict, conflictingCourses } = response.data;
-
-      setHasConflict(hasConflict); // Update state based on API response
-      setConflictingCourses(conflictingCourses); // Store conflicting courses if needed
-    } catch (error) {
-      console.error("Error checking for conflicts:", error);
-    }
-  };
-
-    useEffect(() => {
-        updateConflicts();
-      }, [selectedSchedule]);
-
-
-
-  const getNumberOfSchedules = async () => {
+  const fetchNumberOfSchedules = async () => {
     try {
       const response = await axios.get("http://localhost:7000/getNumOfSchedules");
       setNumOfSchedules(response.data);
@@ -106,23 +36,17 @@ const Calendar = () => {
     }
   };
 
-  useEffect(() => {
-    getNumberOfSchedules();
-  }, []);
-
   const handleScheduleChange = async (e) => {
     const newScheduleNum = Number(e.target.value);
     console.log("Selected schedule:", newScheduleNum);
     try {
       await axios.post("http://localhost:7000/selectSchedule", null, {
-        params: { scheduleIndex: newScheduleNum-1 },
+        params: { scheduleIndex: newScheduleNum - 1 },
       });
     } catch (error) {
       console.error("Error updating schedule:", error);
     }
-   setSelectedSchedule(newScheduleNum);
-   //getNumOfSchedules();
-
+    setSelectedSchedule(newScheduleNum);
   };
 
   const handleNewSchedule = async () => {
@@ -131,7 +55,7 @@ const Calendar = () => {
       const newScheduleNumber = response.data;
       console.log("New schedule created:", newScheduleNumber);
       setNumOfSchedules((prev) => prev + 1);
-      setSelectedSchedule(newScheduleNumber+1);
+      setSelectedSchedule(newScheduleNumber + 1);
     } catch (error) {
       console.error("Error creating new schedule:", error);
     }
@@ -143,7 +67,6 @@ const Calendar = () => {
       const newScheduleIndex = response.data;
       setNumOfSchedules((prev) => (prev > 1 ? prev - 1 : 1));
       setSelectedSchedule(newScheduleIndex + 1);
-      fetchCourses();
     } catch (error) {
       console.error("Error deleting schedule:", error);
     }
@@ -159,9 +82,8 @@ const Calendar = () => {
     } catch (error) {
       console.error("Error updating year:", error);
     }
-    getNumberOfSchedules();
+    fetchNumberOfSchedules();
     setSelectedSchedule(1);
-
   };
 
   const handleTermChange = async (e) => {
@@ -174,16 +96,26 @@ const Calendar = () => {
     } catch (error) {
       console.error("Error updating term:", error);
     }
-   getNumberOfSchedules();
-   console.log("numOfSchedules:", numOfSchedules);
-   setSelectedSchedule(1);
+    fetchNumberOfSchedules();
+    setSelectedSchedule(1);
+  };
 
+  const handleSearchChange = async (e) => {
+    const searchValue = e.target.value;
+    setSearchTerm(searchValue);
+    const response = await axios.post("http://localhost:7000/excuteGeneralSearch", null, {
+            params: { searchTerm: searchValue },
+    });
+    const filteredCourses = response.data; // Assuming the response contains the list of courses
+    setFilteredCourses(filteredCourses);
   };
 
 
 
+
+
   return (
-    <div className="page-container">
+    <div className="controls-container">
       <div className="top-banner">
         <button onClick={() => navigate("/")}>Home</button>
         <button onClick={() => navigate("/quick-schedule")}>Quick Schedule</button>
@@ -217,27 +149,34 @@ const Calendar = () => {
         <button onClick={handleDeleteSchedule}>Delete Schedule</button>
       </div>
 
-     {hasConflict && (
-       <div className="warnings-section">
-         <p className="warning-text">⚠️ Course conflict detected!</p>
-         <ul className="conflict-list">
-           {conflictingCourses.map((course, index) => (
-             <li key={index} className="conflict-item">
-               {course.name} ({course.code}) - {course.time}
-             </li>
-           ))}
-         </ul>
-       </div>
-     )}
+      <div className="search-container">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          placeholder="General Search"
+        />
+      </div>
 
-
-      <div className="calendar-container">
-        <div className="calendar-wrapper">
-          <DayPilotCalendar {...{ viewType: "Week", events, controlRef: (ref) => setCalendar(ref) }} />
+      <div className="courses-list">
+        <h3>Courses</h3>
+        <div className="course-box">
+          {filteredCourses.length === 0 ? (
+            <p>No courses found</p>
+          ) : (
+            filteredCourses.map((course, index) => (
+              <div key={index} className="course-item">
+                <span>{course.name}</span>
+                <button onClick={() => handleCourseSelect(index)}>
+                  Select
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default Calendar;
+export default AddCourseScreen;

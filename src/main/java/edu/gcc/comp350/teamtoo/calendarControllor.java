@@ -3,6 +3,10 @@ package edu.gcc.comp350.teamtoo;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class calendarControllor {
     private final coreTest core;
 
@@ -19,8 +23,19 @@ public class calendarControllor {
         app.post("/selectSchedule", this::selectSchedule);
         app.post("/newSchedule", this::createNewSchedule);
         app.post("/deleteSchedule", this::deleteSchedule);
+        app.get("/checkConflicts", this::hasConflicts);
     }
 
+
+
+    private void hasConflicts(Context ctx) {
+        ArrayList<Course> conflictingCourses = core.getConflictingCourses();
+        boolean hasConflicts = !conflictingCourses.isEmpty();
+        Map<String, Object> response = new HashMap<>();
+        response.put("hasConflict", hasConflicts);
+        response.put("conflictingCourses", conflictingCourses);
+        ctx.json(response);
+    }
 
     private void deleteSchedule(Context ctx) {
         int scheduleIndex = core.deleteSchedule();
@@ -33,7 +48,7 @@ public class calendarControllor {
         ctx.json(index);
     }
     private void getCourseList(Context ctx) {
-        ctx.json(core.getSchedule());
+        ctx.json(core.getNonConflictingCourses());
     }
 
     private void getNumOfShecules(Context ctx) {
