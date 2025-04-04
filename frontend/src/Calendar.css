@@ -173,6 +173,36 @@
   border-radius: 4px;
 }
 
-.course-item button:hover {
-  background-color: #0056b3;
+.course-button {
+  background-color: #007bff; /* Default blue */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
+
+.course-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.selected-button {
+  background-color: #28a745 !important; /* Green when selected */
+  cursor: not-allowed;
+}
+
+.add-course-button {
+  background-color: green;
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.add-course-button:hover {
+  background-color: darkgreen;
+}
+

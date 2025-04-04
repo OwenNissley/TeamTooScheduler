@@ -14,8 +14,15 @@ public class searchController {
     public void registerRoutes(Javalin app) {
         app.get("/getSearchResults", this::getSearchResults);
         app.post("/excuteGeneralSearch", this::excuteGeneralSearch);
-        //app.post("/addCourse", this::addCourse);
+        app.post("/addCourse", this::addCourse);
        // app.post("/removeCourse", this::removeCourse);
+    }
+
+
+    private void addCourse(Context ctx) {
+        int courseIndex = Integer.parseInt(ctx.queryParam("courseIndex"));
+        core.addCourse(courseIndex);
+        ctx.json(core.getSearchResults());
     }
 
     private void getSearchResults(Context ctx) {
@@ -28,5 +35,6 @@ public class searchController {
         core.searchAdvanced();
         ctx.json(core.getSearchResults());
     }
+
 
 }
