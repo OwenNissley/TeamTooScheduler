@@ -248,6 +248,16 @@ public class coreTest {
         return searchResults;
     }
 
+    //ADDED by Monk
+    // Get active filters on search
+    public ArrayList<Filter> getActiveFilters() {
+        return search.getActiveFilters();
+    }
+    // clear all filters
+    public void clearAllFilters() {
+        search.clearFilters();
+    }
+
     //END SEARCHING
     //-------------------------------------------------------------------------------------------------------------
 

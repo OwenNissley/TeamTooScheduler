@@ -17,7 +17,7 @@ public class testMain {
         }).start(7000);
 
         // Start React frontend
-      //  startReactFrontend();
+       //startReactFrontend();
 
         // Ensure React stops when the backend stops
        // Runtime.getRuntime().addShutdownHook(new Thread(() -> {

@@ -9,6 +9,12 @@ const AddCourseScreen = () => {
   const [selectedCourseIndex, setSelectedCourseIndex] = useState(null); // Track selected course index
   const [filteredCourses, setFilteredCourses] = useState([]); // Filtered courses based on search
   const [searchTerm, setSearchTerm] = useState(""); // Track search input
+  const [selectedDayFormat, setSelectedDayFormat] = useState(null); // Default day is Monday
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+
+
+
   const navigate = useNavigate();
   //Boshi not working ??
   const [navigationCount, setNavigationCount] = useState(0);
@@ -90,7 +96,60 @@ const convertTo12HourFormat = (militaryTime) => {
   return `${convertedHour}:${formattedMinutes} ${period}`;
 };
 
+const handleDayChange = async (e) => {
+    const dayFormatChoice = e.target.value;
+    setSelectedDayFormat(dayFormatChoice);
+    // setSearchTerm(searchValue);
 
+   const response = await axios.post("http://localhost:7000/excuteDayFilterSearch", null, {
+        params: { dayFormatChoice: dayFormatChoice },
+      });
+      setFilteredCourses(response.data); // Update filteredCourses from response
+  };
+
+const generateTimeOptions = () => {
+  const times = [];
+  for (let hour = 7; hour <= 22; hour++) { // 7AM to 10PM
+    const ampm = hour < 12 ? "AM" : "PM";
+    const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+    times.push(`${hour12}:00 ${ampm}`);
+  }
+  return times;
+};
+
+ const handleStartTimeChange = async (e) => {
+   const newValue = e.target.value;
+   setStartTime((prev) => {
+     console.log("Previous start time:", prev);
+     console.log("New start time:", newValue);
+     return newValue;
+   });
+   if (!newValue || !endTime) return; // don't send until both are selected
+
+   console.log("Start time changed to:", newValue);
+   console.log("End time:", endTime);
+    const response = await axios.post("http://localhost:7000/excuteTimeFilterSearch", null, {
+           params: { startTime: e.target.value, endTime: endTime },
+         });
+     setFilteredCourses(response.data); // Update filteredCourses from response
+ };
+
+ const handleEndTimeChange = async (e) => {
+   const newValue = e.target.value;
+   setEndTime((prev) => {
+     console.log("Previous end time:", prev);
+     console.log("New end time:", newValue);
+     return newValue;
+   });
+   if (!newValue || !startTime) return; // don't send until both are selected
+
+    console.log("End time changed to:", newValue);
+    console.log("Start time:", startTime);
+      const response = await axios.post("http://localhost:7000/excuteTimeFilterSearch", null, {
+               params: { startTime: startTime, endTime: e.target.value },
+             });
+         setFilteredCourses(response.data); // Update filteredCourses from response
+ };
 
 
   return (
@@ -114,6 +173,49 @@ const convertTo12HourFormat = (militaryTime) => {
           placeholder="General Search"
         />
       </div>
+ {/* Radio Buttons for MWF or TR */}
+ <div className="day-selector">
+   <label>
+     <input
+       type="radio"
+       value="MWF"
+       checked={selectedDayFormat === "MWF"}
+       onChange={ handleDayChange}
+     />
+     MWF (Monday, Wednesday, Friday)
+   </label>
+   <label>
+     <input
+       type="radio"
+       value="TR"
+       checked={selectedDayFormat === "TR"}
+       onChange={handleDayChange}
+     />
+     TR (Tuesday, Thursday)
+   </label>
+ </div>
+
+{/* Time Range Selectors */}
+<div className="time-range">
+  <label>
+    Start Time:
+    <select value={startTime} onChange={handleStartTimeChange}>
+      {generateTimeOptions().map((time) => (
+        <option key={time} value={time}>{time}</option>
+      ))}
+    </select>
+  </label>
+
+  <label>
+    End Time:
+    <select value={endTime} onChange={handleEndTimeChange}>
+      {generateTimeOptions().map((time) => (
+        <option key={time} value={time}>{time}</option>
+      ))}
+    </select>
+  </label>
+</div>
+
 
     <div className="courses-list">
       <h3>Courses</h3>
