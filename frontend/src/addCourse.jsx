@@ -1,29 +1,18 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Calendar.css";
-import ScheduleControls from "./ScheduleControls";
-import { ScheduleContext } from "./ScheduleContext";
 
 const AddCourseScreen = () => {
+  const [numOfSchedules, setNumOfSchedules] = useState(1);
+  const [selectedSchedule, setSelectedSchedule] = useState(1);
+  const [selectedYear, setSelectedYear] = useState("2023");
+  const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [selectedCourseIndex, setSelectedCourseIndex] = useState(null); // Track selected course index
   const [filteredCourses, setFilteredCourses] = useState([]); // Filtered courses based on search
   const [searchTerm, setSearchTerm] = useState(""); // Track search input
   const navigate = useNavigate();
-  //Boshi not working ??
-  const [navigationCount, setNavigationCount] = useState(0);
-  const location = useLocation();
 
- //Boshi not working ??
-useEffect(() => {
-  setNavigationCount((count) => count + 1);
-}, [location.key]); // location.key changes every time you go to this route
-
- //Boshi not working ??
-useEffect(() => {
-  fetchSearchResults();
-   setSearchTerm("");
-}, [navigationCount]);
 
  const fetchSearchResults = async () => {
     try {
@@ -32,6 +21,92 @@ useEffect(() => {
     } catch (error) {
       console.error("Error fetching courses:", error);
     }
+  };
+
+  useEffect(() => {
+      if (searchTerm === "") {
+        // Fetch initial courses when the search term is empty
+        fetchSearchResults();
+      }
+    }, [searchTerm]); // Runs every time the searchTerm changes
+
+
+useEffect(() => {
+    fetchSearchResults();
+    fetchNumberOfSchedules();
+  }, []);
+
+  const fetchNumberOfSchedules = async () => {
+    try {
+      const response = await axios.get("http://localhost:7000/getNumOfSchedules");
+      setNumOfSchedules(response.data);
+    } catch (error) {
+      console.error("Error fetching number of schedules:", error);
+    }
+  };
+
+  const handleScheduleChange = async (e) => {
+    const newScheduleNum = Number(e.target.value);
+    console.log("Selected schedule:", newScheduleNum);
+    try {
+      await axios.post("http://localhost:7000/selectSchedule", null, {
+        params: { scheduleIndex: newScheduleNum - 1 },
+      });
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+    }
+    setSelectedSchedule(newScheduleNum);
+  };
+
+  const handleNewSchedule = async () => {
+    try {
+      const response = await axios.post("http://localhost:7000/newSchedule");
+      const newScheduleNumber = response.data;
+      console.log("New schedule created:", newScheduleNumber);
+      setNumOfSchedules((prev) => prev + 1);
+      setSelectedSchedule(newScheduleNumber + 1);
+    } catch (error) {
+      console.error("Error creating new schedule:", error);
+    }
+  };
+
+  const handleDeleteSchedule = async () => {
+    try {
+      const response = await axios.post("http://localhost:7000/deleteSchedule");
+      const newScheduleIndex = response.data;
+      setNumOfSchedules((prev) => (prev > 1 ? prev - 1 : 1));
+      setSelectedSchedule(newScheduleIndex + 1);
+    } catch (error) {
+      console.error("Error deleting schedule:", error);
+    }
+  };
+
+  const handleYearChange = async (e) => {
+    const newYear = e.target.value;
+    setSelectedYear(newYear);
+    try {
+      await axios.post("http://localhost:7000/updateYear", null, {
+        params: { yearTermString: `${newYear}_${selectedTerm}` },
+      });
+    } catch (error) {
+      console.error("Error updating year:", error);
+    }
+    fetchNumberOfSchedules();
+    setSelectedSchedule(1);
+  };
+
+  const handleTermChange = async (e) => {
+    const newTerm = e.target.value;
+    setSelectedTerm(newTerm);
+    try {
+      await axios.post("http://localhost:7000/updateTerm", null, {
+        params: { yearTermString: `${selectedYear}_${newTerm}` },
+      });
+    } catch (error) {
+      console.error("Error updating term:", error);
+    }
+    fetchNumberOfSchedules();
+    setSelectedSchedule(1);
   };
 
  const handleSearchChange = async (e) => {
@@ -104,7 +179,29 @@ const convertTo12HourFormat = (militaryTime) => {
         <button onClick={() => navigate("/your-info")}>Your Info</button>
       </div>
 
-     <ScheduleControls />
+      <div className="control-banner">
+        <select value={selectedTerm} onChange={handleTermChange}>
+          <option value="Spring">Spring</option>
+          <option value="Fall">Fall</option>
+        </select>
+
+        <select value={selectedYear} onChange={handleYearChange}>
+          <option value="2023">2023</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+        </select>
+
+        <select value={selectedSchedule} onChange={handleScheduleChange}>
+          {Array.from({ length: numOfSchedules }, (_, index) => (
+            <option key={index + 1} value={index + 1}>
+              Schedule {index + 1}
+            </option>
+          ))}
+        </select>
+
+        <button onClick={handleNewSchedule}>New Schedule</button>
+        <button onClick={handleDeleteSchedule}>Delete Schedule</button>
+      </div>
 
       <div className="search-container">
         <input
