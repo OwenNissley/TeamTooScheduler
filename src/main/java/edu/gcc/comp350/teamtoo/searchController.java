@@ -19,9 +19,21 @@ public class searchController {
         app.post("/addCourse", this::addCourse);
          app.post("/excuteDayFilterSearch", this::excuteDayFilterSearch);
          app.post("/excuteTimeFilterSearch", this::excuteTimeFilterSearch);
+         app.post("/clearFilters", this::clearFilters);
        // app.post("/removeCourse", this::removeCourse);
     }
 
+    private void clearFilters(Context ctx) {
+        boolean genSearchEcuxted = core.getGeneralSearchExecuted();
+        if (genSearchEcuxted) {
+            core.setGeneralSearchExecuted(false);
+        }
+        if (!core.getActiveFilters().isEmpty()) {
+            core.clearAllFilters();
+        }
+        core.searchAdvanced();
+        ctx.json(core.getSearchResults());
+    }
 
     private void excuteTimeFilterSearch(Context ctx) {
         // check to only have one time filter at a time

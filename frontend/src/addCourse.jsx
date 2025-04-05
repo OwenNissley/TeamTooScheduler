@@ -12,7 +12,7 @@ const AddCourseScreen = () => {
   const [selectedDayFormat, setSelectedDayFormat] = useState(null); // Default day is Monday
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-
+  const { selectedYear, selectedTerm, selectedSchedule, numOfSchedules} = useContext(ScheduleContext);
 
 
   const navigate = useNavigate();
@@ -25,10 +25,12 @@ useEffect(() => {
   setNavigationCount((count) => count + 1);
 }, [location.key]); // location.key changes every time you go to this route
 
- //Boshi not working ??
+
+
 useEffect(() => {
   fetchSearchResults();
    setSearchTerm("");
+   clearFilters();
 }, [navigationCount]);
 
  const fetchSearchResults = async () => {
@@ -39,6 +41,17 @@ useEffect(() => {
       console.error("Error fetching courses:", error);
     }
   };
+
+    //reset Search
+   const clearFilters = async () => {
+       try {
+       const response = await axios.post("http://localhost:7000/clearFilters");
+       setFilteredCourses(response.data); // assuming response.data is an array of courses
+       } catch(error){
+              console.error("Error clearing filters:", error);
+       }
+    }
+
 
  const handleSearchChange = async (e) => {
     const searchValue = e.target.value;
@@ -160,7 +173,7 @@ const generateTimeOptions = () => {
         <button onClick={() => navigate("/addCourse")}>Add Course</button>
         <button onClick={() => navigate("/review")}>Review</button>
         <button onClick={() => navigate("/course-directory")}>Course Directory</button>
-        <button onClick={() => navigate("/your-info")}>Your Info</button>
+        <button onClick={() => navigate("/young-nigga")}>Your Info</button>
       </div>
 
      <ScheduleControls />

@@ -10,6 +10,7 @@ const ScheduleControls = () => {
     setSelectedYear,
     setSelectedTerm,
     setSelectedSchedule,
+    setNumOfSchedules,
     handleNewSchedule,
     handleDeleteSchedule,
   } = useContext(ScheduleContext);

@@ -218,6 +218,16 @@ public class coreTest {
 
     }
 
+    // get generalSearchExecuted
+    public boolean getGeneralSearchExecuted() {
+        return search.getGeneralSearchExecuted();
+    }
+
+    //set generalSearchExecuted
+    public void setGeneralSearchExecuted(boolean generalSearchExecuted) {
+        search.setGeneralSearchExecuted(generalSearchExecuted);
+    }
+
     public void addFilter(Filter filter) {
         if (filter.getFilterType() == FilterType.SEMESTER) {
             search.filterBasedOnSemester(filter);

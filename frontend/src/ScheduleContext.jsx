@@ -20,7 +20,7 @@ export const ScheduleProvider = ({ children }) => {
     };
 
     getNumberOfSchedules();
-  }, []);
+  }, [selectedTerm, selectedYear]);
 
   const handleYearChange = async (newYear) => {
     setSelectedYear(newYear);
