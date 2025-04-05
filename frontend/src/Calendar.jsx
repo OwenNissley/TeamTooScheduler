@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 import { useNavigate } from "react-router-dom";
+import ScheduleControls from "./ScheduleControls";
+import { ScheduleContext } from "./ScheduleContext";
 import "./Calendar.css";
 
 const dayToNumber = (day) => {
@@ -18,13 +20,12 @@ const Calendar = () => {
   const [calendar, setCalendar] = useState(null);
   const [events, setEvents] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [numOfSchedules, setNumOfSchedules] = useState(1);
-  const [selectedSchedule, setSelectedSchedule] = useState(1);
-  const [selectedYear, setSelectedYear] = useState("2023");
-  const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [hasConflict, setHasConflict] = useState(false);
   const [conflictingCourses, setConflictingCourses] = useState([]);
   const navigate = useNavigate();
+
+
+  const { selectedYear, selectedTerm, selectedSchedule, numOfSchedules} = useContext(ScheduleContext);
 
   const courseColors = {};
   const usedColors = new Set();
@@ -39,12 +40,10 @@ const Calendar = () => {
   };
 
   const fetchCourses = async () => {
-    try {
       const response = await axios.get("http://localhost:7000/updateSchedule");
       const courses = response.data;
       setCourses(courses);
-        console.log("Fetched courses:", courses);
-
+      console.log("Fetched courses:", courses);
 
       const newEvents = courses.flatMap((course) =>
         course.times.map((timeSlot) => {
@@ -67,22 +66,20 @@ const Calendar = () => {
       );
 
       setEvents(newEvents);
-      if (calendar) {
-        calendar.update({ events: newEvents });
-      }
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-    }
+       calendar.update({ events: newEvents });
+
   };
 
   useEffect(() => {
     fetchCourses();
-  }, [selectedYear, selectedTerm, selectedSchedule]);
+    updateConflicts();
+  }, [selectedYear, selectedTerm, selectedSchedule,numOfSchedules ]);
 
   const updateConflicts = async () => {
     try {
       const response = await axios.get("http://localhost:7000/checkConflicts");
       const { hasConflict, conflictingCourses } = response.data;
+      console.log("Conflict check response:", response.data);
 
       setHasConflict(hasConflict); // Update state based on API response
       setConflictingCourses(conflictingCourses); // Store conflicting courses if needed
@@ -91,96 +88,17 @@ const Calendar = () => {
     }
   };
 
-    useEffect(() => {
-        updateConflicts();
-      }, [selectedSchedule]);
+  const convertTo12HourFormat = (militaryTime) => {
+    const [hours, minutes] = militaryTime.split(":").map(Number);
 
+    let period = hours < 12 ? "AM" : "PM";
+    let convertedHour = hours % 12;
+    if (convertedHour === 0) convertedHour = 12; // 0 hour should be 12 for AM/PM format
 
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
 
-  const getNumberOfSchedules = async () => {
-    try {
-      const response = await axios.get("http://localhost:7000/getNumOfSchedules");
-      setNumOfSchedules(response.data);
-    } catch (error) {
-      console.error("Error fetching number of schedules:", error);
-    }
+    return `${convertedHour}:${formattedMinutes} ${period}`;
   };
-
-  useEffect(() => {
-    getNumberOfSchedules();
-  }, []);
-
-  const handleScheduleChange = async (e) => {
-    const newScheduleNum = Number(e.target.value);
-    console.log("Selected schedule:", newScheduleNum);
-    try {
-      await axios.post("http://localhost:7000/selectSchedule", null, {
-        params: { scheduleIndex: newScheduleNum-1 },
-      });
-    } catch (error) {
-      console.error("Error updating schedule:", error);
-    }
-   setSelectedSchedule(newScheduleNum);
-   //getNumOfSchedules();
-
-  };
-
-  const handleNewSchedule = async () => {
-    try {
-      const response = await axios.post("http://localhost:7000/newSchedule");
-      const newScheduleNumber = response.data;
-      console.log("New schedule created:", newScheduleNumber);
-      setNumOfSchedules((prev) => prev + 1);
-      setSelectedSchedule(newScheduleNumber+1);
-    } catch (error) {
-      console.error("Error creating new schedule:", error);
-    }
-  };
-
-  const handleDeleteSchedule = async () => {
-    try {
-      const response = await axios.post("http://localhost:7000/deleteSchedule");
-      const newScheduleIndex = response.data;
-      setNumOfSchedules((prev) => (prev > 1 ? prev - 1 : 1));
-      setSelectedSchedule(newScheduleIndex + 1);
-      fetchCourses();
-    } catch (error) {
-      console.error("Error deleting schedule:", error);
-    }
-  };
-
-  const handleYearChange = async (e) => {
-    const newYear = e.target.value;
-    setSelectedYear(newYear);
-    try {
-      await axios.post("http://localhost:7000/updateYear", null, {
-        params: { yearTermString: `${newYear}_${selectedTerm}` },
-      });
-    } catch (error) {
-      console.error("Error updating year:", error);
-    }
-    getNumberOfSchedules();
-    setSelectedSchedule(1);
-
-  };
-
-  const handleTermChange = async (e) => {
-    const newTerm = e.target.value;
-    setSelectedTerm(newTerm);
-    try {
-      await axios.post("http://localhost:7000/updateTerm", null, {
-        params: { yearTermString: `${selectedYear}_${newTerm}` },
-      });
-    } catch (error) {
-      console.error("Error updating term:", error);
-    }
-   getNumberOfSchedules();
-   console.log("numOfSchedules:", numOfSchedules);
-   setSelectedSchedule(1);
-
-  };
-
-
 
   return (
     <div className="page-container">
@@ -193,49 +111,46 @@ const Calendar = () => {
         <button onClick={() => navigate("/your-info")}>Your Info</button>
       </div>
 
-      <div className="control-banner">
-        <select value={selectedTerm} onChange={handleTermChange}>
-          <option value="Spring">Spring</option>
-          <option value="Fall">Fall</option>
-        </select>
-
-        <select value={selectedYear} onChange={handleYearChange}>
-          <option value="2023">2023</option>
-          <option value="2024">2024</option>
-          <option value="2025">2025</option>
-        </select>
-
-        <select value={selectedSchedule} onChange={handleScheduleChange}>
-          {Array.from({ length: numOfSchedules }, (_, index) => (
-            <option key={index + 1} value={index + 1}>
-              Schedule {index + 1}
-            </option>
-          ))}
-        </select>
-
-        <button onClick={handleNewSchedule}>New Schedule</button>
-        <button onClick={handleDeleteSchedule}>Delete Schedule</button>
-      </div>
-
-     {hasConflict && (
-       <div className="warnings-section">
-         <p className="warning-text">⚠️ Course conflict detected!</p>
-         <ul className="conflict-list">
-           {conflictingCourses.map((course, index) => (
-             <li key={index} className="conflict-item">
-               {course.name} ({course.code}) - {course.time}
-             </li>
-           ))}
-         </ul>
-       </div>
-     )}
-
+      <ScheduleControls />
 
       <div className="calendar-container">
         <div className="calendar-wrapper">
-          <DayPilotCalendar {...{ viewType: "Week", events, controlRef: (ref) => setCalendar(ref) }} />
+                <DayPilotCalendar
+                  viewType="Week"  // Set the view to "Week"
+                  startDate={new Date()}  // Use today's date as the start
+                  days={5}  // Show Monday to Friday
+                  businessBeginsHour={8}  // Start at 8 AM
+                  businessEndsHour={20}  // End at 8 PM
+                  cellDuration={30}  // 30-minute intervals
+                  events={events}
+                     headerDateFormat="dddd"
+
+                />
         </div>
       </div>
+
+      {hasConflict && (
+        <div className="courses-list">
+          <h3>Conflict Detected!</h3>
+          <div className="course-box">
+            {conflictingCourses.length === 0 ? (
+              <p>No conflicting courses</p>
+            ) : (
+              conflictingCourses.map((course, index) => (
+                <div key={index} className="course-item">
+                  <span>{course.name} ({course.credits} credits)</span>
+                  <span>
+                    {" - "}
+                    {course.times
+                      .map((time) => `${time.day} ${convertTo12HourFormat(time.start_time)} - ${convertTo12HourFormat(time.end_time)}`)
+                      .join(", ")}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
