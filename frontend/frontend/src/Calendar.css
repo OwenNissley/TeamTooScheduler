@@ -1,0 +1,80 @@
+/* adjusting the built-in theme */
+
+/* calendar event */
+.calendar_default_event_inner {
+    background: #2e78d6;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 10pt;
+    padding: 5px;
+    opacity: 0.8;
+}
+
+/* First Banner (Navigation) */
+.top-banner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #4CAF50;
+  padding: 8px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  height: 40px;
+}
+
+/* Second Banner (Dropdowns & Buttons) */
+.control-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ddd;
+  padding: 8px;
+  width: 100%;
+  position: fixed;
+  top: 48px; /* Below first banner */
+  left: 0;
+  z-index: 999;
+  height: 40px;
+  gap: 10px;
+}
+
+/* Dropdowns */
+.control-banner select {
+  padding: 5px;
+  font-size: 14px;
+}
+
+/* Buttons */
+.control-banner button {
+  padding: 5px 12px;
+  font-size: 14px;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.control-banner button:hover {
+  background-color: #bbb;
+}
+
+/* Ensure Calendar is visible */
+.calendar-container {
+  margin-top: 100px; /* Pushes calendar below banners */
+}
+
+/* Warnings Section */
+.warnings-section {
+  background-color: #ffcccb;
+  color: #900;
+  text-align: center;
+  padding: 8px;
+  width: 100%;
+  position: relative;
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: bold;
+}

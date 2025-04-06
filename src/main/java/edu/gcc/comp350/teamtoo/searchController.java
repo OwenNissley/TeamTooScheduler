@@ -20,8 +20,36 @@ public class searchController {
          app.post("/excuteDayFilterSearch", this::excuteDayFilterSearch);
          app.post("/excuteTimeFilterSearch", this::excuteTimeFilterSearch);
          app.post("/clearFilters", this::clearFilters);
-       // app.post("/removeCourse", this::removeCourse);
+         app.post("/removeCourse", this::removeCourse);
+         app.get("/getCoursesToDisplay", this::getCoursesToDisplay);
+         app.post("/removeAllCourses", this::removeAllCourses);
+            app.post("/clearSearch", this::clearSearch);
+            app.post("/clearDayFormat", this::clearDayFormat);
+            app.post("/clearTimeRange", this::clearTimeRange);
+
     }
+
+    private void removeAllCourses(Context ctx) {
+        core.removeAllCourses();
+        ctx.json(core.getNonConflictingCourses());
+    }
+
+    private void getCoursesToDisplay(Context ctx) {
+        ArrayList<Course> courses = core.getNonConflictingCourses();
+        ArrayList<Course> conflictingCourses = core.getConflictingCourses();
+        ArrayList<Course> allCourses = new ArrayList<>();
+        allCourses.addAll(courses);
+        allCourses.addAll(conflictingCourses);
+        ctx.json(allCourses);
+    }
+
+    private void removeCourse(Context ctx) {
+        int courseIndex = Integer.parseInt(ctx.queryParam("courseIndex"));
+        core.removeCourse(courseIndex);
+        ctx.json(core.getNonConflictingCourses());
+    }
+
+    // Clear all filters and reset the search
 
     private void clearFilters(Context ctx) {
         boolean genSearchEcuxted = core.getGeneralSearchExecuted();
@@ -30,6 +58,43 @@ public class searchController {
         }
         if (!core.getActiveFilters().isEmpty()) {
             core.clearAllFilters();
+        }
+        core.searchAdvanced();
+        ctx.json(core.getSearchResults());
+    }
+    private void clearSearch(Context ctx) {
+        boolean genSearchEcuxted = core.getGeneralSearchExecuted();
+        if (genSearchEcuxted) {
+            core.setGeneralSearchExecuted(false);
+        }
+        core.searchAdvanced();
+        ctx.json(core.getSearchResults());
+    }
+    private void clearDayFormat(Context ctx) {
+        ArrayList<Filter> activeFilters = new ArrayList<>(core.getActiveFilters());
+
+// Remove all FilterDaysOfWeek filters safely
+        activeFilters.removeIf(filter -> filter instanceof FilterDaysOfWeek);
+
+// Clear and re-add the safe filters back to core
+        core.clearAllFilters();
+        for (Filter filter : activeFilters) {
+            core.addFilter(filter);
+        }
+        core.searchAdvanced();
+        ctx.json(core.getSearchResults());
+    }
+    private void clearTimeRange(Context ctx) {
+        // Only keep non-day filters, then reset the filters
+        ArrayList<Filter> activeFilters = new ArrayList<>(core.getActiveFilters());
+
+// Remove all FilterTime filters safely
+        activeFilters.removeIf(filter -> filter instanceof FilterTime);
+
+// Clear and re-add the safe filters back to core
+        core.clearAllFilters();
+        for (Filter filter : activeFilters) {
+            core.addFilter(filter);
         }
         core.searchAdvanced();
         ctx.json(core.getSearchResults());

@@ -1,4 +1,7 @@
 package edu.gcc.comp350.teamtoo;
+/**
+ * MICAH YOU MUST COME SEEEE ME BEFORE YOU REDSEIGN< TAKE NOTE WHERE I CHANGED ------ I NEED THEM
+ */
 
 import java.sql.SQLOutput;
 import java.util.ArrayList;
@@ -57,8 +60,8 @@ public class Search
         activeFilters.remove(filter);
     }
 
-    //clears all filters
-    private void clearFilters() {
+    //clears all filters - Monk made public
+    public void clearFilters() {
         activeFilters.clear();
     }
 
@@ -69,6 +72,24 @@ public class Search
 
     //removed, SearchAdvanced will always be called to return filter courses
     //public ArrayList<Course> getFilteredCourses() { return filteredCourses; }
+
+    //added HEHHEHHEHHEHHEHEHEHHHEHHEH HAAA
+    //Get filters method
+    public ArrayList<Filter> getActiveFilters() {
+        return activeFilters;
+    }
+
+    //Monk added thsi get genealEarchExuited in order to reset from backed end core
+    public boolean getGeneralSearchExecuted() {
+        return generalSearchExecuted;
+    }
+
+    //set generalSearchExecuted - monk
+    public void setGeneralSearchExecuted(boolean generalSearchExecuted) {
+        this.generalSearchExecuted = generalSearchExecuted;
+    }
+
+
 
     public ArrayList<Course> searchAdvanced()
     {
@@ -125,13 +146,16 @@ public class Search
         }
 
         //clear generalSearchExecuted so that it can be used for the next search
-        generalSearchExecuted = false;
+        // Testing pursposes only - iam not copying entire boshi just to comment out line - bum ahh gaydos heheheh
+        // generalSearchExecuted = false;
 
-        //for now, may be changed later
-        clearFilters();
+        //for now, may be changed later,
+        // Testing pursposes only - iam not copying entire boshi just to comment out line - bum ahh gaydos heheheh
+        //clearFilters();
 
         //the following is for errors
-        clearGeneralFilteredCourses();
+        // Testing pursposes only - iam not copying entire boshi just to comment out line - bum ahh gaydos heheheh
+       // clearGeneralFilteredCourses();
 
         //TESTING PURPOSES ONLY
         System.out.println("Advanced Search Size: " + advancedFilteredCourses.size());

@@ -31,7 +31,38 @@ useEffect(() => {
   fetchSearchResults();
    setSearchTerm("");
    clearFilters();
-}, [navigationCount]);
+}, [navigationCount, selectedYear, selectedTerm, selectedSchedule]);
+
+const clearSearch = async () => {
+     try {
+           const response = await axios.post("http://localhost:7000/clearSearch");
+           setFilteredCourses(response.data); // assuming response.data is an array of courses
+           setSearchTerm ("");
+           } catch(error){
+                  console.error("Error clearing search filters:", error);
+           }
+       }
+
+const clearDayFormat = async () => {
+        try {
+                const response = await axios.post("http://localhost:7000/clearDayFormat");
+                setFilteredCourses(response.data); // assuming response.data is an array of courses
+                setSelectedDayFormat(null);
+                } catch(error){
+                          console.error("Error clearing day format:", error);
+                }
+        }
+const clearTimeRange = async () => {
+        try {
+                const response = await axios.post("http://localhost:7000/clearTimeRange");
+                setFilteredCourses(response.data); // assuming response.data is an array of courses
+                setStartTime("");
+                setEndTime("");
+                } catch(error){
+                            console.error("Error clearing time range:", error);
+                }
+        }
+
 
  const fetchSearchResults = async () => {
     try {
@@ -46,7 +77,11 @@ useEffect(() => {
    const clearFilters = async () => {
        try {
        const response = await axios.post("http://localhost:7000/clearFilters");
-       setFilteredCourses(response.data); // assuming response.data is an array of courses
+       setFilteredCourses(response.data);// assuming response.data is an array of courses
+       setSearchTerm (""); // Track search input
+       setSelectedDayFormat(null); // Default day is Monday
+       setStartTime("");
+       setEndTime("");
        } catch(error){
               console.error("Error clearing filters:", error);
        }
@@ -178,35 +213,38 @@ const generateTimeOptions = () => {
 
      <ScheduleControls />
 
-      <div className="search-container">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          placeholder="General Search"
-        />
-      </div>
- {/* Radio Buttons for MWF or TR */}
- <div className="day-selector">
-   <label>
-     <input
-       type="radio"
-       value="MWF"
-       checked={selectedDayFormat === "MWF"}
-       onChange={ handleDayChange}
-     />
-     MWF (Monday, Wednesday, Friday)
-   </label>
-   <label>
-     <input
-       type="radio"
-       value="TR"
-       checked={selectedDayFormat === "TR"}
-       onChange={handleDayChange}
-     />
-     TR (Tuesday, Thursday)
-   </label>
- </div>
+<div className="search-container">
+  <input
+    type="text"
+    value={searchTerm}
+    onChange={handleSearchChange}
+    placeholder="General Search"
+  />
+  <button className="clear-button" onClick={clearSearch}>Clear</button>
+</div>
+
+{/* Radio Buttons for MWF or TR */}
+<div className="day-selector">
+  <label>
+    <input
+      type="radio"
+      value="MWF"
+      checked={selectedDayFormat === "MWF"}
+      onChange={handleDayChange}
+    />
+    MWF (Monday, Wednesday, Friday)
+  </label>
+  <label>
+    <input
+      type="radio"
+      value="TR"
+      checked={selectedDayFormat === "TR"}
+      onChange={handleDayChange}
+    />
+    TR (Tuesday, Thursday)
+  </label>
+  <button className="clear-button" onClick={clearDayFormat}>Clear</button>
+</div>
 
 {/* Time Range Selectors */}
 <div className="time-range">
@@ -227,6 +265,7 @@ const generateTimeOptions = () => {
       ))}
     </select>
   </label>
+  <button className="clear-button" onClick={clearTimeRange}>Clear</button>
 </div>
 
 

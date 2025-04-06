@@ -66,6 +66,7 @@ public class calendarControllor {
         } else {
             ctx.status(400).result("Schedule index parameter is missing.");
         }
+
     }
 
     private void updateYear(Context ctx) {
@@ -76,6 +77,12 @@ public class calendarControllor {
         } else {
             ctx.status(400).result("Year parameter is missing.");
         }
+        //split the year string into year and term
+        String[] parts = year.split("_");
+        String yearPart = parts[0];
+        String termPart = parts[1];
+        core.addFilter(new FilterSemester(yearPart, termPart));
+        core.searchAdvanced();
     }
     private void updateTerm(Context ctx) {
         String year = ctx.queryParam("yearTermString");
@@ -85,6 +92,11 @@ public class calendarControllor {
         } else {
             ctx.status(400).result("Year parameter is missing.");
         }
+        String[] parts = year.split("_");
+        String yearPart = parts[0];
+        String termPart = parts[1];
+        core.addFilter(new FilterSemester(yearPart, termPart));
+        core.searchAdvanced();
     }
 
 }
