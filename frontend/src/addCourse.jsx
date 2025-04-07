@@ -208,7 +208,7 @@ const generateTimeOptions = () => {
         <button onClick={() => navigate("/addCourse")}>Add Course</button>
         <button onClick={() => navigate("/review")}>Review</button>
         <button onClick={() => navigate("/course-directory")}>Course Directory</button>
-        <button onClick={() => navigate("/young-nigga")}>Your Info</button>
+        <button onClick={() => navigate("/myB")}>Your Info</button>
       </div>
 
      <ScheduleControls />
