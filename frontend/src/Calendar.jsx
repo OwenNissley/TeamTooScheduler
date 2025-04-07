@@ -112,17 +112,12 @@ const Calendar = () => {
 
         <div className="calendar-container">
               <div className="calendar-wrapper">
-                {/* Conditionally render the calendar only after events have been populated */}
-                {events.length > 0 ? (
                   <DayPilotCalendar
                   // NOOOO start date
                     viewType="Week"
                     events={events}  // Pass events to the calendar
                     headerDateFormat="dddd"
                   />
-                ) : (
-                  <p>Loading calendar...</p>  // Optionally show a loading message
-                )}
               </div>
         </div>
 

@@ -6,6 +6,8 @@ package edu.gcc.comp350.teamtoo;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 
+// Monk only changed two things and they are labeled
+
 //Note: filters are created "above" this class
 public class Search
 {
@@ -60,10 +62,6 @@ public class Search
         activeFilters.remove(filter);
     }
 
-    //clears all filters - Monk made public
-    public void clearFilters() {
-        activeFilters.clear();
-    }
 
     //a new filter is created when addFilter is called
     public void addFilter(Filter filter) {
@@ -73,10 +71,16 @@ public class Search
     //removed, SearchAdvanced will always be called to return filter courses
     //public ArrayList<Course> getFilteredCourses() { return filteredCourses; }
 
+    //-------------------------------------------------------------------------------
+    //Monk
     //added HEHHEHHEHHEHHEHEHEHHHEHHEH HAAA
     //Get filters method
     public ArrayList<Filter> getActiveFilters() {
         return activeFilters;
+    }
+    //clears all filters - Monk made public
+    public void clearFilters() {
+        activeFilters.clear();
     }
 
     //Monk added thsi get genealEarchExuited in order to reset from backed end core
@@ -89,6 +93,7 @@ public class Search
         this.generalSearchExecuted = generalSearchExecuted;
     }
 
+//--------------------------------------------------------------------------------------------------
 
 
     public ArrayList<Course> searchAdvanced()

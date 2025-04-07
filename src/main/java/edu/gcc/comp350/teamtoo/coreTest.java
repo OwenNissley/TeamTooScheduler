@@ -1,8 +1,6 @@
 package edu.gcc.comp350.teamtoo;
 //NOTES FOR MICAH"S RETSARTED ASSS
-//I need method to return numebr of schudules
-// i need method to change the selected schedule
-// i need method to return the selected schedule
+//View My cahnges - I Need all Funciotnalkty - DO NOT REMOVE functionality
 //
 //
 //
@@ -94,6 +92,9 @@ public class coreTest {
         //}
     }
 
+    // All added or changed methods below
+    //------------------------------------------------------------------------------------
+    // Added
     public ArrayList<Course> getNonConflictingCourses() {
     ArrayList<Course> nonConflictingCourses = new ArrayList<>();
         for (Course course : this.getSchedule()) {
@@ -103,17 +104,6 @@ public class coreTest {
         }
         return nonConflictingCourses;
     }
-
-
-    //added
-
-    public void removeCourse(Course course) {
-        if (selectedSchedule < schedules.size()) {
-            Schedule schedule = schedules.get(selectedSchedule);
-            schedule.removeCourse(course);
-        }
-    }
-
     public int getNumOfSchedules() {
         return schedules.size();
     } //addded
@@ -124,6 +114,60 @@ public class coreTest {
     public int getSelectedSchedule() {
         return selectedSchedule;
     } //added
+
+
+    //changed
+    public int deleteSchedule() {
+        if(schedules.size() == 1){
+            schedules.remove(0);
+            newSchedule();
+            return 0; //changed 1 -> 0
+        }else {
+            int oldSelectedSchedule = selectedSchedule; //added
+            schedules.remove(selectedSchedule);
+            if (oldSelectedSchedule ==0){
+                selectedSchedule = 0; //added
+            }else {
+                selectedSchedule = oldSelectedSchedule - 1; //added
+            }
+        }
+        return selectedSchedule; //added
+    }
+
+    // get generalSearchExecuted
+    public boolean getGeneralSearchExecuted() {
+        return search.getGeneralSearchExecuted();
+    }
+
+    //set generalSearchExecuted
+    public void setGeneralSearchExecuted(boolean generalSearchExecuted) {
+        search.setGeneralSearchExecuted(generalSearchExecuted);
+    }
+    //ADDED by Monk
+    // Get active filters on search
+    public ArrayList<Filter> getActiveFilters() {
+        return search.getActiveFilters();
+    }
+    // clear all filters
+    public void clearAllFilters() {
+        search.clearFilters();
+    }
+
+
+
+    //------------------------------------------------------------------------------------
+
+
+
+
+
+
+    public void removeCourse(Course course) {
+        if (selectedSchedule < schedules.size()) {
+            Schedule schedule = schedules.get(selectedSchedule);
+            schedule.removeCourse(course);
+        }
+    }
 
     public void removeCourse(int courseIndex) {
         schedules.get(selectedSchedule).removeCourse(courseIndex);
@@ -152,22 +196,6 @@ public class coreTest {
 
     //deletes the currently selected schedule
     //from the list of schedules
-    public int deleteSchedule() {
-        if(schedules.size() == 1){
-            schedules.remove(0);
-            newSchedule();
-            return 0; //changed 1 -> 0
-        }else {
-            int oldSelectedSchedule = selectedSchedule; //added
-            schedules.remove(selectedSchedule);
-                if (oldSelectedSchedule ==0){
-                    selectedSchedule = 0; //added
-                }else {
-                    selectedSchedule = oldSelectedSchedule - 1; //added
-                }
-        }
-        return selectedSchedule; //added
-    }
 
     public void loadSchedule(Schedule schedule){
         selectedSchedule = schedules.indexOf(schedule);
@@ -218,15 +246,6 @@ public class coreTest {
 
     }
 
-    // get generalSearchExecuted
-    public boolean getGeneralSearchExecuted() {
-        return search.getGeneralSearchExecuted();
-    }
-
-    //set generalSearchExecuted
-    public void setGeneralSearchExecuted(boolean generalSearchExecuted) {
-        search.setGeneralSearchExecuted(generalSearchExecuted);
-    }
 
     public void addFilter(Filter filter) {
         if (filter.getFilterType() == FilterType.SEMESTER) {
@@ -258,15 +277,6 @@ public class coreTest {
         return searchResults;
     }
 
-    //ADDED by Monk
-    // Get active filters on search
-    public ArrayList<Filter> getActiveFilters() {
-        return search.getActiveFilters();
-    }
-    // clear all filters
-    public void clearAllFilters() {
-        search.clearFilters();
-    }
 
     //END SEARCHING
     //-------------------------------------------------------------------------------------------------------------

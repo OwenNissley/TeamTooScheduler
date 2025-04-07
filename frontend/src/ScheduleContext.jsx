@@ -28,6 +28,7 @@ export const ScheduleProvider = ({ children }) => {
       await axios.post("http://localhost:7000/updateYear", null, {
         params: { yearTermString: `${newYear}_${selectedTerm}` },
       });
+        setSelectedSchedule(1); // Reset schedule to 1 when year changes
     } catch (error) {
       console.error("Error updating year:", error);
     }
@@ -39,6 +40,7 @@ export const ScheduleProvider = ({ children }) => {
       await axios.post("http://localhost:7000/updateTerm", null, {
         params: { yearTermString: `${selectedYear}_${newTerm}` },
       });
+    setSelectedSchedule(1); // Reset schedule to 1 when year changes
     } catch (error) {
       console.error("Error updating term:", error);
     }
