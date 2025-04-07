@@ -38,8 +38,8 @@ public class searchController {
         ArrayList<Course> courses = core.getNonConflictingCourses();
         ArrayList<Course> conflictingCourses = core.getConflictingCourses();
         ArrayList<Course> allCourses = new ArrayList<>();
-        allCourses.addAll(courses);
         allCourses.addAll(conflictingCourses);
+        allCourses.addAll(courses);
         ctx.json(allCourses);
     }
 

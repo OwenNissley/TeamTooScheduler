@@ -1,0 +1,24 @@
+First Make Sure you have pulled/merged latest Code from GitHub Global Repo
+
+Second Make Sure you have Node.js LS installed via - https://nodejs.org/en
+Verify by opening command prompt or Windows shell and running both (These should return version number):
+npm -v
+Return: 10.9.2
+node -v
+Return: v22.14.0
+
+Third open Project in ineteljiL and run these two commands in terminal:   
+cd frontend         
+npm install axios    
+ 
+Then buld the gradle file
+
+Then run testMain
+
+then run this command in terminal in the frontend folder:
+npm run dev   
+Reutrn: Should have you URL to access front end.       
+
+
+
+
