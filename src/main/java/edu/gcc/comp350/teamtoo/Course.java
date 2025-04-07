@@ -152,11 +152,17 @@ public class Course {
     // Check if the course has a conflict with another course
     //should be working now
     public boolean hasConflict(Course course) {
-        //if course names are the same, return true
-        if (name.equals(course.getName())) {
+        // bug fix course name and number
+        //if course names and number are the same, return true
+        if (course.getNumber() == number && course.getName().equals(name)) {
+            return true;
+        }
+      /*  if (name.equals(course.getName())) {
             return true;
         }
 
+
+       */
         //if times overlapping, return true
         for (TimeSlot time : times) {
             for (TimeSlot otherTime : course.getTimes()) {
