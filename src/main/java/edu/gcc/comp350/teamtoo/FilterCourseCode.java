@@ -1,6 +1,7 @@
 package edu.gcc.comp350.teamtoo;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 // Subclass extending the abstract class "Filter"
 public class FilterCourseCode extends Filter {
