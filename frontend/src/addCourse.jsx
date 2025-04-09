@@ -199,6 +199,11 @@ const generateTimeOptions = () => {
          setFilteredCourses(response.data); // Update filteredCourses from response
  };
 
+ const undoAddCourseHandler = async () => {
+        const response = await axios.post("http://localhost:7000/undoAdd");
+        setFilteredCourses(response.data); // Update filteredCourses from response
+     }
+
 
   return (
     <div className="controls-container">
@@ -300,10 +305,14 @@ const generateTimeOptions = () => {
 
 
       {/* Green Add Course Button */}
-            <button className="add-course-button" onClick={addCourseHandler}>
-              Add Course
-            </button>
-
+      <div className="button-container">
+        <button className="add-course-button" onClick={addCourseHandler}>
+          Add Course
+        </button>
+        <button className="add-course-button" onClick={undoAddCourseHandler}>
+          Undo Add
+        </button>
+      </div>
 
     </div>
   );

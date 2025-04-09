@@ -26,7 +26,19 @@ public class searchController {
             app.post("/clearSearch", this::clearSearch);
             app.post("/clearDayFormat", this::clearDayFormat);
             app.post("/clearTimeRange", this::clearTimeRange);
+            app.post("/undoAdd", this::undoAdd);
+            app.post("/undoRemoveCourse", this::undoRemoveCourse);
+    }
 
+    private void undoRemoveCourse(Context ctx) {
+        core.undoRemove();
+        ctx.json(core.getNonConflictingCourses());
+    }
+
+    private void undoAdd(Context ctx) {
+        // MAke sure undo takes out of search results
+       core.undoAdd();
+       ctx.json(core.getSearchResults());
     }
 
     private void removeAllCourses(Context ctx) {

@@ -133,7 +133,7 @@ const convertToMinutes = (time) => {
   return hours * 60 + minutes;
 };
 
-
+// This needs redone to back end
 const isCourseConflicting = (course) => {
   return conflictingCourses.some((conflictingCourse) => {
     // Case 1: Check if the name and number are the same
@@ -154,6 +154,19 @@ const isCourseConflicting = (course) => {
     );
   });
 };
+
+    const undoRemoveCourseHandler = async () => {
+        try {
+            const response = await axios.post("http://localhost:7000/undoRemoveCourse");
+            const courses = response.data;
+            setCourses(courses);
+            updateCoursesToDisplay();
+            console.log("Fetched courses:", courses);
+        } catch (error) {
+            console.error("Error fetching courses:", error);
+        }
+
+    }
 
 
  return (
@@ -253,6 +266,12 @@ const isCourseConflicting = (course) => {
       >
         Remove All Courses
       </button>
+       <button
+              className="remove-course-button"
+              onClick={undoRemoveCourseHandler}
+            >
+              Undo Remove
+            </button>
     </div>
 
   </div>
