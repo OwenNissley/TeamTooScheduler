@@ -173,18 +173,7 @@ const isCourseConflicting = (course) => {
    <div className="review-course-screen">
      <h1 className="title">Review Courses</h1>
 
-     <div className="controls-container">
-       <div className="top-banner">
-         <button className="nav-button" onClick={() => navigate("/")}>Home</button>
-         <button className="nav-button" onClick={() => navigate("/quick-schedule")}>Quick Schedule</button>
-         <button className="nav-button" onClick={() => navigate("/addCourse")}>Add Course</button>
-         <button className="nav-button" onClick={() => navigate("/review")}>Review</button>
-         <button className="nav-button" onClick={() => navigate("/course-directory")}>Course Directory</button>
-         <button className="nav-button" onClick={() => navigate("/your-info")}>Your Info</button>
-       </div>
-
        <ScheduleControls />
-     </div>
 
      {hasConflict && (
        <div className="courses-list conflict-section">

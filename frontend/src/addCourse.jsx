@@ -205,117 +205,105 @@ const generateTimeOptions = () => {
      }
 
 
-  return (
-    <div className="controls-container">
-      <div className="top-banner">
-        <button onClick={() => navigate("/")}>Home</button>
-        <button onClick={() => navigate("/quick-schedule")}>Quick Schedule</button>
-        <button onClick={() => navigate("/addCourse")}>Add Course</button>
-        <button onClick={() => navigate("/review")}>Review</button>
-        <button onClick={() => navigate("/course-directory")}>Course Directory</button>
-        <button onClick={() => navigate("/myB")}>Your Info</button>
-      </div>
-
+ return (
+   <div>
      <ScheduleControls />
 
-<div className="search-container">
-  <input
-    type="text"
-    value={searchTerm}
-    onChange={handleSearchChange}
-    placeholder="General Search"
-  />
-  <button className="clear-button" onClick={clearSearch}>Clear</button>
-</div>
+     <div className="search-container">
+       <input
+         type="text"
+         value={searchTerm}
+         onChange={handleSearchChange}
+         placeholder="General Search"
+       />
+       <button className="clear-button" onClick={clearSearch}>Clear</button>
+     </div>
 
-{/* Radio Buttons for MWF or TR */}
-<div className="day-selector">
-  <label>
-    <input
-      type="radio"
-      value="MWF"
-      checked={selectedDayFormat === "MWF"}
-      onChange={handleDayChange}
-    />
-    MWF (Monday, Wednesday, Friday)
-  </label>
-  <label>
-    <input
-      type="radio"
-      value="TR"
-      checked={selectedDayFormat === "TR"}
-      onChange={handleDayChange}
-    />
-    TR (Tuesday, Thursday)
-  </label>
-  <button className="clear-button" onClick={clearDayFormat}>Clear</button>
-</div>
+     {/* Radio Buttons for MWF or TR */}
+     <div className="day-selector">
+       <label>
+         <input
+           type="radio"
+           value="MWF"
+           checked={selectedDayFormat === "MWF"}
+           onChange={handleDayChange}
+         />
+         MWF (Monday, Wednesday, Friday)
+       </label>
+       <label>
+         <input
+           type="radio"
+           value="TR"
+           checked={selectedDayFormat === "TR"}
+           onChange={handleDayChange}
+         />
+         TR (Tuesday, Thursday)
+       </label>
+       <button className="clear-button" onClick={clearDayFormat}>Clear</button>
+     </div>
 
-{/* Time Range Selectors */}
-<div className="time-range">
-  <label>
-    Start Time:
-    <select value={startTime} onChange={handleStartTimeChange}>
-      {generateTimeOptions().map((time) => (
-        <option key={time} value={time}>{time}</option>
-      ))}
-    </select>
-  </label>
+     {/* Time Range Selectors */}
+     <div className="time-range">
+       <label>
+         Start Time:
+         <select value={startTime} onChange={handleStartTimeChange}>
+           {generateTimeOptions().map((time) => (
+             <option key={time} value={time}>{time}</option>
+           ))}
+         </select>
+       </label>
 
-  <label>
-    End Time:
-    <select value={endTime} onChange={handleEndTimeChange}>
-      {generateTimeOptions().map((time) => (
-        <option key={time} value={time}>{time}</option>
-      ))}
-    </select>
-  </label>
-  <button className="clear-button" onClick={clearTimeRange}>Clear</button>
-</div>
+       <label>
+         End Time:
+         <select value={endTime} onChange={handleEndTimeChange}>
+           {generateTimeOptions().map((time) => (
+             <option key={time} value={time}>{time}</option>
+           ))}
+         </select>
+       </label>
+       <button className="clear-button" onClick={clearTimeRange}>Clear</button>
+     </div>
 
+     <div className="courses-list">
+       <h3>Courses</h3>
+       <div className="course-box">
+         {filteredCourses.length === 0 ? (
+           <p>No courses found</p>
+         ) : (
+           filteredCourses.map((course, index) => (
+             <div key={index} className="course-item" onClick={() => setSelectedCourseIndex(index)}>
+               <span>{course.name} ({course.credits} credits)</span>
+               <span>
+                 {" - "}
+                 {course.times
+                   .map((time) => `${time.day} ${convertTo12HourFormat(time.start_time)} - ${convertTo12HourFormat(time.end_time)}`)
+                   .join(", ")}
+               </span>
+               <button
+                 onClick={() => handleCourseSelect(index)}
+                 disabled={selectedCourseIndex === index}
+                 className={`course-button ${selectedCourseIndex === index ? "selected-button" : ""}`}
+               >
+                 {selectedCourseIndex === index ? "Selected" : "Select"}
+               </button>
+             </div>
+           ))
+         )}
+       </div>
+     </div>
 
-    <div className="courses-list">
-      <h3>Courses</h3>
-      <div className="course-box">
-        {filteredCourses.length === 0 ? (
-          <p>No courses found</p>
-        ) : (
-          filteredCourses.map((course, index) => (
-            <div key={index} className="course-item" onClick={() => setSelectedCourseIndex(index)}>
-              <span>{course.name} ({course.credits} credits)</span>
-              <span>
-                {" - "}
-                {course.times
-                  .map((time) => `${time.day} ${convertTo12HourFormat(time.start_time)} - ${convertTo12HourFormat(time.end_time)}`)
-                  .join(", ")}
-              </span>
-              <button
-                onClick={() => handleCourseSelect(index)}
-                disabled={selectedCourseIndex === index}
-                className={`course-button ${selectedCourseIndex === index ? "selected-button" : ""}`}
-              >
-                {selectedCourseIndex === index ? "Selected" : "Select"}
-              </button>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+     {/* Green Add Course Button */}
+     <div className="button-container">
+       <button className="add-course-button" onClick={addCourseHandler}>
+         Add Course
+       </button>
+       <button className="add-course-button" onClick={undoAddCourseHandler}>
+         Undo Add
+       </button>
+     </div>
+   </div>
+ );
 
-
-
-      {/* Green Add Course Button */}
-      <div className="button-container">
-        <button className="add-course-button" onClick={addCourseHandler}>
-          Add Course
-        </button>
-        <button className="add-course-button" onClick={undoAddCourseHandler}>
-          Undo Add
-        </button>
-      </div>
-
-    </div>
-  );
 };
 
 export default AddCourseScreen;
