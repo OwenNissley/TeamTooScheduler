@@ -98,28 +98,18 @@ const Calendar = () => {
   };
 
   return (
-    <div className="page-container">
-      <div className="top-banner">
-        <button onClick={() => navigate("/")}>Home</button>
-        <button onClick={() => navigate("/quick-schedule")}>Quick Schedule</button>
-        <button onClick={() => navigate("/addCourse")}>Add Course</button>
-        <button onClick={() => navigate("/review")}>Review</button>
-        <button onClick={() => navigate("/course-directory")}>Course Directory</button>
-        <button onClick={() => navigate("/your-info")}>Your Info</button>
-      </div>
-
+    <>
       <ScheduleControls />
 
-        <div className="calendar-container">
-              <div className="calendar-wrapper">
-                  <DayPilotCalendar
-                  // NOOOO start date
-                    viewType="Week"
-                    events={events}  // Pass events to the calendar
-                    headerDateFormat="dddd"
-                  />
-              </div>
+      <div className="calendar-container">
+        <div className="calendar-wrapper">
+          <DayPilotCalendar
+            viewType="Week"
+            events={events}  // Pass events to the calendar
+            headerDateFormat="dddd"
+          />
         </div>
+      </div>
 
       {hasConflict && (
         <div className="courses-list">
@@ -143,8 +133,9 @@ const Calendar = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
+
 
 };
 

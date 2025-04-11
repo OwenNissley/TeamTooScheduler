@@ -304,6 +304,7 @@ public class coreTest {
     //THE FOLLOWING IS FOR UNDO/REDO
     public void undoAdd() {
         schedules.get(selectedSchedule).undoAdd();
+        // Make sure search results are updated
     }
 
     public void undoRemove() {
