@@ -54,7 +54,7 @@ public class Core {
         selectedSchedule = 0;
 
         //init search
-        search = new Search(courseRegistry.getCourses(semester));
+        search = new Search();
 
 
     }
@@ -137,12 +137,18 @@ public class Core {
         }
         schedules = semesterSchedules.get(semester);
 
+        //print confirmation
+        System.out.println("Semester updated to: " + semester);
+
         //if schedules is empty, add a new schedule
         if(schedules.isEmpty()){
             schedules.add(new Schedule());
         }
 
         selectedSchedule = 0; //reset selected schedule to the first one
+
+        //print confirmation
+        System.out.println("Selected schedule updated to: " + selectedSchedule);
     }
 
 
@@ -158,13 +164,7 @@ public class Core {
     private Search search;
 
     public void addFilter(Filter filter) {
-        if (filter.getFilterType() == FilterType.SEMESTER) {
-            search.filterBasedOnSemester(filter);
-        }
-        else
-        {
             search.addFilter(filter);
-        }
     }
 
     public void removeFilter(Filter filter) {
@@ -173,12 +173,12 @@ public class Core {
 
     public void searchGeneral(String searchTerm)
     {
-        search.searchGeneral(searchTerm);
+        search.searchGeneral(searchTerm, courseRegistry.getCourses(semester));
     }
 
     public void searchAdvanced()
     {
-        searchResults = search.searchAdvanced();
+        searchResults = search.searchAdvanced(courseRegistry.getCourses(semester));
         calculateConflictingCoursesInSearchResults();
 
     }

@@ -116,9 +116,9 @@ public class CourseRegistry {
         // Print the map
         for (String semester : courseMap.keySet()) {
             System.out.println("Semester: " + semester);
-            for (Course course : courseMap.get(semester)) {
-                System.out.println("  Course: " + course.getName());
-            }
+            //for (Course course : courseMap.get(semester)) {
+            //    System.out.println("  Course: " + course.getName());
+            //}
         }
     }
 }

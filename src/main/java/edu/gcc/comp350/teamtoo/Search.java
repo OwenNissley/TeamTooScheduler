@@ -12,49 +12,18 @@ import java.util.ArrayList;
 public class Search
 {
     private ArrayList<Filter> activeFilters;
-    private ArrayList<Course> semesterFilteredCourses;
+    //private ArrayList<Course> semesterFilteredCourses;
     private ArrayList<Course> generalFilteredCourses;
-    private final ArrayList<Course> allCourses;
+    //private final ArrayList<Course> allCourses;
     private boolean generalSearchExecuted; //used to determine if general search has been executed
 
     //constructor for empty
     public Search () {
-        this.allCourses = new ArrayList<>();
-        this.semesterFilteredCourses = new ArrayList<>();
+        //this.allCourses = new ArrayList<>();
+        //this.semesterFilteredCourses = new ArrayList<>();
         this.activeFilters = new ArrayList<>();
         this.generalFilteredCourses = new ArrayList<>();
         this.generalSearchExecuted = false; //set to false since no search has been executed
-    }
-
-    public Search(ArrayList<Course> allCourses) {
-        this.allCourses = allCourses;
-
-        this.semesterFilteredCourses = new ArrayList<>();
-        this.activeFilters = new ArrayList<>();
-        this.generalFilteredCourses = new ArrayList<>();
-
-        //TESTING PURPOSES ONLY
-        System.out.println("All Course Size: " + allCourses.size());
-    }
-
-    //add classes to define semesterFilteredCourses right away (before other searches can be doen)
-    //add checks to make sure term is selected prior to other searches
-    public void filterBasedOnSemester(Filter semesterFilter)
-    {
-        semesterFilteredCourses.clear();
-        //Filter termFilter = new FilterSemester(semesterFilter);
-        for (Course course : allCourses) {
-            if (semesterFilter.filtersCourse(course))
-                semesterFilteredCourses.add(course);
-        }
-
-        //TESTING PERPOSES ONLY
-        System.out.println("Semester Filtered Size: " + semesterFilteredCourses.size());
-    }
-
-    //clear generalFilteredCourses
-    private void clearGeneralFilteredCourses() {
-        generalFilteredCourses.clear();
     }
 
     //removes a filter
@@ -96,8 +65,17 @@ public class Search
 //--------------------------------------------------------------------------------------------------
 
 
-    public ArrayList<Course> searchAdvanced()
+    public ArrayList<Course> searchAdvanced(ArrayList<Course> semesterFilteredCourses)
     {
+        //FOR TESTING PURPOSES ONLY
+        //print out size of semesterFilteredCourses
+        try {
+            System.out.println("Semester Filtered Courses Size: " + semesterFilteredCourses.size());
+        } catch (NullPointerException e) {
+            System.out.println("\\u001B[31mERROR: no term filtered courses.\\u001B[0m\" ");
+            return null;
+        }
+
         ArrayList<Course> advancedFilteredCourses = new ArrayList<>();
         ArrayList<Course> pointer = generalFilteredCourses;
 
@@ -120,7 +98,8 @@ public class Search
             for (Course course : pointer) {
                 advancedFilteredCourses.add(course);
             }
-            clearGeneralFilteredCourses();
+            //remove this following line???
+            generalFilteredCourses.clear();
 
             return advancedFilteredCourses;
         }
@@ -152,15 +131,15 @@ public class Search
 
         //clear generalSearchExecuted so that it can be used for the next search
         // Testing pursposes only - iam not copying entire boshi just to comment out line - bum ahh gaydos heheheh
-        // generalSearchExecuted = false;
+        generalSearchExecuted = false;
 
         //for now, may be changed later,
         // Testing pursposes only - iam not copying entire boshi just to comment out line - bum ahh gaydos heheheh
-        //clearFilters();
+        clearFilters();
 
         //the following is for errors
         // Testing pursposes only - iam not copying entire boshi just to comment out line - bum ahh gaydos heheheh
-       // clearGeneralFilteredCourses();
+        generalFilteredCourses.clear();
 
         //TESTING PURPOSES ONLY
         System.out.println("Advanced Search Size: " + advancedFilteredCourses.size());
@@ -169,8 +148,13 @@ public class Search
     }
 
     //does not return, only updates generalFilteredCourses from semesterFilteredCourses
-    public void searchGeneral(String searchTerm)
+    public void searchGeneral(String searchTerm, ArrayList<Course> semesterFilteredCourses)
     {
+        //FOR TESTING PURPOSES ONLY
+        //print out size of semesterFilteredCourses
+        System.out.println("Semester Filtered Courses Size: " + semesterFilteredCourses.size());
+
+
         generalFilteredCourses.clear();
         //fill generalFilteredCourses.add() based on searchTerm
         if (semesterFilteredCourses.isEmpty()){
