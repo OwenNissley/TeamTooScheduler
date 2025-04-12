@@ -33,6 +33,7 @@ public class Course {
     @JsonProperty("total_seats")// Changed to List<TimeSlot> for multiple TimeSlots
     private int totalSeats;
 
+    private String courseID;
 
     public Course() {}
 
@@ -54,20 +55,21 @@ public class Course {
         this.subject = subject;
         this.times = times;
         this.totalSeats = totalSeats;
+        this.courseID = subject + " " + number + section;
     }
 
     //to string method - returns string with name of course, number of credits, the times and days of week
     @Override
     public String toString() {
         if (times.isEmpty())
-            return name + " (" + credits + " credits) -- " + daysString() + " -- No time specified";
+            return getCourseID() + ": " + name + " (" + credits + " credits) -- " + daysString() + " -- No time specified";
         else
         {
             StringBuilder timesString = new StringBuilder();
             for (TimeSlot time : times) {
                 timesString.append(time.toString()).append("; ");
             }
-            return name + " (" + credits + " credits) -- " + daysString() + " -- " + timesString.toString().trim();
+            return getCourseID() + ": " + name + " (" + credits + " credits) -- " + daysString() + " -- " + timesString.toString().trim();
         }
             //return name + " (" + credits + " credits) -- " + daysString() + ") -- " + times.get(0).toString();
     }
@@ -78,6 +80,7 @@ public class Course {
         String result = String.join(" ", faculty);
         return result;
     }
+    public List<String> getFacultyList() { return faculty; }
     public boolean isLab() { return lab; }
     public boolean isOpen() { return open; }
     public String getLocation() { return location; }
@@ -89,7 +92,7 @@ public class Course {
     public String getSubject() { return subject; }
     public ArrayList<TimeSlot> getTimes() { return times; }
     public int getTotalSeats() { return totalSeats; }
-
+    public String getCourseID() { return subject + " " + number + section; }
 
 
     public static class TimeSlot {

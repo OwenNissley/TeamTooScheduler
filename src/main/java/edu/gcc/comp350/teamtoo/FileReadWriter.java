@@ -103,7 +103,7 @@ public class FileReadWriter {
 
     }
 
-
+    //not really by id too much anymore
     public Course getCourseByID(String ID){
         for(Course course : directory) {
             if (("" + course.getSubject() + course.getNumber() + course.getSection() + course.getSemester()).equals(ID)) {

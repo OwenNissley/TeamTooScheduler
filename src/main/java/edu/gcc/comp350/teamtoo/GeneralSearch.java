@@ -114,17 +114,54 @@ public class GeneralSearch {
         String searchLower = searchInput.toLowerCase();
 
         for (Course course : courses) {
+            boolean courseAdded = false;
+
+            //cycle through course name
             String courseName = course.getName().toLowerCase();
 
             // Check for exact match first
-            boolean isExactMatch = courseName.startsWith(searchLower) || containsSubstringInWords(courseName,searchLower);
+            boolean isExactMatch = courseName.startsWith(searchLower) || containsSubstringInWords(courseName, searchLower);
 
             if (isExactMatch) {
                 exactMatches.add(course);
-            } else  {
+                courseAdded = true;
+            } else {
                 double similarity = nGramSimilarity(searchInput, courseName, n);
                 if (similarity >= threshold) {
                     similarityScores.put(course, similarity);
+                    courseAdded = true;
+                }
+            }
+
+            //cycle through course id
+            //pars numbers and remove 00s
+            if (!courseAdded) {
+                String courseId = course.getCourseID().toLowerCase();
+
+                // Check for exact match first
+                isExactMatch = courseId.startsWith(searchLower);
+
+                if (isExactMatch) {
+                    exactMatches.add(course);
+                    courseAdded = true;
+                }
+            }
+
+            //cycle through faculty
+            if (!courseAdded) {
+                String facultyLower = course.getFaculty().toLowerCase();
+
+                // Check for exact match first
+                isExactMatch = facultyLower.startsWith(searchLower) || containsSubstringInWords(facultyLower, searchLower);
+                if (isExactMatch) {
+                    exactMatches.add(course);
+                    courseAdded = true;
+                } else {
+                    double similarity = nGramSimilarity(searchInput, facultyLower, n);
+                    if (similarity >= threshold) {
+                        similarityScores.put(course, similarity);
+                        courseAdded = true;
+                    }
                 }
             }
         }

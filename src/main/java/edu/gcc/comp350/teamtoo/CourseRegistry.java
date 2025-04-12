@@ -8,9 +8,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class CourseRegistry {
     private ArrayList<Course> courses;
+    private Map<String, ArrayList<Course>> courseMap;
 
     @JsonProperty("date")
     private String date;
@@ -20,10 +23,21 @@ public class CourseRegistry {
 
     public CourseRegistry() {
         this.courses = new ArrayList<>();
+        this.courseMap = new HashMap<>();
     }
 
+    //this should only be called once (that once is in loadCoursesFromJson)
+    //and we will allow it to be called once for the FRW so i don't have to refactor that
     public ArrayList<Course> getCourses() {
         return courses;
+    }
+
+    public Map<String, ArrayList<Course>> getCourseMap() {
+        return courseMap;
+    }
+
+    public ArrayList<Course> getCourses(String semester) {
+        return courseMap.get(semester);
     }
 
     public void loadCoursesFromJson(String filePath) {
@@ -74,10 +88,37 @@ public class CourseRegistry {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //break course list into map
+        generateCourseMap();
     }
 
     public static void main(String[] args) {
         CourseRegistry registry = new CourseRegistry();
         registry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");  // Load and print courses
+    }
+
+    //generates a map of arraylists based on semester
+    public void generateCourseMap() {
+        // Iterate through the list of courses
+        for (Course course : courses) {
+            String semester = course.getSemester();
+
+            // If the semester is not already in the map, add it with an empty list
+            if (!courseMap.containsKey(semester)) {
+                courseMap.put(semester, new ArrayList<>());
+            }
+
+            // Add the course to the list for that semester
+            courseMap.get(semester).add(course);
+        }
+
+        // Print the map
+        for (String semester : courseMap.keySet()) {
+            System.out.println("Semester: " + semester);
+            for (Course course : courseMap.get(semester)) {
+                System.out.println("  Course: " + course.getName());
+            }
+        }
     }
 }

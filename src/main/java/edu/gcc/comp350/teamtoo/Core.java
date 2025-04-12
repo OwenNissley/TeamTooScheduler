@@ -54,7 +54,7 @@ public class Core {
         selectedSchedule = 0;
 
         //init search
-        search = new Search(courseRegistry.getCourses());
+        search = new Search(courseRegistry.getCourses(semester));
 
 
     }
