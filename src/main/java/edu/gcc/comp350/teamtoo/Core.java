@@ -11,6 +11,7 @@ public class Core {
     private CourseRegistry courseRegistry;
     private ArrayList<Course> searchResults;
     private FileReadWriter FRW;
+    private ArrayList<Course> conflictingCourses = new ArrayList<>();
 
     //fixing schedules
     private String semester;
@@ -69,7 +70,7 @@ public class Core {
         if (selectedSchedule < schedules.size()) {
             Schedule schedule = schedules.get(selectedSchedule);
             schedule.addCourse(course);
-
+            updateConflictingCoursesInSearchResults(course);
         }
     }
 
@@ -77,7 +78,8 @@ public class Core {
         //if (selectedSchedule < schedules.size()) {
             //Schedule schedule = schedules.get(selectedSchedule);
             schedules.get(selectedSchedule).addCourse(searchResults.get(courseIndex));
-            searchResults.remove(courseIndex);
+            //searchResults.remove(courseIndex);
+            updateConflictingCoursesInSearchResults(searchResults.get(courseIndex));
         //}
     }
 
@@ -169,12 +171,6 @@ public class Core {
     //creates search and maintains search, eventually returning search results
     private Search search;
 
-    public void searchCourse()
-    {
-
-
-    }
-
     public void addFilter(Filter filter) {
         if (filter.getFilterType() == FilterType.SEMESTER) {
             search.filterBasedOnSemester(filter);
@@ -197,8 +193,8 @@ public class Core {
     public void searchAdvanced()
     {
         searchResults = search.searchAdvanced();
-        //remove courses that are already in the schedule
-        //CANT DO THIS
+        calculateConflictingCoursesInSearchResults();
+
     }
 
     public ArrayList<Course> getSearchResults() {
@@ -219,6 +215,41 @@ public class Core {
     public boolean checkConflicts()
     {
         return schedules.get(selectedSchedule).getIsConflict();
+    }
+
+    //returns a list of conflicting courses in searchResults
+    public ArrayList<Course> getConflictingCoursesInSearchResults()
+    {
+        return conflictingCourses;
+    }
+
+    //calculates a list of conflicting courses in searchResults
+    public void calculateConflictingCoursesInSearchResults()
+    {
+        conflictingCourses.clear();
+        for (Course c : searchResults)
+        {
+            for (Course s : schedules.get(selectedSchedule).getCourses())
+            {
+                //if course conflicts with s and s is not the same course
+                if (c.hasConflict(s) && !c.equals(s))
+                {
+                    conflictingCourses.add(c);
+                }
+            }
+        }
+    }
+
+    public void updateConflictingCoursesInSearchResults(Course s)
+    {
+        for (Course c : searchResults)
+        {
+            //if course conflicts with s and s is not the same course
+            if (c.hasConflict(s) && !c.equals(s))
+            {
+                conflictingCourses.add(c);
+            }
+        }
     }
 
 
