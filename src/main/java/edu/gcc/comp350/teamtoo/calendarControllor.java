@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class calendarControllor {
-    private final coreTest core;
+    private final Core core;
 
-    public calendarControllor(coreTest core) {
+    public calendarControllor(Core core) {
         this.core = core;
     }
 

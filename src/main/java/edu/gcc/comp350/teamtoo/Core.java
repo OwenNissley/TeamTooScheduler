@@ -1,6 +1,5 @@
 package edu.gcc.comp350.teamtoo;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -95,7 +94,7 @@ public class Core {
     }
 
     public void removeAllCourses() {
-        schedules.get(selectedSchedule).clearSchedule();
+        schedules.get(selectedSchedule).removeAllCourses();
     }
 
     public ArrayList<Course> getConflictingCourses() {
@@ -113,19 +112,6 @@ public class Core {
         Schedule newSchedule = new Schedule();
         schedules.add(newSchedule);
         selectedSchedule = schedules.indexOf(newSchedule);
-    }
-
-    //deletes the currently selected schedule
-    //from the list of schedules
-    public int deleteSchedule() {
-        if(schedules.size() == 1){
-            return 1;
-        }
-        schedules.remove(selectedSchedule);
-        if(selectedSchedule >= schedules.size()){
-            selectedSchedule = schedules.size() - 1;
-        }
-        return 0;
     }
 
     public void loadSchedule(Schedule schedule){
@@ -223,6 +209,12 @@ public class Core {
         return conflictingCourses;
     }
 
+    //monkeys return for conflicting courses
+    public ArrayList<Course> getNonConflictingCourses()
+    {
+        return conflictingCourses;
+    }
+
     //calculates a list of conflicting courses in searchResults
     public void calculateConflictingCoursesInSearchResults()
     {
@@ -268,14 +260,62 @@ public class Core {
         schedules.get(selectedSchedule).undoRemove();
     }
 
-    public void redoAdd() {
-        schedules.get(selectedSchedule).redoAdd();
+    public void clearUndoRedoHistory() {
+        schedules.get(selectedSchedule).clearUndoRedoHistory();
     }
 
-    public void redoRemove() {
-        schedules.get(selectedSchedule).redoRemove();
-    }
     //END UNDO/REDO
     //-------------------------------------------------------------------------------------------------------------
 
+
+    //Monk frontend additions
+    public int getNumOfSchedules() {
+        return schedules.size();
+    } //addded
+
+    public void setSelectedSchedule(int selectedSchedule) {
+        this.selectedSchedule = selectedSchedule;
+    } //added
+    public int getSelectedSchedule() {
+        return selectedSchedule;
+    } //added
+
+
+    //changed
+    public int deleteSchedule() {
+        if(schedules.size() == 1){
+            schedules.remove(0);
+            newSchedule();
+            return 0; //changed 1 -> 0
+        }else {
+            int oldSelectedSchedule = selectedSchedule; //added
+            schedules.remove(selectedSchedule);
+            if (oldSelectedSchedule ==0){
+                selectedSchedule = 0; //added
+            }else {
+                selectedSchedule = oldSelectedSchedule - 1; //added
+            }
+        }
+        return selectedSchedule; //added
+    }
+
+    // get generalSearchExecuted
+    public boolean getGeneralSearchExecuted() {
+        return search.getGeneralSearchExecuted();
+    }
+
+    //set generalSearchExecuted
+    public void setGeneralSearchExecuted(boolean generalSearchExecuted) {
+        search.setGeneralSearchExecuted(generalSearchExecuted);
+    }
+
+    //ADDED by Monk
+    // Get active filters on search
+    public ArrayList<Filter> getActiveFilters() {
+        return search.getActiveFilters();
+    }
+    // clear all filters
+    public void clearAllFilters() {
+        search.clearFilters();
+    }
 }

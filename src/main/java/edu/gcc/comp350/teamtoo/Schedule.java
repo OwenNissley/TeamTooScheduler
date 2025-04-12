@@ -1,7 +1,6 @@
 package edu.gcc.comp350.teamtoo;
 
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 public class Schedule
 {
@@ -13,14 +12,14 @@ public class Schedule
     private ArrayList<Course> conflictingCourses; //list of courses that conflict
 
     //used for undo and redo
-    private ScheduleHistory history;
+    private ArrayList<Course> history;
 
     private static int idCounter = 1; // Unique ID generator for schedules  //Micah -  not sure if we need this
 
     public Schedule(){
         this.courses = new ArrayList<>();
         this.scheduleID = idCounter++;
-        this.history = new ScheduleHistory(courses);
+        this.history = new ArrayList<>();
         isConflict = false;
         conflictingCourses = new ArrayList<>();
     }
@@ -29,7 +28,7 @@ public class Schedule
     public Schedule(ArrayList<Course> courses){
         this.courses = new ArrayList<>(courses);
         this.scheduleID = idCounter++;
-        this.history = new ScheduleHistory(courses);
+        this.history = new ArrayList<>();
         isConflict = false;
         conflictingCourses = new ArrayList<>();
         checkConflict(); // check for conflicts when schedule is created
@@ -63,44 +62,49 @@ public class Schedule
             }
         }
     }
-    public boolean hasConflict() {
-        return false;
-    }
-    public void removeCourse(Course course) {
+
+    public boolean removeCourse(Course course) {
         if (courses.remove(course)) {
-            history.updateHistory(courses); // call this at the end
+            history.add(course); // call this at the end
             checkConflict();
+            return true;
+        }
+        else {
+            return false;
         }
     }
     public void removeCourse(int index) {
         if (index >= 0 && index < courses.size()) {
-            courses.remove(index);
-            history.updateHistory(courses); // call this at the end
-            checkConflict();
+            removeCourse(courses.get(index));
         }
     }
-    public void addCourse(Course course) {
-        //for (Course c : courses) {
-            //if (!c.equals(course)) {
+    public boolean addCourse(Course course) {
             if (!courses.contains(course)) {
                 courses.add(course);
+                history.add(course); // call this at the end
                 checkConflict(course);
-                history.updateHistory(courses); // call this at the end
+                return true;
             }
-        //}
-    }
-    public void setSchedule(ArrayList<Course> newCourses){
-        this.courses = newCourses;
-        history.updateHistory(courses);
+            else {
+                //System.out.println("Course already exists in schedule.");
+                return false;
+            }
     }
 
-    public void clearSchedule() {
+    //remove or replace
+    public void setSchedule(ArrayList<Course> newCourses){
+        this.courses = newCourses;
+        //history.updateHistory(courses);
+    }
+
+    public void removeAllCourses() {
+        //history.add(courses); // call this at the end
+
         courses.clear();
 
         // recheck conflicts
         checkConflict();
 
-        history.updateHistory(courses); // call this at the end
     }
 
 
@@ -111,34 +115,35 @@ public class Schedule
 
     public void undoAdd()
     {
-        undoAction();  //I anticipate this not working
+        if (!history.isEmpty()) {
+            //remove last course in list
+            if(removeCourse(history.get(history.size() - 1))) {
+                //remove it twice because remove will add it back
+                history.remove(history.size() - 1);
+                history.remove(history.size() - 1);
+            }
+            else
+                history.clear();
+        }
     }
 
     public void undoRemove()
     {
-        undoAction();  //I anticipate this not working
+        if (!history.isEmpty()) {
+            //add last course in list
+            if(addCourse(history.get(history.size() - 1))) {
+                //remove it twice because add will add it back
+                history.remove(history.size() - 1);
+                history.remove(history.size() - 1);
+            }
+            else
+                history.clear();
+        }
     }
 
-    public void redoAdd()
+    public void clearUndoRedoHistory()
     {
-        redoAction();  //I anticipate this not working
-    }
-
-    public void redoRemove()
-    {
-        redoAction();  //I anticipate this not working
-    }
-
-    public void undoAction() {
-        history.getPrev(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData());
-        //addCourse(hirstory.getCurrentNodeDate)
-        checkConflict(); // recheck conflicts after undo
-    }
-    public void redoAction() {
-        history.getNext(courses);
-        courses = new ArrayList<>(history.getCurrentNodeData());
-        checkConflict(); // recheck conflicts after redo
+        history.clear();
     }
 
     //END UNDO AND REDO

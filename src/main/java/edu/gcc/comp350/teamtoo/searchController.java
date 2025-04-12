@@ -9,9 +9,9 @@ import java.util.ArrayList;
 
 public class searchController {
 
-    private final coreTest core;
+    private final Core core;
 
-    public searchController(coreTest core) {
+    public searchController(Core core) {
         this.core = core;
     }
 
