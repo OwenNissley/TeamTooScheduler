@@ -24,16 +24,6 @@ public class Schedule
         conflictingCourses = new ArrayList<>();
     }
 
-    //this should be deleted and not be used at all
-    public Schedule(ArrayList<Course> courses){
-        this.courses = new ArrayList<>(courses);
-        this.scheduleID = idCounter++;
-        this.history = new ArrayList<>();
-        isConflict = false;
-        conflictingCourses = new ArrayList<>();
-        checkConflict(); // check for conflicts when schedule is created
-    }
-
     public int getScheduleID() {
         return scheduleID;
     }

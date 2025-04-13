@@ -32,7 +32,7 @@ public class FileReadWriter {
     public Map<String, ArrayList<Schedule>> readScheduleFromFile(String fileName) {
         Map<String, ArrayList<Schedule>> hashedSchedules = new HashMap<>();
         ArrayList<Schedule> schedules = new ArrayList<>();
-        ArrayList<Course> courses = new ArrayList<>();
+        Schedule schedule = new Schedule();
         int courseCount = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
@@ -50,8 +50,8 @@ public class FileReadWriter {
                 }
                 else if(line.equals("**********")){
                     //System.out.println("Runs");
-                    schedules.add(new Schedule(courses));
-                    courses.clear();
+                    schedules.add(schedule);
+                    schedule = new Schedule();
                     courseCount = 0;
                 }
                 else{
@@ -59,7 +59,7 @@ public class FileReadWriter {
                     Course course = getCourseByID(line);
                     //System.out.println(course.getName());
                     if(course != null){
-                        courses.add(course);
+                        schedule.addCourse(course);
                         courseCount++;
                     }
                 }

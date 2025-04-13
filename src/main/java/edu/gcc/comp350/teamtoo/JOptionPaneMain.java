@@ -1,7 +1,5 @@
 package edu.gcc.comp350.teamtoo;
 
-import io.javalin.Javalin;
-
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -10,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class Main {
+public class JOptionPaneMain {
     private static Core core;
 
     //for semester stuff
