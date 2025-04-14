@@ -20,12 +20,12 @@ import io.javalin.http.Context;
 import java.util.ArrayList;
 
 public class reactController {
-    private final coreTest core;
+    private final Core core;
     private final calendarControllor calendarControllor;
     private final searchController searchController;
 
     public reactController() {
-        this.core = new coreTest();
+        this.core = new Core();
         calendarControllor = new calendarControllor(core);
         searchController = new searchController(core);
         core.addFilter(new FilterSemester("2023", "Fall"));
