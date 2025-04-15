@@ -25,7 +25,7 @@ public class Course {
     private int openSeats;
 
 
-    private char section;
+    private String section;
     private String semester;
     private String subject;
     private ArrayList<TimeSlot> times;
@@ -33,13 +33,14 @@ public class Course {
     @JsonProperty("total_seats")// Changed to List<TimeSlot> for multiple TimeSlots
     private int totalSeats;
 
+    private String courseID;
 
     public Course() {}
 
     // **Constructor**
     public Course(int credits, List<String> faculty, boolean lab, boolean open,
                   String location, String name, int number, int open_seats,
-                  char section, String semester, String subject, ArrayList<TimeSlot> times,
+                  String  section, String semester, String subject, ArrayList<TimeSlot> times,
                   int totalSeats) {
         this.credits = credits;
         this.faculty = faculty;
@@ -54,20 +55,21 @@ public class Course {
         this.subject = subject;
         this.times = times;
         this.totalSeats = totalSeats;
+        this.courseID = subject + " " + number + section;
     }
 
     //to string method - returns string with name of course, number of credits, the times and days of week
     @Override
     public String toString() {
         if (times.isEmpty())
-            return name + " (" + credits + " credits) -- " + daysString() + " -- No time specified";
+            return getCourseID() + ": " + name + " (" + credits + " credits) -- " + daysString() + " -- No time specified";
         else
         {
             StringBuilder timesString = new StringBuilder();
             for (TimeSlot time : times) {
                 timesString.append(time.toString()).append("; ");
             }
-            return name + " (" + credits + " credits) -- " + daysString() + " -- " + timesString.toString().trim();
+            return getCourseID() + ": " + name + " (" + credits + " credits) -- " + daysString() + " -- " + timesString.toString().trim();
         }
             //return name + " (" + credits + " credits) -- " + daysString() + ") -- " + times.get(0).toString();
     }
@@ -78,18 +80,19 @@ public class Course {
         String result = String.join(" ", faculty);
         return result;
     }
+    public List<String> getFacultyList() { return faculty; }
     public boolean isLab() { return lab; }
     public boolean isOpen() { return open; }
     public String getLocation() { return location; }
     public String getName() { return name; }
     public int getNumber() { return number; }
     public int getOpenSeats() { return openSeats; }
-    public char getSection() { return section; }
+    public String getSection() { return section; }
     public String getSemester() { return semester; }
     public String getSubject() { return subject; }
     public ArrayList<TimeSlot> getTimes() { return times; }
     public int getTotalSeats() { return totalSeats; }
-
+    public String getCourseID() { return subject + " " + number + section; }
 
 
     public static class TimeSlot {

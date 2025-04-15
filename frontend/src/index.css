@@ -181,6 +181,14 @@ body {
   margin: 1rem auto; /* Center align */
 }
 
+.conflicting-course {
+  background-color: #fdd; /* light red background */
+  border: 1px solid red;
+  color: darkred;
+  font-weight: bold;
+}
+
+
 .conflict-warning h2 {
   margin-bottom: 0.5rem;
 }

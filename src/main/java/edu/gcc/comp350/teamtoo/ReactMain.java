@@ -3,7 +3,7 @@ package edu.gcc.comp350.teamtoo;
 import io.javalin.Javalin;
 import java.io.IOException;
 
-public class testMain {
+public class ReactMain {
     private static Process reactProcess;
 
     public static void main(String[] args) {

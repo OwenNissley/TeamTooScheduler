@@ -1,15 +1,17 @@
 package edu.gcc.comp350.teamtoo;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 
 public class searchController {
 
-    private final coreTest core;
+    private final Core core;
 
-    public searchController(coreTest core) {
+    public searchController(Core core) {
         this.core = core;
     }
 
@@ -26,7 +28,19 @@ public class searchController {
             app.post("/clearSearch", this::clearSearch);
             app.post("/clearDayFormat", this::clearDayFormat);
             app.post("/clearTimeRange", this::clearTimeRange);
+            app.post("/undoAdd", this::undoAdd);
+            app.post("/undoRemoveCourse", this::undoRemoveCourse);
+    }
 
+    private void undoRemoveCourse(Context ctx) {
+        core.undoRemove();
+        ctx.json(core.getNonConflictingCourses());
+    }
+
+    private void undoAdd(Context ctx) {
+        // MAke sure undo takes out of search results
+       core.undoAdd();
+       ctx.json(core.getSearchResults());
     }
 
     private void removeAllCourses(Context ctx) {
@@ -38,15 +52,43 @@ public class searchController {
         ArrayList<Course> courses = core.getNonConflictingCourses();
         ArrayList<Course> conflictingCourses = core.getConflictingCourses();
         ArrayList<Course> allCourses = new ArrayList<>();
-        allCourses.addAll(conflictingCourses);
         allCourses.addAll(courses);
+        allCourses.addAll(conflictingCourses);
         ctx.json(allCourses);
     }
 
     private void removeCourse(Context ctx) {
-        int courseIndex = Integer.parseInt(ctx.queryParam("courseIndex"));
-        core.removeCourse(courseIndex);
-        ctx.json(core.getNonConflictingCourses());
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.readTree(ctx.body());
+
+            // Extract the values from the JSON body
+            String name = jsonNode.get("name").asText();
+            int number = jsonNode.get("number").asInt();
+            int credits = jsonNode.get("credits").asInt();
+
+            // Output the received course data (for debugging)
+            System.out.println("Received course to remove: " + name + ", Number: " + number + ", Credits: " + credits);
+
+            // check which course object matches, name, number, credits
+            ArrayList<Course> courses = core.getNonConflictingCourses();
+            ArrayList<Course> conflictingCourses = core.getConflictingCourses();
+            courses.addAll(conflictingCourses);
+            Course selectedCourse = null;
+            for (Course course : courses) {
+                System.out.println("Course: " + course.getName() + ", Number: " + course.getNumber() + ", Credits: " + course.getCredits());
+                if (course.getName().equals(name) && course.getNumber() == number && course.getCredits() == credits) {
+                    selectedCourse = course;
+                    break;
+                }
+            }
+
+            core.removeCourse(selectedCourse);
+            ctx.json(core.getNonConflictingCourses());
+
+        } catch (Exception e) {
+            ctx.status(400).result("Invalid course data");
+        }
     }
 
     // Clear all filters and reset the search

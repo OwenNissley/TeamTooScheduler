@@ -1,6 +1,5 @@
 package edu.gcc.comp350.teamtoo;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -11,6 +10,7 @@ public class Core {
     private CourseRegistry courseRegistry;
     private ArrayList<Course> searchResults;
     private FileReadWriter FRW;
+    private ArrayList<Course> conflictingCourses = new ArrayList<>();
 
     //fixing schedules
     private String semester;
@@ -54,7 +54,7 @@ public class Core {
         selectedSchedule = 0;
 
         //init search
-        search = new Search(courseRegistry.getCourses());
+        search = new Search();
 
 
     }
@@ -69,7 +69,7 @@ public class Core {
         if (selectedSchedule < schedules.size()) {
             Schedule schedule = schedules.get(selectedSchedule);
             schedule.addCourse(course);
-
+            updateConflictingCoursesInSearchResults(course);
         }
     }
 
@@ -77,7 +77,8 @@ public class Core {
         //if (selectedSchedule < schedules.size()) {
             //Schedule schedule = schedules.get(selectedSchedule);
             schedules.get(selectedSchedule).addCourse(searchResults.get(courseIndex));
-            searchResults.remove(courseIndex);
+            //searchResults.remove(courseIndex);
+            updateConflictingCoursesInSearchResults(searchResults.get(courseIndex));
         //}
     }
 
@@ -93,7 +94,7 @@ public class Core {
     }
 
     public void removeAllCourses() {
-        schedules.get(selectedSchedule).clearSchedule();
+        schedules.get(selectedSchedule).removeAllCourses();
     }
 
     public ArrayList<Course> getConflictingCourses() {
@@ -111,19 +112,6 @@ public class Core {
         Schedule newSchedule = new Schedule();
         schedules.add(newSchedule);
         selectedSchedule = schedules.indexOf(newSchedule);
-    }
-
-    //deletes the currently selected schedule
-    //from the list of schedules
-    public int deleteSchedule() {
-        if(schedules.size() == 1){
-            return 1;
-        }
-        schedules.remove(selectedSchedule);
-        if(selectedSchedule >= schedules.size()){
-            selectedSchedule = schedules.size() - 1;
-        }
-        return 0;
     }
 
     public void loadSchedule(Schedule schedule){
@@ -149,12 +137,18 @@ public class Core {
         }
         schedules = semesterSchedules.get(semester);
 
+        //print confirmation
+        System.out.println("Semester updated to: " + semester);
+
         //if schedules is empty, add a new schedule
         if(schedules.isEmpty()){
             schedules.add(new Schedule());
         }
 
         selectedSchedule = 0; //reset selected schedule to the first one
+
+        //print confirmation
+        System.out.println("Selected schedule updated to: " + selectedSchedule);
     }
 
 
@@ -169,20 +163,8 @@ public class Core {
     //creates search and maintains search, eventually returning search results
     private Search search;
 
-    public void searchCourse()
-    {
-
-
-    }
-
     public void addFilter(Filter filter) {
-        if (filter.getFilterType() == FilterType.SEMESTER) {
-            search.filterBasedOnSemester(filter);
-        }
-        else
-        {
             search.addFilter(filter);
-        }
     }
 
     public void removeFilter(Filter filter) {
@@ -191,14 +173,14 @@ public class Core {
 
     public void searchGeneral(String searchTerm)
     {
-        search.searchGeneral(searchTerm);
+        search.searchGeneral(searchTerm, courseRegistry.getCourses(semester));
     }
 
     public void searchAdvanced()
     {
-        searchResults = search.searchAdvanced();
-        //remove courses that are already in the schedule
-        //CANT DO THIS
+        searchResults = search.searchAdvanced(courseRegistry.getCourses(semester));
+        calculateConflictingCoursesInSearchResults();
+
     }
 
     public ArrayList<Course> getSearchResults() {
@@ -221,6 +203,47 @@ public class Core {
         return schedules.get(selectedSchedule).getIsConflict();
     }
 
+    //returns a list of conflicting courses in searchResults
+    public ArrayList<Course> getConflictingCoursesInSearchResults()
+    {
+        return conflictingCourses;
+    }
+
+    //monkeys return for conflicting courses
+    public ArrayList<Course> getNonConflictingCourses()
+    {
+        return conflictingCourses;
+    }
+
+    //calculates a list of conflicting courses in searchResults
+    public void calculateConflictingCoursesInSearchResults()
+    {
+        conflictingCourses.clear();
+        for (Course c : searchResults)
+        {
+            for (Course s : schedules.get(selectedSchedule).getCourses())
+            {
+                //if course conflicts with s and s is not the same course
+                if (c.hasConflict(s) && !c.equals(s))
+                {
+                    conflictingCourses.add(c);
+                }
+            }
+        }
+    }
+
+    public void updateConflictingCoursesInSearchResults(Course s)
+    {
+        for (Course c : searchResults)
+        {
+            //if course conflicts with s and s is not the same course
+            if (c.hasConflict(s) && !c.equals(s))
+            {
+                conflictingCourses.add(c);
+            }
+        }
+    }
+
 
     //END CONFLICTING SCHEDULES
     //-------------------------------------------------------------------------------------------------------------
@@ -237,14 +260,62 @@ public class Core {
         schedules.get(selectedSchedule).undoRemove();
     }
 
-    public void redoAdd() {
-        schedules.get(selectedSchedule).redoAdd();
+    public void clearUndoRedoHistory() {
+        schedules.get(selectedSchedule).clearUndoRedoHistory();
     }
 
-    public void redoRemove() {
-        schedules.get(selectedSchedule).redoRemove();
-    }
     //END UNDO/REDO
     //-------------------------------------------------------------------------------------------------------------
 
+
+    //Monk frontend additions
+    public int getNumOfSchedules() {
+        return schedules.size();
+    } //addded
+
+    public void setSelectedSchedule(int selectedSchedule) {
+        this.selectedSchedule = selectedSchedule;
+    } //added
+    public int getSelectedSchedule() {
+        return selectedSchedule;
+    } //added
+
+
+    //changed
+    public int deleteSchedule() {
+        if(schedules.size() == 1){
+            schedules.remove(0);
+            newSchedule();
+            return 0; //changed 1 -> 0
+        }else {
+            int oldSelectedSchedule = selectedSchedule; //added
+            schedules.remove(selectedSchedule);
+            if (oldSelectedSchedule ==0){
+                selectedSchedule = 0; //added
+            }else {
+                selectedSchedule = oldSelectedSchedule - 1; //added
+            }
+        }
+        return selectedSchedule; //added
+    }
+
+    // get generalSearchExecuted
+    public boolean getGeneralSearchExecuted() {
+        return search.getGeneralSearchExecuted();
+    }
+
+    //set generalSearchExecuted
+    public void setGeneralSearchExecuted(boolean generalSearchExecuted) {
+        search.setGeneralSearchExecuted(generalSearchExecuted);
+    }
+
+    //ADDED by Monk
+    // Get active filters on search
+    public ArrayList<Filter> getActiveFilters() {
+        return search.getActiveFilters();
+    }
+    // clear all filters
+    public void clearAllFilters() {
+        search.clearFilters();
+    }
 }

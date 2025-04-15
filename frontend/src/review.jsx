@@ -97,12 +97,18 @@ const removeCourseHandler = async () => {
      return;
    }
 
-   //const selectedCourse = courses[selectedCourseIndex];
+   const selectedCourse = coursesToDisplay[selectedCourseIndex];
+   console.log(selectedCourse);
+   const courseData = {
+        name: selectedCourse.name,
+        number: selectedCourse.number,
+        credits: selectedCourse.credits,
+       }
+
+
 
    try {
-     const response = await axios.post("http://localhost:7000/removeCourse", null, {
-       params: { courseIndex: selectedCourseIndex },
-     });
+    const response = await axios.post( "http://localhost:7000/removeCourse",courseData);
 
      setCourses(response.data); // Update filteredCourses from response
      setSelectedCourseIndex(null); // Reset selection after successful addition
@@ -110,11 +116,12 @@ const removeCourseHandler = async () => {
      updateCoursesToDisplay();
     // alert(`Course "${selectedCourse.name}" removed successfully!`);
    } catch (error) {
-     console.error("Error adding course:", error);
+     console.error("Error removing course:", error);
    }
 
  };
 
+//needs redone to be in the backend
 const isTimeOverlapping = (courseTime, conflictingTime) => {
   // Convert times to minutes to simplify the comparison.
   const startCourseTimeInMinutes = convertToMinutes(courseTime.start_time);
@@ -133,14 +140,13 @@ const convertToMinutes = (time) => {
   return hours * 60 + minutes;
 };
 
-
+// This needs redone to back end
 const isCourseConflicting = (course) => {
   return conflictingCourses.some((conflictingCourse) => {
     // Case 1: Check if the name and number are the same
     if (conflictingCourse.name === course.name && conflictingCourse.number === course.number) {
       return true;
     }
-
     // Case 2: Check if the times overlap on the same day
     return conflictingCourse.times.some((conflictingTime) =>
       course.times.some((courseTime) => {
@@ -155,23 +161,26 @@ const isCourseConflicting = (course) => {
   });
 };
 
+    const undoRemoveCourseHandler = async () => {
+        try {
+            const response = await axios.post("http://localhost:7000/undoRemoveCourse");
+            const courses = response.data;
+            setCourses(courses);
+            updateCoursesToDisplay();
+            updateConflicts();
+            console.log("Fetched courses:", courses);
+        } catch (error) {
+            console.error("Error fetching courses:", error);
+        }
+
+    }
+
 
  return (
    <div className="review-course-screen">
      <h1 className="title">Review Courses</h1>
 
-     <div className="controls-container">
-       <div className="top-banner">
-         <button className="nav-button" onClick={() => navigate("/")}>Home</button>
-         <button className="nav-button" onClick={() => navigate("/quick-schedule")}>Quick Schedule</button>
-         <button className="nav-button" onClick={() => navigate("/addCourse")}>Add Course</button>
-         <button className="nav-button" onClick={() => navigate("/review")}>Review</button>
-         <button className="nav-button" onClick={() => navigate("/course-directory")}>Course Directory</button>
-         <button className="nav-button" onClick={() => navigate("/your-info")}>Your Info</button>
-       </div>
-
        <ScheduleControls />
-     </div>
 
      {hasConflict && (
        <div className="courses-list conflict-section">
@@ -253,6 +262,12 @@ const isCourseConflicting = (course) => {
       >
         Remove All Courses
       </button>
+       <button
+              className="remove-course-button"
+              onClick={undoRemoveCourseHandler}
+            >
+              Undo Remove
+            </button>
     </div>
 
   </div>
