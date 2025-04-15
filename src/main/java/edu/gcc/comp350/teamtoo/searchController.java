@@ -6,6 +6,7 @@ import io.javalin.http.Context;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class searchController {
 
@@ -30,6 +31,26 @@ public class searchController {
             app.post("/clearTimeRange", this::clearTimeRange);
             app.post("/undoAdd", this::undoAdd);
             app.post("/undoRemoveCourse", this::undoRemoveCourse);
+            app.post("/parseCourseInformation", this::parseCourseInformation);
+    }
+
+    private void parseCourseInformation(Context ctx) {
+        try {
+            // Extract courseId from the request parameters
+            String courseId = ctx.queryParam("courseId");
+            if (courseId == null || courseId.isEmpty()) {
+                ctx.status(400).result("Missing courseId parameter");
+                return;
+            }
+
+            // Call the Core method to parse course information
+            Map<String, Object> parsedCourse = core.parseCourseInformation(courseId);
+
+            // Return the parsed course information as JSON
+            ctx.json(parsedCourse);
+        } catch (Exception e) {
+            ctx.status(500).result("Error parsing course information: " + e.getMessage());
+        }
     }
 
     private void undoRemoveCourse(Context ctx) {

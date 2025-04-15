@@ -1,17 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Calendar.css";
-import ScheduleControls from "./ScheduleControls";
-import { ScheduleContext } from "./ScheduleContext";
 
 const CourseDirectory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCourses, setFilteredCourses] = useState([]);
-  const [selectedCourseIndex, setSelectedCourseIndex] = useState(null);
-  const [selectedDayFormat, setSelectedDayFormat] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [hoveredCourseDetails, setHoveredCourseDetails] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+  const [isMouseOver, setIsMouseOver] = useState(false);
   const navigate = useNavigate();
 
   const handleSearchChange = async (e) => {
@@ -23,34 +20,13 @@ const CourseDirectory = () => {
       return;
     }
 
-    const response = await axios.post("http://localhost:7000/excuteGeneralSearch", null, {
-      params: { searchTerm: searchValue },
-    });
-    setFilteredCourses(response.data);
-  };
-
-  const handleCourseSelect = (index) => {
-    setSelectedCourseIndex(index);
-  };
-
-  const addCourseHandler = async () => {
-    if (selectedCourseIndex === null) {
-      alert("Please select a course first.");
-      return;
-    }
-
-    const selectedCourse = filteredCourses[selectedCourseIndex];
-
     try {
-      const response = await axios.post("http://localhost:7000/addCourse", null, {
-        params: { courseIndex: selectedCourseIndex },
+      const response = await axios.post("http://localhost:7000/excuteGeneralSearch", null, {
+        params: { searchTerm: searchValue },
       });
-
       setFilteredCourses(response.data);
-      setSelectedCourseIndex(null);
-      alert(`Course "${selectedCourse.name}" added successfully!`);
     } catch (error) {
-      console.error("Error adding course:", error);
+      console.error("Error fetching courses:", error);
     }
   };
 
@@ -62,48 +38,59 @@ const CourseDirectory = () => {
     return `${convertedHour}:${formattedMinutes} ${period}`;
   };
 
-  const handleDayChange = async (e) => {
-    const dayFormatChoice = e.target.value;
-    setSelectedDayFormat(dayFormatChoice);
+  const handleMouseEnterCourse = async (e, course) => {
+    const rect = e.target.getBoundingClientRect();
+    let top = rect.bottom + window.scrollY;
+    let left = rect.left + window.scrollX;
 
-    const response = await axios.post("http://localhost:7000/excuteDayFilterSearch", null, {
-      params: { dayFormatChoice },
-    });
-    setFilteredCourses(response.data);
-  };
-
-  const generateTimeOptions = () => {
-    const times = [];
-    for (let hour = 7; hour <= 22; hour++) {
-      const ampm = hour < 12 ? "AM" : "PM";
-      const hour12 = hour % 12 || 12;
-      times.push(`${hour12}:00 ${ampm}`);
+    // Adjust popup position to fit within the screen
+    const popupHeight = 200;
+    const popupWidth = 300;
+    if (top + popupHeight > window.innerHeight + window.scrollY) {
+      top = rect.top + window.scrollY - popupHeight;
     }
-    return times;
+    if (left + popupWidth > window.innerWidth + window.scrollX) {
+      left = window.innerWidth + window.scrollX - popupWidth;
+    }
+
+    setPopupPosition({ top, left });
+
+    try {
+      const response = await axios.post(
+        "http://localhost:7000/parseCourseInformation",
+        null,
+        { params: { courseId: course.name } }
+      );
+      if (response.data) {
+        setHoveredCourseDetails(response.data);
+        setIsMouseOver(true); // Keep the popup visible
+      } else {
+        console.error("No course details returned from the server");
+      }
+    } catch (error) {
+      console.error("Error fetching course details:", error);
+    }
   };
 
-  const handleStartTimeChange = async (e) => {
-    const newValue = e.target.value;
-    setStartTime(newValue);
-
-    if (!newValue || !endTime) return;
-
-    const response = await axios.post("http://localhost:7000/excuteTimeFilterSearch", null, {
-      params: { startTime: newValue, endTime },
-    });
-    setFilteredCourses(response.data);
+  const handleMouseLeaveCourse = () => {
+    setTimeout(() => {
+      if (!isMouseOver) {
+        setHoveredCourseDetails(null); // Hide the popup
+      }
+    }, 50); // Small delay to allow mouse transition to the popup
   };
 
-  const handleEndTimeChange = async (e) => {
-    const newValue = e.target.value;
-    setEndTime(newValue);
+  const handleMouseEnterArea = () => {
+    setIsMouseOver(true); // Keep the popup visible
+  };
 
-    if (!newValue || !startTime) return;
-
-    const response = await axios.post("http://localhost:7000/excuteTimeFilterSearch", null, {
-      params: { startTime, endTime: newValue },
-    });
-    setFilteredCourses(response.data);
+  const handleMouseLeaveArea = () => {
+    setIsMouseOver(false);
+    setTimeout(() => {
+      if (!isMouseOver) {
+        setHoveredCourseDetails(null); // Hide the popup
+      }
+    }, 50); // Small delay to ensure proper state update
   };
 
   return (
@@ -129,104 +116,67 @@ const CourseDirectory = () => {
         </button>
       </div>
 
-      <div className="day-selector">
-        <label>
-          <input
-            type="radio"
-            value="MWF"
-            checked={selectedDayFormat === "MWF"}
-            onChange={handleDayChange}
-          />
-          MWF (Monday, Wednesday, Friday)
-        </label>
-        <label>
-          <input
-            type="radio"
-            value="TR"
-            checked={selectedDayFormat === "TR"}
-            onChange={handleDayChange}
-          />
-          TR (Tuesday, Thursday)
-        </label>
-        <button className="clear-button" onClick={() => setSelectedDayFormat("")}>
-          Clear
-        </button>
-      </div>
-
-      <div className="time-range">
-        <label>
-          Start Time:
-          <select value={startTime} onChange={handleStartTimeChange}>
-            {generateTimeOptions().map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label>
-          End Time:
-          <select value={endTime} onChange={handleEndTimeChange}>
-            {generateTimeOptions().map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className="clear-button" onClick={() => {
-          setStartTime("");
-          setEndTime("");
-        }}>
-          Clear
-        </button>
-      </div>
-
-      <div className="courses-list">
-        <h3>Courses</h3>
-        <div className="course-box">
-          {filteredCourses.length === 0 ? (
-            <p>No courses found</p>
-          ) : (
-            filteredCourses.map((course, index) => (
-              <div
-                key={index}
-                className="course-item"
-                onClick={() => handleCourseSelect(index)}
-              >
-                <span>
-                  {course.name} ({course.credits} credits)
-                </span>
-                <span>
-                  {" - "}
-                  {course.times
-                    .map(
-                      (time) =>
-                        `${time.day} ${convertTo12HourFormat(
-                          time.start_time
-                        )} - ${convertTo12HourFormat(time.end_time)}`
-                    )
-                    .join(", ")}
-                </span>
-                <button
-                  onClick={() => handleCourseSelect(index)}
-                  disabled={selectedCourseIndex === index}
-                  className={`course-button ${
-                    selectedCourseIndex === index ? "selected-button" : ""
-                  }`}
+      <div
+        className="courses-container"
+        onMouseEnter={handleMouseEnterArea}
+        onMouseLeave={handleMouseLeaveArea}
+      >
+        <div className="courses-list">
+          <h3>Courses</h3>
+          <div className="course-box">
+            {filteredCourses.length === 0 ? (
+              <p>No courses found</p>
+            ) : (
+              filteredCourses.map((course, index) => (
+                <div
+                  key={index}
+                  className="course-item"
+                  onMouseEnter={(e) => handleMouseEnterCourse(e, course)}
                 >
-                  {selectedCourseIndex === index ? "Selected" : "Select"}
-                </button>
-              </div>
-            ))
-          )}
+                  <span>
+                    {course.name} ({course.credits} credits)
+                  </span>
+                  <span>
+                    {" - "}
+                    {course.times
+                      .map(
+                        (time) =>
+                          `${time.day} ${convertTo12HourFormat(
+                            time.start_time
+                          )} - ${convertTo12HourFormat(time.end_time)}`
+                      )
+                      .join(", ")}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-      </div>
 
-      <button className="add-course-button" onClick={addCourseHandler}>
-        Add Course
-      </button>
+        {hoveredCourseDetails && (
+          <div
+            className="hovered-course-details-popup"
+            style={{ top: popupPosition.top, left: popupPosition.left }}
+            onMouseEnter={handleMouseEnterArea}
+            onMouseLeave={handleMouseLeaveArea}
+          >
+            <div className="popup-content">
+              <h4>Course Details</h4>
+              <p>Name: {hoveredCourseDetails.name}</p>
+              <p>Credits: {hoveredCourseDetails.credits}</p>
+              <p>Faculty: {hoveredCourseDetails.faculty}</p>
+              <p>Location: {hoveredCourseDetails.location}</p>
+              <p>Open Seats: {hoveredCourseDetails.openSeats}</p>
+              <p>Total Seats: {hoveredCourseDetails.totalSeats}</p>
+              <p>Times: {hoveredCourseDetails.times.join(", ")}</p>
+              <p>Subject: {hoveredCourseDetails.subject}</p>
+              <p>Number: {hoveredCourseDetails.number}</p>
+              <p>Section: {hoveredCourseDetails.section}</p>
+              <p>Semester: {hoveredCourseDetails.semester}</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

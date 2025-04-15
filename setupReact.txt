@@ -10,7 +10,7 @@ Return: v22.14.0
 Third open Project in ineteljiL and run these two commands in terminal:   
 cd frontend         
 npm install axios    
- 
+
 Then buld the gradle file
 
 Then run testMain

@@ -40,6 +40,16 @@ public class CourseRegistry {
         return courseMap.get(semester);
     }
 
+    // Retrieves a course by its ID
+    public Course getCourseById(String courseId) {
+        for (Course course : courses) {
+            if (course.getName().equals(courseId)) {
+                return course;
+            }
+        }
+        return null; // Return null if no course is found with the given ID
+    }
+
     public void loadCoursesFromJson(String filePath) {
         try {
             // Create ObjectMapper
