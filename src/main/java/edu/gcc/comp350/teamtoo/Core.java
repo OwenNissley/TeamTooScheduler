@@ -59,6 +59,52 @@ public class Core {
 
     }
 
+    public Map<String, Object> parseCourseInformation(String courseId) {
+        Course course = courseRegistry.getCourseById(courseId); // Ensure courseRegistry has this method
+        if (course == null) {
+            throw new IllegalArgumentException("Course not found");
+        }
+
+        Map<String, Object> courseDetails = new HashMap<>();
+        courseDetails.put("name", course.getName());
+        courseDetails.put("credits", course.getCredits());
+        courseDetails.put("faculty", course.getFaculty());
+        courseDetails.put("location", course.getLocation());
+        courseDetails.put("openSeats", course.getOpenSeats());
+        courseDetails.put("totalSeats", course.getTotalSeats());
+        courseDetails.put("times", course.getTimes());
+        courseDetails.put("subject", course.getSubject());
+        courseDetails.put("number", course.getNumber());
+        courseDetails.put("section", course.getSection());
+        courseDetails.put("semester", course.getSemester());
+
+        return courseDetails;
+    }
+
+    /*public ArrayList<Map<String, Object>> parseCourseInformation() {
+        ArrayList<Course> courses = courseRegistry.getCourses(semester); // Retrieve courses for the current semester
+        ArrayList<Map<String, Object>> detailedCourses = new ArrayList<>();
+
+        for (Course course : courses) {
+            Map<String, Object> courseDetails = new HashMap<>();
+            courseDetails.put("name", course.getName());
+            courseDetails.put("credits", course.getCredits());
+            courseDetails.put("faculty", course.getFaculty());
+            courseDetails.put("location", course.getLocation());
+            courseDetails.put("openSeats", course.getOpenSeats());
+            courseDetails.put("totalSeats", course.getTotalSeats());
+            courseDetails.put("times", course.getTimes());
+            courseDetails.put("subject", course.getSubject());
+            courseDetails.put("number", course.getNumber());
+            courseDetails.put("section", course.getSection());
+            courseDetails.put("semester", course.getSemester());
+            detailedCourses.add(courseDetails);
+        }
+
+        return detailedCourses; // Return the detailed course list
+    }
+    */
+
     //writes 'schedules' into the file 'StoredSchedules.txt'
     //saving the current schedules the user has
     public void saveSchedulesIntoFile(){

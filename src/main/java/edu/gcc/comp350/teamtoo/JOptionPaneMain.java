@@ -17,7 +17,7 @@ public class JOptionPaneMain {
 
     public static void main(String[] args) {
         core = new Core();
-       run();
+        run();
     }
 
     public static void run() {
@@ -122,20 +122,20 @@ public class JOptionPaneMain {
         }
 
 
-       // Create the table and scroll pane
-       JTable scheduleTable = new JTable(new ScheduleTableModel(nonConflictingCourses));
-       scheduleTable.setRowHeight(50); // Set row height
+        // Create the table and scroll pane
+        JTable scheduleTable = new JTable(new ScheduleTableModel(nonConflictingCourses));
+        scheduleTable.setRowHeight(50); // Set row height
 
-       // Set column width
-       for (int i = 0; i < scheduleTable.getColumnCount(); i++) {
-           TableColumn column = scheduleTable.getColumnModel().getColumn(i);
-           column.setPreferredWidth(150);
-       }
+        // Set column width
+        for (int i = 0; i < scheduleTable.getColumnCount(); i++) {
+            TableColumn column = scheduleTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(150);
+        }
 
-       JScrollPane scrollPane = new JScrollPane(scheduleTable);
-       scheduleTable.setFillsViewportHeight(true);
+        JScrollPane scrollPane = new JScrollPane(scheduleTable);
+        scheduleTable.setFillsViewportHeight(true);
 
-       // Add components to the home panel
+        // Add components to the home panel
         homePanel.add(warningsTextArea, BorderLayout.CENTER);
         homePanel.add(scrollPane, BorderLayout.SOUTH);
         mainPanel.removeAll();
@@ -1073,7 +1073,7 @@ public class JOptionPaneMain {
             }
         });
 
-        
+
 
         return semesterWrapper;
     }
