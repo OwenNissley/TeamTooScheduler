@@ -255,11 +255,26 @@ public class Core {
         return conflictingCourses;
     }
 
-    //monkeys return for conflicting courses
+    //monkeys return for conflicting courses - BRUUUUUUUUU it was suposed to be nonConflciting,
+    // IT WAS NAMED getNonConflictingCourses
+    //then you retuend conflicting courses - bruuu
+    // - Crashed th whole ahhh app, cuase used to fetch- BRUUUUUUU
+    // Your gonna get hurt
     public ArrayList<Course> getNonConflictingCourses()
     {
-        return conflictingCourses;
+        //return conflictingCourses; - NO NO NO ON NO
+        // get all courses in the selected schedule
+        //and remove the conflicting courses
+
+        ArrayList<Course> nonConflictingCourses = new ArrayList<>(schedules.get(selectedSchedule).getCourses());
+        nonConflictingCourses.removeAll(schedules.get(selectedSchedule).getConflictingCourses());
+
+        return nonConflictingCourses;
+
+
     }
+
+
 
     //calculates a list of conflicting courses in searchResults
     public void calculateConflictingCoursesInSearchResults()

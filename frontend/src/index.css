@@ -150,6 +150,12 @@ body {
   background-color: #00695c;
 }
 
+.added-course {
+  background-color: #4caf50;
+
+}
+
+
 /* Calendar Full Screen */
 .calendar-container {
   flex-grow: 1;
