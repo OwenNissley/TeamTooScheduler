@@ -121,7 +121,7 @@ const removeCourseHandler = async () => {
 
  };
 
-//needs redone to be in the backend
+//This has to be in front end, and no contains for a list, so making it myself
 const isTimeOverlapping = (courseTime, conflictingTime) => {
   // Convert times to minutes to simplify the comparison.
   const startCourseTimeInMinutes = convertToMinutes(courseTime.start_time);

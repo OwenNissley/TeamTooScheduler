@@ -13,6 +13,25 @@ const AddCourseScreen = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const { selectedYear, selectedTerm, selectedSchedule, numOfSchedules} = useContext(ScheduleContext);
+  const [conflictStatuses, setConflictStatuses] = useState([]);
+  const [addedStatuses, setAddedStatuses] = useState([]);
+
+useEffect(() => {
+  const checkStatuses = async () => {
+    const conflicts = await Promise.all(
+      filteredCourses.map((course) => isCourseConflicting(course))
+    );
+    const added = await Promise.all(
+      filteredCourses.map((course) => isCourseAdded(course))
+    );
+    setConflictStatuses(conflicts);
+    setAddedStatuses(added);
+  };
+
+  if (filteredCourses.length > 0) {
+    checkStatuses();
+  }
+}, [filteredCourses]);
 
 
   const navigate = useNavigate();
@@ -204,6 +223,80 @@ const generateTimeOptions = () => {
         setFilteredCourses(response.data); // Update filteredCourses from response
      }
 
+//This has to be in front end, and no contains for a list, so making it myself
+const isTimeOverlapping = (courseTime, conflictingTime) => {
+  // Convert times to minutes to simplify the comparison.
+  const startCourseTimeInMinutes = convertToMinutes(courseTime.start_time);
+  const endCourseTimeInMinutes = convertToMinutes(courseTime.end_time);
+  const startConflictingTimeInMinutes = convertToMinutes(conflictingTime.start_time);
+  const endConflictingTimeInMinutes = convertToMinutes(conflictingTime.end_time);
+
+  // Check if there's any overlap.
+  return (
+    (startCourseTimeInMinutes < endConflictingTimeInMinutes && endCourseTimeInMinutes > startConflictingTimeInMinutes)
+  );
+};
+
+const convertToMinutes = (time) => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+// This needs redone to back end
+const isCourseConflicting = async (course) => {
+    // get conflictingCoursesInSearchResults
+  const response = await axios.post("http://localhost:7000/getConflictingCoursesInSearchResults");
+  const conflictingCoursesInSearchResults = response.data;
+  console.log("Conflicting courses in search results:", conflictingCoursesInSearchResults);
+  if (conflictingCoursesInSearchResults.length === 0) {
+    return false; // No conflicts if the list is empty
+  }
+  // Check if the course is in the conflicting courses
+    return conflictingCoursesInSearchResults.some((conflictingCourse) => {
+        // Case 1: Check if the name and number are the same
+         if (conflictingCourse.name === course.name && conflictingCourse.number === course.number) {
+                 return true;
+               }
+               // Case 2: Check if the times overlap on the same day
+               return conflictingCourse.times.some((conflictingTime) =>
+                 course.times.some((courseTime) => {
+                   // Check if the days are the same
+                   if (courseTime.day === conflictingTime.day) {
+                     // Use helper method to check if times overlap
+                     return isTimeOverlapping(courseTime, conflictingTime);
+                   }
+                   return false;
+   })
+         );
+       });
+     };
+
+
+const isCourseAdded = async (course) => {
+    // get allCourses
+    const response = await axios.post("http://localhost:7000/getAllCourses");
+    const addedCourses = response.data;
+    console.log("Added courses:", addedCourses);
+      return addedCourses.some((conflictingCourse) => {
+        // Case 1: Check if the name and number are the same
+        if (conflictingCourse.name === course.name && conflictingCourse.number === course.number) {
+          return true;
+        }
+        // Case 2: Check if the times overlap on the same day
+        return conflictingCourse.times.some((conflictingTime) =>
+          course.times.some((courseTime) => {
+            // Check if the days are the same
+            if (courseTime.day === conflictingTime.day) {
+              // Use helper method to check if times overlap
+              return isTimeOverlapping(courseTime, conflictingTime);
+            }
+            return false;
+          })
+        );
+      });
+    };
+
+
 
  return (
    <div>
@@ -271,7 +364,14 @@ const generateTimeOptions = () => {
            <p>No courses found</p>
          ) : (
            filteredCourses.map((course, index) => (
-             <div key={index} className="course-item" onClick={() => setSelectedCourseIndex(index)}>
+            <div
+                key={index}
+                className={`course-item
+                  ${selectedCourseIndex === index ? "selected-course" : ""}
+                  ${conflictStatuses[index] ? "conflicting-course" : ""}
+                  ${addedStatuses[index] ? "added-course" : ""}`}
+                onClick={() => setSelectedCourseIndex(index)}
+              >
                <span>{course.name} ({course.credits} credits)</span>
                <span>
                  {" - "}
