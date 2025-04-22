@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { ScheduleContext } from "./ScheduleContext";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ScheduleControls = () => {
     const navigate = useNavigate();
@@ -17,6 +18,16 @@ const ScheduleControls = () => {
     handleDeleteSchedule,
   } = useContext(ScheduleContext);
 
+    const handleSave = async () => {
+        try {
+            await axios.post("http://localhost:7000/saveSchedule");
+            alert("Schedule saved successfully!");
+        } catch (error) {
+            console.error("Error saving schedule:", error);
+            alert("Failed to save schedule.");
+        }
+    }
+
   return (
     <div className="controls-container">
       <div className="top-banner">
@@ -26,6 +37,7 @@ const ScheduleControls = () => {
         <button className="nav-button" onClick={() => navigate("/review")}>Review</button>
         <button className="nav-button" onClick={() => navigate("/course-directory")}>Course Directory</button>
         <button className="nav-button" onClick={() => navigate("/your-info")}>Your Info</button>
+        <button className="nav-button" onClick={handleSave}>Save</button>
       </div>
 
       <div className="control-banner">

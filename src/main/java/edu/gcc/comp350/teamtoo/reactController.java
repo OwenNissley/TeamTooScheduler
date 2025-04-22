@@ -44,11 +44,8 @@ public class reactController {
        searchController.registerRoutes(app);
     }
 
-
-
-    private void setFilter(Context ctx) {
-
-      //  search
+    public void saveCore() {
+        core.saveSchedulesIntoFile();
     }
 
 }

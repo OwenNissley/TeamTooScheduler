@@ -24,9 +24,15 @@ public class calendarControllor {
         app.post("/newSchedule", this::createNewSchedule);
         app.post("/deleteSchedule", this::deleteSchedule);
         app.get("/checkConflicts", this::hasConflicts);
+        app.post("/saveSchedule", this::saveSchedule);
     }
 
 
+
+
+    private void saveSchedule(Context ctx) {
+       core.saveSchedulesIntoFile();
+    }
 
     private void hasConflicts(Context ctx) {
         ArrayList<Course> conflictingCourses = core.getConflictingCourses();
