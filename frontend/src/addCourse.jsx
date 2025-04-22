@@ -364,9 +364,7 @@ const isCourseAdded = async (course) => {
             <div
                 key={index}
                 className={`course-item
-                  ${selectedCourseIndex === index ? "selected-course" : ""}
-                  ${conflictStatuses[index] ? "conflicting-course" : ""}
-                  ${addedStatuses[index] ? "added-course" : ""}`}
+                  ${selectedCourseIndex === index ? "selected-course" : ""}`}
                 onClick={() => setSelectedCourseIndex(index)}
               >
                <span>{course.name} ({course.credits} credits)</span>
