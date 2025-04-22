@@ -7,7 +7,7 @@ import { ScheduleContext } from "./ScheduleContext";
 import "./quickShec.css"; // Import the CSS file for styling
 
 const QuickShecScreen = () => {
-       const [selectedDayFormat, setSelectedDayFormat] = useState(null); // Default day is Monday
+       const [selectedDayFormat, setSelectedDayFormat] = useState(""); // Default day is Monday
        const [startTime, setStartTime] = useState("");
        const [endTime, setEndTime] = useState("");
        const {selectedYear, selectedTerm, selectedSchedule, numOfSchedules} = useContext(ScheduleContext);
@@ -84,34 +84,42 @@ const QuickShecScreen = () => {
 
         const createNewScheduleManual = async () => {
             try {
-                const response = await axios.post("http://localhost:7000/Youcan creak your own backend call and implement it,- Micah", {
-                selectedDayFormat,
-                startTime,
-                endTime,
-                totalCredits,
-                fields,
+                const response = await axios.post("http://localhost:7000/createNewScheduleManual", {
+                    dayFormat: selectedDayFormat,
+                    startTime: startTime,
+                    endTime: endTime,
+                    credits: totalCredits,
+                    courses: fields,
                 });
                 console.log("Schedule created:", response.data);
+                // Navigate to the review page after creating the schedule
+                navigate("/review");
             } catch (error) {
                 console.error("Error creating schedule:", error);
             }
         }
 
+
+        const createNewScheduleSkip = async () => {
+            try {
+                const response = await axios.post("http://localhost:7000/createNewScheduleSkip", {
+                                dayFormat: selectedDayFormat,
+                                   startTime: startTime,
+                                   endTime: endTime,
+                                   credits: totalCredits,
+                                   courses: fields,
+                });
+                console.log("Schedule created:", response.data);
+
+                // Navigate to the review page after creating the schedule
+                navigate("/review");
+            } catch (error) {
+                console.error("Error creating schedule:", error);
+            }
+        }
 
         const createNewScheduleStatusSheet = async () => {
-            try {
-                const response = await axios.post("http://localhost:7000/Youcan creak your own backend call and implement it,- Micah/Coldan", {
-                selectedDayFormat,
-                startTime,
-                endTime,
-                totalCredits,
-                fields,
-                });
-                console.log("Schedule created:", response.data);
-            } catch (error) {
-                console.error("Error creating schedule:", error);
             }
-        }
 
   return (
       <div className="center-container">
@@ -188,7 +196,7 @@ const QuickShecScreen = () => {
             {/* Buttons */}
             <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
               <button onClick={createNewScheduleStatusSheet} >Create from Status Sheets</button>
-              <button className="nav-button" onClick={() => navigate("/")}>Skip</button>
+              <button className="nav-button" onClick={createNewScheduleSkip}>Skip</button>
             </div>
 
             {/* Manual Header */}
