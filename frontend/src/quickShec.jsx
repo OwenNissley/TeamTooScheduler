@@ -107,7 +107,7 @@ const QuickShecScreen = () => {
                                    startTime: startTime,
                                    endTime: endTime,
                                    credits: totalCredits,
-                                   courses: fields,
+
                 });
                 console.log("Schedule created:", response.data);
 

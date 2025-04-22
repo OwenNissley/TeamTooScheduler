@@ -76,20 +76,16 @@ public class searchController {
             String startTime = jsonNode.get("startTime").asText();
             String endTime = jsonNode.get("endTime").asText();
             int totalCredits = jsonNode.get("credits").asInt();
-            ArrayList<String> fields = new ArrayList<>();
-            for (JsonNode field : jsonNode.get("courses")) {
-                fields.add(field.asText());
-            }
 
 
 
             // Output the received course data (for debugging)
             System.out.println("Received course data: Day Format: " + dayFormat + ", Start Time: " + startTime + ", End Time: " + endTime + ", Total Credits: " + totalCredits);
             // print the fields
-            System.out.println("Fields: " + fields);
+
             // Call the Core method to create a new schedule
 
-            //core.quickSchedule(dayFormat, startTime, endTime, totalCredits, fields);
+            //core.quickSchedule(dayFormat, startTime, endTime, totalCredits);
         } catch (Exception e) {
             ctx.status(500).result("Error parsing course information: " + e.getMessage());
         }
