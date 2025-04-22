@@ -34,8 +34,62 @@ public class searchController {
             app.post("/parseCourseInformation", this::parseCourseInformation);
         app.post("/getConflictingCoursesInSearchResults", this::getConflictingCoursesInSearchResults);
         app.post("/getAllCourses", this::getAllCourses);
+        app.post("/createNewScheduleManual", this::createNewScheduleManual);
+        app.post("/createNewScheduleSkip", this::createNewScheduleSkip);
     }
 
+    private void createNewScheduleManual(Context ctx) {
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.readTree(ctx.body());
+            // Extract the values from the JSON body
+            String dayFormat = jsonNode.get("dayFormat").asText();
+            String startTime = jsonNode.get("startTime").asText();
+            String endTime = jsonNode.get("endTime").asText();
+            int totalCredits = jsonNode.get("credits").asInt();
+            ArrayList<String> fields = new ArrayList<>();
+            for (JsonNode field : jsonNode.get("courses")) {
+                fields.add(field.asText());
+            }
+
+
+
+            // Output the received course data (for debugging)
+            System.out.println("Received course data: Day Format: " + dayFormat + ", Start Time: " + startTime + ", End Time: " + endTime + ", Total Credits: " + totalCredits);
+            // print the fields
+            System.out.println("Fields: " + fields);
+            // Call the Core method to create a new schedule
+
+           // core.quickSchedule(dayFormat, startTime, endTime, totalCredits, fields);
+
+        } catch (Exception e) {
+            ctx.status(500).result("Error parsing course information: " + e.getMessage());
+        }
+    }
+    private void createNewScheduleSkip(Context ctx) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.readTree(ctx.body());
+            // Extract the values from the JSON body
+            String dayFormat = jsonNode.get("dayFormat").asText();
+            String startTime = jsonNode.get("startTime").asText();
+            String endTime = jsonNode.get("endTime").asText();
+            int totalCredits = jsonNode.get("credits").asInt();
+
+
+
+            // Output the received course data (for debugging)
+            System.out.println("Received course data: Day Format: " + dayFormat + ", Start Time: " + startTime + ", End Time: " + endTime + ", Total Credits: " + totalCredits);
+            // print the fields
+
+            // Call the Core method to create a new schedule
+
+            //core.quickSchedule(dayFormat, startTime, endTime, totalCredits);
+        } catch (Exception e) {
+            ctx.status(500).result("Error parsing course information: " + e.getMessage());
+        }
+    }
     private void getAllCourses(Context ctx) {
         ArrayList<Course> allCourses = new ArrayList<>(core.getConflictingCourses());
         allCourses.addAll(core.getNonConflictingCourses());
