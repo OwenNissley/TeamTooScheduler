@@ -6,6 +6,7 @@ import AddCourseScreen from "./addCourse";
 import { ScheduleProvider } from "./ScheduleContext";
 import ReviewCourseScreen from "./review";
 import CourseDirectory from "./courseDirectory";
+import QuickShecScreen from "./quickShec";
 
 const App = () => {
    return (
@@ -16,6 +17,7 @@ const App = () => {
             <Route path="/addCourse" element={<AddCourseScreen />} />
             <Route path="/review" element={<ReviewCourseScreen />} />
             <Route path="/course-directory" element={<CourseDirectory />} />
+            <Route path="/quick-schedule" element={<QuickShecScreen />} />
           </Routes>
         </Router>
       </ScheduleProvider>

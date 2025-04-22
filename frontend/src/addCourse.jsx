@@ -225,16 +225,18 @@ const generateTimeOptions = () => {
 
 //This has to be in front end, and no contains for a list, so making it myself
 const isTimeOverlapping = (courseTime, conflictingTime) => {
-  // Convert times to minutes to simplify the comparison.
-  const startCourseTimeInMinutes = convertToMinutes(courseTime.start_time);
-  const endCourseTimeInMinutes = convertToMinutes(courseTime.end_time);
-  const startConflictingTimeInMinutes = convertToMinutes(conflictingTime.start_time);
-  const endConflictingTimeInMinutes = convertToMinutes(conflictingTime.end_time);
+  const startCourse = convertToMinutes(courseTime.start_time);
+  const endCourse = convertToMinutes(courseTime.end_time);
+  const startConflict = convertToMinutes(conflictingTime.start_time);
+  const endConflict = convertToMinutes(conflictingTime.end_time);
 
-  // Check if there's any overlap.
-  return (
-    (startCourseTimeInMinutes < endConflictingTimeInMinutes && endCourseTimeInMinutes > startConflictingTimeInMinutes)
-  );
+  // Check if the start of the course falls within the conflict time
+  const startInConflict = startCourse >= startConflict && startCourse <= endConflict;
+  // Check if the end of the course falls within the conflict time
+  const endInConflict = endCourse >= startConflict && endCourse <= endConflict;
+
+  // Return true if there's an overlap
+  return startInConflict || endInConflict;
 };
 
 const convertToMinutes = (time) => {
@@ -251,26 +253,21 @@ const isCourseConflicting = async (course) => {
   if (conflictingCoursesInSearchResults.length === 0) {
     return false; // No conflicts if the list is empty
   }
-  // Check if the course is in the conflicting courses
-    return conflictingCoursesInSearchResults.some((conflictingCourse) => {
-        // Case 1: Check if the name and number are the same
-         if (conflictingCourse.name === course.name && conflictingCourse.number === course.number) {
-                 return true;
-               }
-               // Case 2: Check if the times overlap on the same day
-               return conflictingCourse.times.some((conflictingTime) =>
-                 course.times.some((courseTime) => {
-                   // Check if the days are the same
-                   if (courseTime.day === conflictingTime.day) {
-                     // Use helper method to check if times overlap
-                     return isTimeOverlapping(courseTime, conflictingTime);
-                   }
-                   return false;
-   })
-         );
-       });
-     };
+// Check if the course is in the conflicting courses
+return conflictingCoursesInSearchResults.some((conflictingCourse) => {
+  // Check if the name and number are the same
+  if (conflictingCourse.name === course.name && conflictingCourse.number === course.number) {
+    return true;
+  }
 
+  // Check if the times overlap on the same day
+  return conflictingCourse.times.some((conflictingTime) =>
+    course.times.some((courseTime) =>
+      courseTime.day === conflictingTime.day && isTimeOverlapping(courseTime, conflictingTime)
+    )
+  );
+});
+}
 
 const isCourseAdded = async (course) => {
     // get allCourses
