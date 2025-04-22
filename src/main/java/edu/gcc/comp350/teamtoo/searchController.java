@@ -32,6 +32,17 @@ public class searchController {
             app.post("/undoAdd", this::undoAdd);
             app.post("/undoRemoveCourse", this::undoRemoveCourse);
             app.post("/parseCourseInformation", this::parseCourseInformation);
+        app.post("/getConflictingCoursesInSearchResults", this::getConflictingCoursesInSearchResults);
+        app.post("/getAllCourses", this::getAllCourses);
+    }
+
+    private void getAllCourses(Context ctx) {
+        ArrayList<Course> allCourses = new ArrayList<>(core.getConflictingCourses());
+        allCourses.addAll(core.getNonConflictingCourses());
+        ctx.json(allCourses);
+    }
+    private void getConflictingCoursesInSearchResults(Context ctx) {
+        ctx.json(core.getConflictingCoursesInSearchResults());
     }
 
     private void parseCourseInformation(Context ctx) {
@@ -126,10 +137,11 @@ public class searchController {
         ctx.json(core.getSearchResults());
     }
     private void clearSearch(Context ctx) {
-        boolean genSearchEcuxted = core.getGeneralSearchExecuted();
-        if (genSearchEcuxted) {
-            core.setGeneralSearchExecuted(false);
-        }
+       // boolean genSearchEcuxted = core.getGeneralSearchExecuted();
+     //   if (genSearchEcuxted) {
+       //     core.setGeneralSearchExecuted(false);
+     //   }
+        core.searchGeneral("");
         core.searchAdvanced();
         ctx.json(core.getSearchResults());
     }
@@ -215,6 +227,7 @@ public class searchController {
 
     private void addCourse(Context ctx) {
         int courseIndex = Integer.parseInt(ctx.queryParam("courseIndex"));
+        System.out.println("Adding course at index: " + courseIndex);
         core.addCourse(courseIndex);
         ctx.json(core.getSearchResults());
     }

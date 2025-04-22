@@ -98,8 +98,8 @@ public class Search
             for (Course course : pointer) {
                 advancedFilteredCourses.add(course);
             }
-            //remove this following line???
-            generalFilteredCourses.clear();
+            //remove this following line??? - Monk commented line out
+           // generalFilteredCourses.clear();
 
             return advancedFilteredCourses;
         }
@@ -131,15 +131,15 @@ public class Search
 
         //clear generalSearchExecuted so that it can be used for the next search
         // Testing pursposes only - iam not copying entire boshi just to comment out line - bum ahh gaydos heheheh
-        generalSearchExecuted = false;
+       // generalSearchExecuted = false;
 
         //for now, may be changed later,
         // Testing pursposes only - iam not copying entire boshi just to comment out line - bum ahh gaydos heheheh
-        clearFilters();
+      //  clearFilters();
 
         //the following is for errors
         // Testing pursposes only - iam not copying entire boshi just to comment out line - bum ahh gaydos heheheh
-        generalFilteredCourses.clear();
+      //  generalFilteredCourses.clear();
 
         //TESTING PURPOSES ONLY
         System.out.println("Advanced Search Size: " + advancedFilteredCourses.size());
@@ -154,6 +154,13 @@ public class Search
         //print out size of semesterFilteredCourses
         System.out.println("Semester Filtered Courses Size: " + semesterFilteredCourses.size());
 
+        //Monk to get it to clear with an empty search term, to fufill condion in search advanced wich
+        // requires false booleans and empty gen earch results
+        if (searchTerm.isEmpty()) {
+            generalFilteredCourses.clear();
+            generalSearchExecuted = false;
+            return;
+        }
 
         generalFilteredCourses.clear();
         //fill generalFilteredCourses.add() based on searchTerm

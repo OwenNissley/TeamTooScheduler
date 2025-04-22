@@ -16,7 +16,7 @@ public class calendarControllor {
 
     public void registerRoutes(Javalin app) {
         //app.get("/courseReg", this::getCourseList);
-        app.get("/updateSchedule", this::getCourseList);
+        app.get("/updateSchedule", this::getNonConflictingCourses);
         app.get("/getNumOfSchedules", this::getNumOfShecules);
         app.post("/updateYear", this::updateYear);
         app.post("/updateTerm", this::updateTerm);
@@ -47,7 +47,7 @@ public class calendarControllor {
         int index = core.getSelectedSchedule();
         ctx.json(index);
     }
-    private void getCourseList(Context ctx) {
+    private void getNonConflictingCourses(Context ctx) {
         ctx.json(core.getNonConflictingCourses());
     }
 
