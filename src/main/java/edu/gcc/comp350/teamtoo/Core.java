@@ -199,7 +199,6 @@ public class Core {
 
 
 
-    public void quickSchedule() {}
 
 
 
@@ -379,4 +378,36 @@ public class Core {
     public void clearAllFilters() {
         search.clearFilters();
     }
+
+
+    //-------------------------------------------------------------------------------------------------------------
+    //THE FOLLOWING IS FOR QUICK SCHEDULE
+
+    public void quickSchedule(String day, String startTime, String endTime, int numCredits, String[] requiredCourses)
+    {
+        //clear all filters
+        search.clearFilters();
+
+        //create a filter for the day
+        if (day.equals("MWF") || day.equals("TR")) {
+            FilterDaysOfWeek dayFilter = new FilterDaysOfWeek(day);
+            search.addFilter(dayFilter);
+        }
+
+        //create a filter for the time
+
+
+        ArrayList<Course> potentialCourses = new ArrayList<>();
+
+
+    }
+
+    public void quickSchedule(String day, String startTime, String endTime, int numCredits)
+    {
+        //bust
+    }
+
+
+    //END QUICK SCHEDULE
+    //-------------------------------------------------------------------------------------------------------------
 }
