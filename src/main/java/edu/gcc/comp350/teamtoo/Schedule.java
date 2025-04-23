@@ -203,8 +203,8 @@ public class Schedule
     {
         for (Course c : courses)
         {
-            //if course conflicts with c and c is not the same course
-            if (course.hasConflict(c) && !course.equals(c))
+            //if course conflicts with c or  c is the same course
+            if (course.hasConflict(c) || course.equals(c))
             {
                 return true;
                 //if course is not in conflictingCourses, add it

@@ -432,7 +432,27 @@ public class Core {
 
         //add courses to potentialCourses based on filters
         searchGeneral("");
+        //add filters if not added already
+        //create a filter for the day
+        if (!addedDayFilter) {
+            if (day.equals("MWF") || day.equals("TR")) {
+                dayFilter = new FilterDaysOfWeek(day);
+                addFilter(dayFilter);
+            }
+        }
+        //create a filter for the time
+        if (!addedTimeFilter) {
+            timeFilter = new FilterTime(startTime, endTime);
+            addFilter(timeFilter);
+        }
         qs.addCourses(search.searchAdvanced(courseRegistry.getCourses(semester)));
+        //if filters were only created for the general filtered classes, remove them
+        if (!addedDayFilter) {
+            removeFilter(dayFilter);
+        }
+        if (!addedTimeFilter) {
+            removeFilter(timeFilter);
+        }
 
         //try to calculate the schedule, if fail, then remove filters for search terms
         ArrayList<Integer> qsFailValue = new ArrayList<>();
@@ -464,7 +484,7 @@ public class Core {
                 System.out.println("Quick schedule cannot add required courses, removing day filter");
                 if (addedDayFilter) {
                     removeFilter(dayFilter);
-                    addedDayFilter = false;
+                    //addedDayFilter = false;
                 }
             }
             //if failcount is 1, remove the time filter
@@ -473,7 +493,7 @@ public class Core {
                 //remove the time filter
                 if (addedTimeFilter) {
                     removeFilter(timeFilter);
-                    addedTimeFilter = false;
+                    //addedTimeFilter = false;
                 }
                 //update search term and research
 
@@ -492,25 +512,25 @@ public class Core {
             }
             qsFailValue.add(qs.calculateSchedule());
 
-            //add back the filters if removed
-            if (!addedDayFilter) {
+            //add back the filters if removed and not already in list
+            if (addedDayFilter && !getActiveFilters().contains(dayFilter)) {
                 //add back the day filter
-                if (!(recursion > 0)) {
-                    if (day.equals("MWF") || day.equals("TR")) {
+                //if (!(recursion > 0)) {
+                    //if (day.equals("MWF") || day.equals("TR")) {
                         addFilter(dayFilter);
-                        addedDayFilter = true;
-                    }
-                }
+                        //addedDayFilter = true;
+                    //}
+                //}
             }
 
             //add back the time filter if removed
-            if (!addedTimeFilter) {
+            if (addedTimeFilter && !getActiveFilters().contains(timeFilter)) {
                 //add back the time filter
                 //add back the time filter
-                if (!(recursion > 1)) {
+                //if (!(recursion > 1)) {
                     addFilter(timeFilter);
                     addedTimeFilter = true;
-                }
+                //}
             }
         }
 

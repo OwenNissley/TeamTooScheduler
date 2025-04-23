@@ -93,6 +93,7 @@ public class QuickSchedule
                     // Check if the course can be added to the schedule
                     if (!schedule.hasConflict(course)) {
                         schedule.addCourse(course);
+                        System.out.println("Adding course " + course.getName() + " to schedule");
                         currentCredits += course.getCredits();
                         coursesAdded.set(i, true); // Mark the course as added
 
@@ -152,6 +153,7 @@ public class QuickSchedule
                         // Check if the course can be added to the schedule
                         if (!schedule.hasConflict(course)) {
                             schedule.addCourse(course);
+                            System.out.println("Adding course " + course.getName() + " to schedule");
                             currentCredits += course.getCredits();
                             coursesAdded.set(i, true); // Mark the course as added
 
@@ -188,7 +190,7 @@ public class QuickSchedule
             }
         }
 
-        System.out.println("Finalizing schedule...");
+        System.out.println("Reviewing required schedule...");
         //if any courses werent added, return the index
         for (int i = 0; i < courses.size() - 1; i++) {
             if (!coursesAdded.get(i)) {
@@ -214,10 +216,64 @@ public class QuickSchedule
             System.out.println("Required courses exceed maximum allowed credits, overriding");
             return -1;
         }
+        else if (currentCredits == numCredits) {
+            System.out.println("All required courses added, returning success");
+            return -1; // Return -1 if all required courses have been added
+        }
 
         //fourth, calculate the schedule with optional courses (last courses)
+        //NOTE, this works best assuming the list of courses if filtered from the preferences
+        //while the last map in the arraylist has next, and current credits is less than the max
+        //for all elements in the last map in the arraylist (use standard for loop)
+        System.out.println("Adding optional courses to schedule...");
+        //print credits met and credits needed
+        System.out.println("Current credits: " + currentCredits);
+        System.out.println("Credits needed: " + numCredits);
+        Map<Course, Integer> lastCourseMap = courses.get(courses.size() - 1);
+        // Check if the last course map is empty
+        if (lastCourseMap.isEmpty()) {
+            System.out.println("Last course map is empty, failing.");
+            return 7; // Return 7 if the last course map is empty
+        }
+        for (int entryIndex = 0; entryIndex < lastCourseMap.size(); entryIndex++) {
+            Map.Entry<Course, Integer> entry = (Map.Entry<Course, Integer>) lastCourseMap.entrySet().toArray()[entryIndex];
+            Course course = entry.getKey();
 
+            // Check if the course can be added to the schedule
+            if (!schedule.hasConflict(course)) {
+                schedule.addCourse(course);
+                System.out.println("Adding course " + course.getName() + " to schedule");
+                currentCredits += course.getCredits();
+                //coursesAdded.set(courses.size() - 1, true); // Mark the course as added
+                //lastCourseMap.remove(course); // Remove the course from the map
+                //entryIndex--; // Adjust the index after removal to avoid skipping elements
+            }
 
+            //print credits
+            //System.out.println("Current credits: " + currentCredits);
+            //System.out.println("Credits needed: " + numCredits);
+
+            // Check if the current credits exceed the maximum allowed credits
+            if (currentCredits > numCredits) {
+                System.out.println("Optional courses exceed maximum allowed credits, overriding and returning success");
+                return -1; // Return -1 if the current credits exceed the maximum allowed credits
+            }
+            else if (currentCredits == numCredits) {
+                System.out.println("All courses added, returning success");
+                return -1; // Return -1 if all courses have been added
+            }
+            else {
+                continue;
+            }
+        }
+
+        // Check if the current credits does not meet the maximum allowed credits
+        if (currentCredits < numCredits) {
+            System.out.println("Optional courses cannot meet maximum allowed credits, returning problem");
+            return 7; // Return -1 if the current credits exceed the maximum allowed credits
+        }
+
+        System.out.println("All courses added, returning success (I dont think this should ever print");
         return -1; //success return value
     }
 
@@ -264,6 +320,13 @@ public class QuickSchedule
                         if (course.hasConflict(otherCourse)) {
                             priority++;
                         }
+                    }
+                }
+                //cycle through all courses in the schedule and increment priority if time conflicts
+                if (schedule.getCourses() != null || !schedule.getCourses().isEmpty()) {
+                    if (schedule.hasConflict(course))
+                    {
+                        priority++;
                     }
                 }
             }
