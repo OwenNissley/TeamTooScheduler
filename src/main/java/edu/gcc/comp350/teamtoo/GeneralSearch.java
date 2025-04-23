@@ -113,6 +113,9 @@ public class GeneralSearch {
 
         String searchLower = searchInput.toLowerCase();
 
+        searchLower = searchLower.replaceFirst("(\\d)", " $1");
+        searchLower = searchLower.replaceAll("00", "");
+
         for (Course course : courses) {
             boolean courseAdded = false;
 
@@ -234,7 +237,7 @@ public class GeneralSearch {
 
     public static void main(String[] args) {
         //Test Code
-        CourseRegistry courseRegistry = new CourseRegistry();
+        /*CourseRegistry courseRegistry = new CourseRegistry();
         courseRegistry.loadCoursesFromJson("src/main/java/edu/gcc/comp350/teamtoo/data_wolfe_1.json");
         GeneralSearch genSearch = new GeneralSearch(courseRegistry);
         ArrayList<Course> results = genSearch.searchCourses("Comp");
@@ -242,6 +245,17 @@ public class GeneralSearch {
             System.out.println(course.getName() + " - " + course.getSection() + " - " + course.getSemester());
         }
         System.out.println("Search Results: " + results.size());
+        System.out.println("Search Results: " + genSearch.getSearchResults().size());
+         */
+
+        String course = "COMP350";
+
+        String courseId = "COMP350";
+
+        // add a space before the first number and remove 00s
+        courseId = courseId.replaceFirst("(\\d)", " $1");
+        courseId = courseId.replaceAll(" 00", " ");
+        System.out.println(courseId);
     }
 }
 

@@ -198,6 +198,21 @@ public class Schedule
         }
     }
 
+    //added for QuickSchedule, but may have other uses
+    public boolean hasConflict(Course course)
+    {
+        for (Course c : courses)
+        {
+            //if course conflicts with c or  c is the same course
+            if (course.hasConflict(c) || course.equals(c))
+            {
+                return true;
+                //if course is not in conflictingCourses, add it
+            }
+        }
+        return false;
+    }
+
     //getters
     public boolean getIsConflict() {return isConflict;}
 
