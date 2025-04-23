@@ -63,7 +63,28 @@ const CourseDirectory = () => {
       );
       if (response.data) {
         setHoveredCourseDetails(response.data);
-        setIsMouseOver(true); // Keep the popup visible
+        setIsMouseOver("course"); // Set to "course" when hovering over a course
+
+        // Start a timer to hide the popup after 4 seconds
+        const fadeOutTimer = setTimeout(() => {
+          if (!isMouseOver) {
+            const popup = document.querySelector(".hovered-course-details-popup");
+            if (popup) {
+              popup.classList.add("fade-out");
+              setTimeout(() => {
+                setHoveredCourseDetails(null); // Hide the popup after fade-out
+              }, 500); // Match the CSS transition duration
+            }
+          }
+        }, 4000); // 4-second timer
+
+        // Clear the timer if the mouse enters the popup
+        const popup = document.querySelector(".hovered-course-details-popup");
+        if (popup) {
+          popup.addEventListener("mouseenter", () => {
+            clearTimeout(fadeOutTimer);
+          });
+        }
       } else {
         console.error("No course details returned from the server");
       }
@@ -73,25 +94,38 @@ const CourseDirectory = () => {
   };
 
   const handleMouseLeaveCourse = () => {
-    setTimeout(() => {
-      if (!isMouseOver) {
-        setHoveredCourseDetails(null); // Hide the popup
+    if (isMouseOver === "course") {
+      setIsMouseOver(null); // Reset only if the mouse was over a course
+      const popup = document.querySelector(".hovered-course-details-popup");
+      if (popup) {
+        popup.classList.add("fade-out");
+        setTimeout(() => {
+          setHoveredCourseDetails(null); // Hide the popup after fade-out
+        }, 500); // Match the CSS transition duration
       }
-    }, 50); // Small delay to allow mouse transition to the popup
+    }
   };
 
   const handleMouseEnterArea = () => {
-    setIsMouseOver(true); // Keep the popup visible
+    setIsMouseOver("popup"); // Reset the timer when hovering over the popup
   };
 
   const handleMouseLeaveArea = () => {
-    setIsMouseOver(false);
-    setTimeout(() => {
-      if (!isMouseOver) {
-        setHoveredCourseDetails(null); // Hide the popup
+      if (isMouseOver === "popup") {
+        setIsMouseOver(null); // Reset only if the mouse was over the popup
+        setTimeout(() => {
+          if (!isMouseOver) {
+            const popup = document.querySelector(".hovered-course-details-popup");
+            if (popup) {
+              popup.classList.add("fade-out");
+              setTimeout(() => {
+                setHoveredCourseDetails(null); // Hide the popup after fade-out
+              }, 500); // Match the CSS transition duration
+            }
+          }
+        }, 50); // Small delay to ensure proper state update
       }
-    }, 50); // Small delay to ensure proper state update
-  };
+    };
 
   return (
     <div className="controls-container">
@@ -161,6 +195,26 @@ const CourseDirectory = () => {
             onMouseLeave={handleMouseLeaveArea}
           >
             <div className="popup-content">
+              <button
+                className="close-popup-button"
+                onClick={() => {
+                  const popup = document.querySelector(".hovered-course-details-popup");
+                  if (popup) {
+                    popup.classList.add("fade-out");
+                    setTimeout(() => {
+                      setHoveredCourseDetails(null); // Hide the popup after fade-out
+                    }, 500); // Match the CSS transition duration
+                  }
+
+                  // Prevent the same popup from showing up again for 1 second
+                  setIsMouseOver("blocked");
+                  setTimeout(() => {
+                    setIsMouseOver(null);
+                  }, 1000);
+                }}
+              >
+                &times;
+              </button>
               <h4>Course Details</h4>
               <p>Name: {hoveredCourseDetails.name}</p>
               <p>Credits: {hoveredCourseDetails.credits}</p>

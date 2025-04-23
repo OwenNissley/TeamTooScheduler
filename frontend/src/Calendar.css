@@ -10,4 +10,24 @@
   max-height: 300px; /* Limit height */
   overflow: auto; /* Enable scrolling */
   cursor: default; /* Normal cursor */
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.hovered-course-details-popup.fade-out {
+  opacity: 0;
+}
+
+.close-popup-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+}
+.close-popup-button:hover {
+  color: red;
 }
