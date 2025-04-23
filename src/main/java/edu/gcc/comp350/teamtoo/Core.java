@@ -386,25 +386,36 @@ public class Core {
     //-------------------------------------------------------------------------------------------------------------
     //THE FOLLOWING IS FOR QUICK SCHEDULE
 
-    public boolean quickSchedule(String day, String startTime, String endTime, int numCredits, ArrayList<String> requiredCourses)
+    public boolean quickSchedule(String day, String startTime, String endTime, int numCredits, ArrayList<String> requiredCourses, int recursion)
     {
-        System.out.println("Quick schedule called");
+        System.out.println("Quick schedule called with recursion level: " + recursion);
+        if (recursion > 2) {
+            System.out.println("Recursion level too high, failing");
+            return false;
+        }
         boolean addedDayFilter = false;
+        boolean addedTimeFilter = false;
         Filter dayFilter = null; //for some boshi error
+        Filter timeFilter = null; //for some boshi error
 
         //clear all filters
         clearAllFilters();
 
         //create a filter for the day
-        if (day.equals("MWF") || day.equals("TR")) {
-            dayFilter = new FilterDaysOfWeek(day);
-            addFilter(dayFilter);
-            addedDayFilter = true;
+        if (!(recursion > 0)) {
+            if (day.equals("MWF") || day.equals("TR")) {
+                dayFilter = new FilterDaysOfWeek(day);
+                addFilter(dayFilter);
+                addedDayFilter = true;
+            }
         }
 
         //create a filter for the time
-        Filter timeFilter = new FilterTime(startTime, endTime);
-        addFilter(timeFilter);
+        if (!(recursion > 1)) {
+            timeFilter = new FilterTime(startTime, endTime);
+            addFilter(timeFilter);
+            addedTimeFilter = true;
+        }
 
         //create variables we need
         QuickSchedule qs = new QuickSchedule(numCredits);
@@ -445,8 +456,8 @@ public class Core {
 
             //if failCount >= 3, we cannot add required courses
             if (failCount >= 3) {
-                System.out.println("Quick schedule cannot add required courses, failing");
-                return false;
+                System.out.println("Quick schedule cannot add required courses, retrying Quick schedule with reduced filters");
+                return quickSchedule(day, startTime, endTime, numCredits, requiredCourses, recursion + 1);
             }
             //if failcount is 2, remove the day filter
             else if (failCount == 1) {
@@ -460,7 +471,10 @@ public class Core {
             else if (failCount == 2) {
                 System.out.println("Quick schedule cannot add required courses, removing time filter");
                 //remove the time filter
-                removeFilter(timeFilter);
+                if (addedTimeFilter) {
+                    removeFilter(timeFilter);
+                    addedTimeFilter = false;
+                }
                 //update search term and research
 
             }
@@ -477,6 +491,27 @@ public class Core {
                 qs.addCourses(search.searchAdvanced(courseRegistry.getCourses(semester)), qsFailValue.getLast());
             }
             qsFailValue.add(qs.calculateSchedule());
+
+            //add back the filters if removed
+            if (!addedDayFilter) {
+                //add back the day filter
+                if (!(recursion > 0)) {
+                    if (day.equals("MWF") || day.equals("TR")) {
+                        addFilter(dayFilter);
+                        addedDayFilter = true;
+                    }
+                }
+            }
+
+            //add back the time filter if removed
+            if (!addedTimeFilter) {
+                //add back the time filter
+                //add back the time filter
+                if (!(recursion > 1)) {
+                    addFilter(timeFilter);
+                    addedTimeFilter = true;
+                }
+            }
         }
 
         //clear all filters
@@ -494,6 +529,11 @@ public class Core {
         selectedSchedule = schedules.indexOf(qs.getSchedule());
 
         return true;
+    }
+
+    public void quickSchedule(String day, String startTime, String endTime, int numCredits, ArrayList<String> requiredCourses)
+    {
+        quickSchedule(day, startTime, endTime, numCredits, requiredCourses, 0);
     }
 
     public void quickSchedule(String day, String startTime, String endTime, int numCredits)
