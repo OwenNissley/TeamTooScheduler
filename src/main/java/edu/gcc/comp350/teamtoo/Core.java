@@ -1,5 +1,8 @@
 package edu.gcc.comp350.teamtoo;
 
+import io.javalin.plugin.bundled.RouteOverviewPlugin;
+
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -383,28 +386,140 @@ public class Core {
     //-------------------------------------------------------------------------------------------------------------
     //THE FOLLOWING IS FOR QUICK SCHEDULE
 
-    public void quickSchedule(String day, String startTime, String endTime, int numCredits, String[] requiredCourses)
+    public boolean quickSchedule(String day, String startTime, String endTime, int numCredits, ArrayList<String> requiredCourses)
     {
+        System.out.println("Quick schedule called");
+        boolean addedDayFilter = false;
+        Filter dayFilter = null; //for some boshi error
+
         //clear all filters
-        search.clearFilters();
+        clearAllFilters();
 
         //create a filter for the day
         if (day.equals("MWF") || day.equals("TR")) {
-            FilterDaysOfWeek dayFilter = new FilterDaysOfWeek(day);
-            search.addFilter(dayFilter);
+            dayFilter = new FilterDaysOfWeek(day);
+            addFilter(dayFilter);
+            addedDayFilter = true;
         }
 
         //create a filter for the time
+        Filter timeFilter = new FilterTime(startTime, endTime);
+        addFilter(timeFilter);
 
+        //create variables we need
+        QuickSchedule qs = new QuickSchedule(numCredits);
 
-        ArrayList<Course> potentialCourses = new ArrayList<>();
+        System.out.println("Searching based on searchTerms");
+        //begin adding courses to potentialCourses based on required courses
+        for (String searchTerm : requiredCourses) {
+            //general search if search term is not empty
+            if (!searchTerm.isEmpty()) {
+                searchGeneral(searchTerm);
+                qs.addCourses(search.searchAdvanced(courseRegistry.getCourses(semester)));
+            }
+        }
 
+        //add courses to potentialCourses based on filters
+        searchGeneral("");
+        qs.addCourses(search.searchAdvanced(courseRegistry.getCourses(semester)));
 
+        //try to calculate the schedule, if fail, then remove filters for search terms
+        ArrayList<Integer> qsFailValue = new ArrayList<>();
+        qsFailValue.add(qs.calculateSchedule()); //success as -1
+        while (qsFailValue.getLast() != -1)
+        {
+            //qsFailValue has a maximum value of 7
+            //if qsFailValue is 7, we cannot fully create a schedule, an should break out of while loop
+            if (qsFailValue.getLast() == 7) {
+                System.out.println("Quick schedule cannot meet credit limit OR no other classes meet filter requirements, generating schedule anyways");
+                break;
+            }
+
+            //if the last qsFailValue has occurred 3 times or more, break out of loop
+            int failCount = 0;
+            for (int i = 0; i < qsFailValue.size(); i++) {
+                if (qsFailValue.get(i) == qsFailValue.getLast()) {
+                    failCount++;
+                }
+            }
+
+            //if failCount >= 3, we cannot add required courses
+            if (failCount >= 3) {
+                System.out.println("Quick schedule cannot add required courses, failing");
+                return false;
+            }
+            //if failcount is 2, remove the day filter
+            else if (failCount == 1) {
+                System.out.println("Quick schedule cannot add required courses, removing day filter");
+                if (addedDayFilter) {
+                    removeFilter(dayFilter);
+                    addedDayFilter = false;
+                }
+            }
+            //if failcount is 1, remove the time filter
+            else if (failCount == 2) {
+                System.out.println("Quick schedule cannot add required courses, removing time filter");
+                //remove the time filter
+                removeFilter(timeFilter);
+                //update search term and research
+
+            }
+            //failcount 0 should not be possible
+            else {
+                System.out.println("Quick schedule calculation returned 0, this should not be possible, failing");
+                return false;
+            }
+
+            //recalculate the schedule
+            String searchTerm = requiredCourses.get(qsFailValue.getLast());
+            if (!searchTerm.isEmpty()) {
+                searchGeneral(searchTerm);
+                qs.addCourses(search.searchAdvanced(courseRegistry.getCourses(semester)), qsFailValue.getLast());
+            }
+            qsFailValue.add(qs.calculateSchedule());
+        }
+
+        //clear all filters
+        search.clearFilters();
+        //Print success
+        System.out.println("Quick schedule success");
+
+        //add schedule as a new schedule and update to the new schedule
+        //if current schedule is empty, replace its contents
+        if (schedules.get(selectedSchedule).getCourses().isEmpty()) {
+            schedules.set(selectedSchedule, qs.getSchedule());
+        } else {
+            schedules.add(qs.getSchedule());
+        }
+        selectedSchedule = schedules.indexOf(qs.getSchedule());
+
+        return true;
     }
 
     public void quickSchedule(String day, String startTime, String endTime, int numCredits)
     {
-        //bust
+        //call quickSchedule with empty required courses
+        ArrayList<String> requiredCourses = new ArrayList<>();
+        quickSchedule(day, startTime, endTime, numCredits, requiredCourses);
+    }
+
+    //quickschedule test
+    public static void main(String[] args) {
+        Core core = new Core();
+        core.updateSemester("2023_Fall");
+        core.newSchedule();
+        ArrayList<String> requiredCourses = new ArrayList<>();
+        requiredCourses.add("COMP141");
+        requiredCourses.add("acct200");
+        requiredCourses.add("writ");
+        requiredCourses.add("journalism");
+        core.quickSchedule("MWF", "12:00 PM", "3:00 PM", 12, requiredCourses);
+
+        // Print the courses in the selected schedule
+        System.out.println("Courses in the selected schedule:");
+        for (Course course : core.getSchedule()) {
+            System.out.println(course.getName());
+        }
     }
 
 

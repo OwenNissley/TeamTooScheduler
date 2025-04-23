@@ -61,7 +61,7 @@ public class searchController {
             System.out.println("Fields: " + fields);
             // Call the Core method to create a new schedule
 
-           // core.quickSchedule(dayFormat, startTime, endTime, totalCredits, fields);
+            core.quickSchedule(dayFormat, startTime, endTime, totalCredits, fields);
 
         } catch (Exception e) {
             ctx.status(500).result("Error parsing course information: " + e.getMessage());
@@ -85,7 +85,7 @@ public class searchController {
 
             // Call the Core method to create a new schedule
 
-            //core.quickSchedule(dayFormat, startTime, endTime, totalCredits);
+            core.quickSchedule(dayFormat, startTime, endTime, totalCredits);
         } catch (Exception e) {
             ctx.status(500).result("Error parsing course information: " + e.getMessage());
         }
