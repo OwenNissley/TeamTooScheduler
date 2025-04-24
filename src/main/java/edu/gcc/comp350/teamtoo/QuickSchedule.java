@@ -329,6 +329,9 @@ public class QuickSchedule
                         priority++;
                     }
                 }
+
+                //set the priority
+                entry.setValue(priority);
             }
         }
     }
