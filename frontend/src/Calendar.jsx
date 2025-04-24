@@ -105,8 +105,12 @@ const Calendar = () => {
         <div className="calendar-wrapper">
           <DayPilotCalendar
             viewType="Week"
-            events={events}  // Pass events to the calendar
+            events={events} // Pass events to the calendar
             headerDateFormat="dddd"
+            onEventClick={(args) => {
+              const courseName = args.e.data.text; // Get the course name from the clicked event
+              navigate(`/course-directory?search=${encodeURIComponent(courseName)}`); // Redirect to courseDirectory with the course name as a query parameter
+            }}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Calendar.css";
 
 const CourseDirectory = () => {
@@ -10,6 +10,17 @@ const CourseDirectory = () => {
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [isMouseOver, setIsMouseOver] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Extract the search query parameter from the URL
+    const params = new URLSearchParams(location.search);
+    const searchQuery = params.get("search");
+    if (searchQuery) {
+      setSearchTerm(searchQuery); // Set the search bar value
+      performSearch(searchQuery); // Trigger a search for the course
+    }
+  }, [location]);
 
   const handleSearchChange = async (e) => {
     const searchValue = e.target.value;
@@ -20,9 +31,13 @@ const CourseDirectory = () => {
       return;
     }
 
+    performSearch(searchValue);
+  };
+
+  const performSearch = async (query) => {
     try {
       const response = await axios.post("http://localhost:7000/excuteGeneralSearch", null, {
-        params: { searchTerm: searchValue },
+        params: { searchTerm: query },
       });
       setFilteredCourses(response.data);
     } catch (error) {
@@ -111,21 +126,21 @@ const CourseDirectory = () => {
   };
 
   const handleMouseLeaveArea = () => {
-      if (isMouseOver === "popup") {
-        setIsMouseOver(null); // Reset only if the mouse was over the popup
-        setTimeout(() => {
-          if (!isMouseOver) {
-            const popup = document.querySelector(".hovered-course-details-popup");
-            if (popup) {
-              popup.classList.add("fade-out");
-              setTimeout(() => {
-                setHoveredCourseDetails(null); // Hide the popup after fade-out
-              }, 500); // Match the CSS transition duration
-            }
+    if (isMouseOver === "popup") {
+      setIsMouseOver(null); // Reset only if the mouse was over the popup
+      setTimeout(() => {
+        if (!isMouseOver) {
+          const popup = document.querySelector(".hovered-course-details-popup");
+          if (popup) {
+            popup.classList.add("fade-out");
+            setTimeout(() => {
+              setHoveredCourseDetails(null); // Hide the popup after fade-out
+            }, 500); // Match the CSS transition duration
           }
-        }, 50); // Small delay to ensure proper state update
-      }
-    };
+        }
+      }, 50); // Small delay to ensure proper state update
+    }
+  };
 
   return (
     <div className="controls-container">
