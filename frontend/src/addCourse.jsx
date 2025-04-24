@@ -10,8 +10,8 @@ const AddCourseScreen = () => {
   const [filteredCourses, setFilteredCourses] = useState([]); // Filtered courses based on search
   const [searchTerm, setSearchTerm] = useState(""); // Track search input
   const [selectedDayFormat, setSelectedDayFormat] = useState(null); // Default day is Monday
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [startTime, setStartTime] = useState("7:00 AM");
+  const [endTime, setEndTime] = useState("7:00 PM");
   const { selectedYear, selectedTerm, selectedSchedule, numOfSchedules} = useContext(ScheduleContext);
   const [conflictStatuses, setConflictStatuses] = useState([]);
   const [addedStatuses, setAddedStatuses] = useState([]);

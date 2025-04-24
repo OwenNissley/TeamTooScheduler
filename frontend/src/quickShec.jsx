@@ -8,8 +8,8 @@ import "./quickShec.css"; // Import the CSS file for styling
 
 const QuickShecScreen = () => {
        const [selectedDayFormat, setSelectedDayFormat] = useState(""); // Default day is Monday
-       const [startTime, setStartTime] = useState("");
-       const [endTime, setEndTime] = useState("");
+       const [startTime, setStartTime] = useState("7:00 AM");
+       const [endTime, setEndTime] = useState("7:00 PM");
        const {selectedYear, selectedTerm, selectedSchedule, numOfSchedules} = useContext(ScheduleContext);
        const [totalCredits, setTotalCredits] = useState("");
        const [fields, setFields] = useState(Array(7).fill(""));
