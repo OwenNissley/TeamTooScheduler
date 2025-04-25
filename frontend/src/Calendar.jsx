@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 import { useNavigate } from "react-router-dom";
@@ -23,8 +23,7 @@ const Calendar = () => {
   const [conflictingCourses, setConflictingCourses] = useState([]);
   const navigate = useNavigate();
 
-
-  const { selectedYear, selectedTerm, selectedSchedule, numOfSchedules} = useContext(ScheduleContext);
+  const { selectedYear, selectedTerm, selectedSchedule, numOfSchedules } = useContext(ScheduleContext);
 
   const courseColors = {};
   const usedColors = new Set();
@@ -39,38 +38,40 @@ const Calendar = () => {
   };
 
   const fetchCourses = async () => {
-      const response = await axios.get("http://localhost:7000/updateSchedule");
-      const courses = response.data;
-      setCourses(courses);
-      console.log("Fetched courses:", courses);
+    const response = await axios.get("http://localhost:7000/updateSchedule");
+    const courses = response.data;
+    setCourses(courses);
+    console.log("Fetched courses:", courses);
 
-      const newEvents = courses.flatMap((course) =>
-        course.times.map((timeSlot) => {
-          const dayOffset = dayToNumber(timeSlot.day);
-          const startDate = DayPilot.Date.today().firstDayOfWeek().addDays(dayOffset);
+    const newEvents = courses.flatMap((course) =>
+      course.times.map((timeSlot) => {
+        const dayOffset = dayToNumber(timeSlot.day);
+        const startDate = DayPilot.Date.today().firstDayOfWeek().addDays(dayOffset);
 
-          if (!courseColors[course.number]) {
-            courseColors[course.number] = getUniqueColor();
-          }
+        if (!courseColors[course.number]) {
+          courseColors[course.number] = getUniqueColor();
+        }
 
-          return {
-            id: `${course.number}-${timeSlot.day}-${timeSlot.start_time}`,
-            text: course.name,
-            start: startDate.addHours(parseTime(timeSlot.start_time)),
-            end: startDate.addHours(parseTime(timeSlot.end_time)),
-            resource: dayOffset.toString(),
-            backColor: courseColors[course.number],
-          };
-        })
-      );
-      setEvents(newEvents);
-        console.log("Events for calendar:", newEvents);
+        return {
+          id: `${course.number}-${timeSlot.day}-${timeSlot.start_time}`,
+          text: course.name,
+          start: startDate.addHours(parseTime(timeSlot.start_time)),
+          end: startDate.addHours(parseTime(timeSlot.end_time)),
+          resource: dayOffset.toString(),
+          backColor: courseColors[course.number],
+          semester: course.semester.split("_")[1], // Extract "Fall", "Spring", etc.
+          year: course.semester.split("_")[0], // Extract the year (e.g., "2024")
+        };
+      })
+    );
+    setEvents(newEvents);
+    console.log("Events for calendar:", newEvents);
   };
 
   useEffect(() => {
     fetchCourses();
     updateConflicts();
-  }, [selectedYear, selectedTerm, selectedSchedule,numOfSchedules ]);
+  }, [selectedYear, selectedTerm, selectedSchedule, numOfSchedules]);
 
   const updateConflicts = async () => {
     try {
@@ -108,8 +109,12 @@ const Calendar = () => {
             events={events} // Pass events to the calendar
             headerDateFormat="dddd"
             onEventClick={(args) => {
-              const courseName = args.e.data.text; // Get the course name from the clicked event
-              navigate(`/course-directory?search=${encodeURIComponent(courseName)}`); // Redirect to courseDirectory with the course name as a query parameter
+              const { text: courseName, semester, year } = args.e.data; // Get course details from the clicked event
+              navigate(
+                `/course-directory?search=${encodeURIComponent(courseName)}&semester=${encodeURIComponent(
+                  semester
+                )}&year=${encodeURIComponent(year)}`
+              ); // Redirect to courseDirectory with query parameters
             }}
           />
         </div>
@@ -139,8 +144,6 @@ const Calendar = () => {
       )}
     </>
   );
-
-
 };
 
 export default Calendar;
