@@ -38,6 +38,9 @@ const ScheduleControls = () => {
         <button className="nav-button" onClick={() => navigate("/course-directory")}>Course Directory</button>
         <button className="nav-button" onClick={() => navigate("/your-info")}>Your Info</button>
         <button className="nav-button" onClick={handleSave}>Save</button>
+        <button onClick={() => window.location.href = "http://localhost:8000"}>
+          Go to Chat App
+        </button>
       </div>
 
       <div className="control-banner">
