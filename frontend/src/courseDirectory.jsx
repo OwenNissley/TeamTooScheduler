@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Calendar.css";
@@ -6,40 +6,106 @@ import "./Calendar.css";
 const CourseDirectory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCourses, setFilteredCourses] = useState([]);
+  const [suggestions, setSuggestions] = useState([]); // Store suggestions for autofill
   const [hoveredCourseDetails, setHoveredCourseDetails] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [isMouseOver, setIsMouseOver] = useState(false);
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedSemester, setSelectedSemester] = useState("");
+  const debounceTimer = useRef(null); // Ref for debounce timer
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    // Extract the search query parameter from the URL
     const params = new URLSearchParams(location.search);
     const searchQuery = params.get("search");
-    if (searchQuery) {
-      setSearchTerm(searchQuery); // Set the search bar value
-      performSearch(searchQuery); // Trigger a search for the course
-    }
+    const semester = params.get("semester");
+    const year = params.get("year");
+
+    if (searchQuery) setSearchTerm(searchQuery);
+    if (semester) setSelectedSemester(semester);
+    if (year) setSelectedYear(year);
+
+    performSearch(searchQuery, year, semester);
   }, [location]);
 
-  const handleSearchChange = async (e) => {
+  const handleSearchChange = (e) => {
     const searchValue = e.target.value;
     setSearchTerm(searchValue);
 
-    if (!searchValue) {
-      setFilteredCourses([]);
+    // Debounce the search and fetch suggestions
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      fetchSuggestions(searchValue);
+      performSearch(searchValue, selectedYear, selectedSemester);
+    }, 300); // 300ms delay
+  };
+
+  const fetchSuggestions = async (query) => {
+    if (!query) {
+      setSuggestions([]);
       return;
     }
 
-    performSearch(searchValue);
+    try {
+      const response = await axios.post("http://localhost:7000/getSuggestions", null, {
+        params: { searchTerm: query },
+      });
+      setSuggestions(response.data.length > 0 ? [response.data[0]] : []); // Only show the closest match
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+    }
   };
 
-  const performSearch = async (query) => {
+  const handleKeyDown = (e) => {
+    if (e.key === "Tab" && suggestions.length > 0) {
+      // Autofill the search bar with the suggestion
+      e.preventDefault();
+      setSearchTerm(suggestions[0]);
+      setSuggestions([]); // Clear suggestions after autofill
+    }
+  };
+
+  const handleYearChange = (e) => {
+    const year = e.target.value;
+    setSelectedYear(year);
+
+    // Debounce the search
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      performSearch(searchTerm, year, selectedSemester);
+    }, 300);
+  };
+
+  const handleSemesterChange = (e) => {
+    const semester = e.target.value;
+    setSelectedSemester(semester);
+
+    // Debounce the search
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      performSearch(searchTerm, selectedYear, semester);
+    }, 300);
+  };
+
+  const performSearch = async (query, year, semester) => {
     try {
       const response = await axios.post("http://localhost:7000/excuteGeneralSearch", null, {
         params: { searchTerm: query },
       });
-      setFilteredCourses(response.data);
+
+      let courses = response.data;
+
+      // Filter courses based on year and semester
+      courses = courses.filter((course) => {
+        const [courseYear, courseSemester] = course.semester.split("_");
+        return (
+          (!year || courseYear === year) &&
+          (!semester || courseSemester === semester)
+        );
+      });
+
+      setFilteredCourses(courses);
     } catch (error) {
       console.error("Error fetching courses:", error);
     }
@@ -58,7 +124,6 @@ const CourseDirectory = () => {
     let top = rect.bottom + window.scrollY;
     let left = rect.left + window.scrollX;
 
-    // Adjust popup position to fit within the screen
     const popupHeight = 200;
     const popupWidth = 300;
     if (top + popupHeight > window.innerHeight + window.scrollY) {
@@ -78,22 +143,20 @@ const CourseDirectory = () => {
       );
       if (response.data) {
         setHoveredCourseDetails(response.data);
-        setIsMouseOver("course"); // Set to "course" when hovering over a course
+        setIsMouseOver("course");
 
-        // Start a timer to hide the popup after 4 seconds
         const fadeOutTimer = setTimeout(() => {
           if (!isMouseOver) {
             const popup = document.querySelector(".hovered-course-details-popup");
             if (popup) {
               popup.classList.add("fade-out");
               setTimeout(() => {
-                setHoveredCourseDetails(null); // Hide the popup after fade-out
-              }, 500); // Match the CSS transition duration
+                setHoveredCourseDetails(null);
+              }, 500);
             }
           }
-        }, 4000); // 4-second timer
+        }, 4000);
 
-        // Clear the timer if the mouse enters the popup
         const popup = document.querySelector(".hovered-course-details-popup");
         if (popup) {
           popup.addEventListener("mouseenter", () => {
@@ -110,35 +173,35 @@ const CourseDirectory = () => {
 
   const handleMouseLeaveCourse = () => {
     if (isMouseOver === "course") {
-      setIsMouseOver(null); // Reset only if the mouse was over a course
+      setIsMouseOver(null);
       const popup = document.querySelector(".hovered-course-details-popup");
       if (popup) {
         popup.classList.add("fade-out");
         setTimeout(() => {
-          setHoveredCourseDetails(null); // Hide the popup after fade-out
-        }, 500); // Match the CSS transition duration
+          setHoveredCourseDetails(null);
+        }, 500);
       }
     }
   };
 
   const handleMouseEnterArea = () => {
-    setIsMouseOver("popup"); // Reset the timer when hovering over the popup
+    setIsMouseOver("popup");
   };
 
   const handleMouseLeaveArea = () => {
     if (isMouseOver === "popup") {
-      setIsMouseOver(null); // Reset only if the mouse was over the popup
+      setIsMouseOver(null);
       setTimeout(() => {
         if (!isMouseOver) {
           const popup = document.querySelector(".hovered-course-details-popup");
           if (popup) {
             popup.classList.add("fade-out");
             setTimeout(() => {
-              setHoveredCourseDetails(null); // Hide the popup after fade-out
-            }, 500); // Match the CSS transition duration
+              setHoveredCourseDetails(null);
+            }, 500);
           }
         }
-      }, 50); // Small delay to ensure proper state update
+      }, 50);
     }
   };
 
@@ -154,15 +217,60 @@ const CourseDirectory = () => {
       </div>
 
       <div className="search-container">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          placeholder="General Search"
-        />
-        <button className="clear-button" onClick={() => setSearchTerm("")}>
-          Clear
-        </button>
+        <div style={{ position: "relative" }}>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
+            placeholder="General Search"
+            style={{
+              width: "100%",
+              height: "40px",
+              fontSize: "16px",
+              padding: "8px",
+              zIndex: 2,
+            }}
+          />
+          {suggestions.length > 0 && (
+            <input
+              type="text"
+              value={suggestions[0]} // Only show the suggestion itself
+              disabled
+              style={{
+                width: "100%",
+                height: "40px",
+                fontSize: "16px",
+                padding: "8px",
+                color: "gray",
+                position: "absolute",
+                zIndex: 1,
+                pointerEvents: "none",
+              }}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="semester-selector">
+        <label>
+          Year:
+          <select value={selectedYear} onChange={handleYearChange}>
+            <option value="">Any</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+          </select>
+        </label>
+        <label>
+          Semester:
+          <select value={selectedSemester} onChange={handleSemesterChange}>
+            <option value="">Any</option>
+            <option value="Fall">Fall</option>
+            <option value="Spring">Spring</option>
+            <option value="Summer">Summer</option>
+          </select>
+        </label>
       </div>
 
       <div
@@ -217,11 +325,10 @@ const CourseDirectory = () => {
                   if (popup) {
                     popup.classList.add("fade-out");
                     setTimeout(() => {
-                      setHoveredCourseDetails(null); // Hide the popup after fade-out
-                    }, 500); // Match the CSS transition duration
+                      setHoveredCourseDetails(null);
+                    }, 500);
                   }
 
-                  // Prevent the same popup from showing up again for 1 second
                   setIsMouseOver("blocked");
                   setTimeout(() => {
                     setIsMouseOver(null);

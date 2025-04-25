@@ -6,6 +6,7 @@ import io.javalin.http.Context;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class searchController {
@@ -36,6 +37,7 @@ public class searchController {
         app.post("/getAllCourses", this::getAllCourses);
         app.post("/createNewScheduleManual", this::createNewScheduleManual);
         app.post("/createNewScheduleSkip", this::createNewScheduleSkip);
+        app.post("/getSuggestions", this::getSuggestions);
     }
 
     private void createNewScheduleManual(Context ctx) {
@@ -97,6 +99,21 @@ public class searchController {
     }
     private void getConflictingCoursesInSearchResults(Context ctx) {
         ctx.json(core.getConflictingCoursesInSearchResults());
+    }
+
+    private void getSuggestions(Context ctx) {
+        try {
+            String searchTerm = ctx.queryParam("searchTerm");
+            if (searchTerm == null || searchTerm.isEmpty()) {
+                ctx.status(400).result("Missing searchTerm parameter");
+                return;
+            }
+
+            String closestSuggestion = core.getClosestSuggestion(searchTerm);
+            ctx.json(closestSuggestion != null ? List.of(closestSuggestion) : List.of());
+        } catch (Exception e) {
+            ctx.status(500).result("Error fetching suggestions: " + e.getMessage());
+        }
     }
 
     private void parseCourseInformation(Context ctx) {
