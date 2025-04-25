@@ -6,6 +6,7 @@ import "./Calendar.css";
 const CourseDirectory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCourses, setFilteredCourses] = useState([]);
+  const [suggestions, setSuggestions] = useState([]); // Store suggestions for autofill
   const [hoveredCourseDetails, setHoveredCourseDetails] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [isMouseOver, setIsMouseOver] = useState(false);
@@ -32,11 +33,37 @@ const CourseDirectory = () => {
     const searchValue = e.target.value;
     setSearchTerm(searchValue);
 
-    // Debounce the search
+    // Debounce the search and fetch suggestions
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => {
+      fetchSuggestions(searchValue);
       performSearch(searchValue, selectedYear, selectedSemester);
     }, 300); // 300ms delay
+  };
+
+  const fetchSuggestions = async (query) => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:7000/getSuggestions", null, {
+        params: { searchTerm: query },
+      });
+      setSuggestions(response.data.length > 0 ? [response.data[0]] : []); // Only show the closest match
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Tab" && suggestions.length > 0) {
+      // Autofill the search bar with the suggestion
+      e.preventDefault();
+      setSearchTerm(suggestions[0]);
+      setSuggestions([]); // Clear suggestions after autofill
+    }
   };
 
   const handleYearChange = (e) => {
@@ -190,15 +217,39 @@ const CourseDirectory = () => {
       </div>
 
       <div className="search-container">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          placeholder="General Search"
-        />
-        <button className="clear-button" onClick={() => setSearchTerm("")}>
-          Clear
-        </button>
+        <div style={{ position: "relative" }}>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
+            placeholder="General Search"
+            style={{
+              width: "100%",
+              height: "40px",
+              fontSize: "16px",
+              padding: "8px",
+              zIndex: 2,
+            }}
+          />
+          {suggestions.length > 0 && (
+            <input
+              type="text"
+              value={suggestions[0]} // Only show the suggestion itself
+              disabled
+              style={{
+                width: "100%",
+                height: "40px",
+                fontSize: "16px",
+                padding: "8px",
+                color: "gray",
+                position: "absolute",
+                zIndex: 1,
+                pointerEvents: "none",
+              }}
+            />
+          )}
+        </div>
       </div>
 
       <div className="semester-selector">

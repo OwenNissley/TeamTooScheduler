@@ -4,6 +4,7 @@ import io.javalin.plugin.bundled.RouteOverviewPlugin;
 
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -60,6 +61,43 @@ public class Core {
         search = new Search();
 
 
+    }
+
+    public String getClosestSuggestion(String searchTerm) {
+        String closestMatch = null;
+        int closestDistance = Integer.MAX_VALUE;
+
+        for (Course course : courseRegistry.getCourses(semester)) {
+            String courseName = course.getName();
+            int distance = calculateLevenshteinDistance(searchTerm.toLowerCase(), courseName.toLowerCase());
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestMatch = courseName; // Return the full course name
+            }
+        }
+
+        return closestMatch;
+    }
+
+    private int calculateLevenshteinDistance(String a, String b) {
+        int[][] dp = new int[a.length() + 1][b.length() + 1];
+
+        for (int i = 0; i <= a.length(); i++) {
+            for (int j = 0; j <= b.length(); j++) {
+                if (i == 0) {
+                    dp[i][j] = j;
+                } else if (j == 0) {
+                    dp[i][j] = i;
+                } else {
+                    dp[i][j] = Math.min(
+                        dp[i - 1][j - 1] + (a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1),
+                        Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1)
+                    );
+                }
+            }
+        }
+
+        return dp[a.length()][b.length()];
     }
 
     public Map<String, Object> parseCourseInformation(String courseId) {
