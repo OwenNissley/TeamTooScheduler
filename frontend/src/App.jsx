@@ -10,8 +10,8 @@ import QuickShecScreen from "./quickShec";
 
 const App = () => {
    return (
-      <ScheduleProvider> {/* Wrap the entire app with the ScheduleProvider */}
-        <Router>
+       <Router>
+         <ScheduleProvider> {/* Wrap the entire app with the ScheduleProvider */}
           <Routes>
             <Route path="/" element={<Calendar />} />
             <Route path="/addCourse" element={<AddCourseScreen />} />
@@ -19,8 +19,8 @@ const App = () => {
             <Route path="/course-directory" element={<CourseDirectory />} />
             <Route path="/quick-schedule" element={<QuickShecScreen />} />
           </Routes>
-        </Router>
-      </ScheduleProvider>
+        </ScheduleProvider>
+      </Router>
     );
 };
 

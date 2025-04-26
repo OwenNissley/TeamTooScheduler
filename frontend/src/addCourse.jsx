@@ -94,8 +94,8 @@ const AddCourseScreen = () => {
     try {
       const response = await axios.post("http://localhost:7000/clearTimeRange");
       setFilteredCourses(response.data); // assuming response.data is an array of courses
-      setStartTime("");
-      setEndTime("");
+      setStartTime("7:00 AM");
+      setEndTime("7:00 PM");
     } catch (error) {
       console.error("Error clearing time range:", error);
     }
@@ -116,8 +116,8 @@ const AddCourseScreen = () => {
       setFilteredCourses(response.data); // assuming response.data is an array of courses
       setSearchTerm(""); // Track search input
       setSelectedDayFormat(null); // Default day is Monday
-      setStartTime("");
-      setEndTime("");
+      setStartTime("7:00 AM");
+      setEndTime("7:00 PM");
     } catch (error) {
       console.error("Error clearing filters:", error);
     }
@@ -200,7 +200,6 @@ const AddCourseScreen = () => {
   const handleStartTimeChange = async (e) => {
     const newValue = e.target.value;
     setStartTime(newValue);
-    if (!newValue || !endTime) return;
 
     const response = await axios.post("http://localhost:7000/excuteTimeFilterSearch", null, {
       params: { startTime: newValue, endTime: endTime },
@@ -211,7 +210,6 @@ const AddCourseScreen = () => {
   const handleEndTimeChange = async (e) => {
     const newValue = e.target.value;
     setEndTime(newValue);
-    if (!newValue || !startTime) return;
 
     const response = await axios.post("http://localhost:7000/excuteTimeFilterSearch", null, {
       params: { startTime: startTime, endTime: newValue },

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+
 public class Core {
     private ArrayList<Schedule> schedules;
     private int selectedSchedule;
@@ -209,6 +210,8 @@ public class Core {
         return schedules.get(selectedSchedule);
     }
 
+
+
     public ArrayList<Schedule> getSavedSchedules() {
         return schedules;
     }
@@ -265,7 +268,7 @@ public class Core {
     public void searchAdvanced()
     {
         searchResults = search.searchAdvanced(courseRegistry.getCourses(semester));
-        calculateConflictingCoursesInSearchResults();
+        //calculateConflictingCoursesInSearchResults();
 
     }
 
@@ -379,6 +382,11 @@ public class Core {
     } //added
     public int getSelectedSchedule() {
         return selectedSchedule;
+    } //added
+
+    // get current semester
+    public String getSemester() {
+        return semester;
     } //added
 
 
@@ -495,11 +503,11 @@ public class Core {
         //try to calculate the schedule, if fail, then remove filters for search terms
         ArrayList<Integer> qsFailValue = new ArrayList<>();
         qsFailValue.add(qs.calculateSchedule()); //success as -1
-        while (qsFailValue.getLast() != -1)
+        while (qsFailValue.get(qsFailValue.size()-1) != -1)
         {
             //qsFailValue has a maximum value of 7
             //if qsFailValue is 7, we cannot fully create a schedule, an should break out of while loop
-            if (qsFailValue.getLast() == 7) {
+            if (qsFailValue.get(qsFailValue.size()-1) == 7) {
                 System.out.println("Quick schedule cannot meet credit limit OR no other classes meet filter requirements, generating schedule anyways");
                 break;
             }
@@ -507,7 +515,7 @@ public class Core {
             //if the last qsFailValue has occurred 3 times or more, break out of loop
             int failCount = 0;
             for (int i = 0; i < qsFailValue.size(); i++) {
-                if (qsFailValue.get(i) == qsFailValue.getLast()) {
+                if (qsFailValue.get(i) == qsFailValue.get(qsFailValue.size()-1)) {
                     failCount++;
                 }
             }
@@ -543,10 +551,10 @@ public class Core {
             }
 
             //recalculate the schedule
-            String searchTerm = requiredCourses.get(qsFailValue.getLast());
+            String searchTerm = requiredCourses.get(qsFailValue.get(qsFailValue.size()-1));
             if (!searchTerm.isEmpty()) {
                 searchGeneral(searchTerm);
-                qs.addCourses(search.searchAdvanced(courseRegistry.getCourses(semester)), qsFailValue.getLast());
+                qs.addCourses(search.searchAdvanced(courseRegistry.getCourses(semester)), qsFailValue.get(qsFailValue.size()-1));
             }
             qsFailValue.add(qs.calculateSchedule());
 

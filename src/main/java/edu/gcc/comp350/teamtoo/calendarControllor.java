@@ -17,7 +17,7 @@ public class calendarControllor {
     public void registerRoutes(Javalin app) {
         //app.get("/courseReg", this::getCourseList);
         app.get("/updateSchedule", this::getNonConflictingCourses);
-        app.get("/getNumOfSchedules", this::getNumOfShecules);
+        app.get("/getNumberOfSchedulesAndCurrentSchedule", this::getNumberOfSchedulesAndCurrentSchedule);
         app.post("/updateYear", this::updateYear);
         app.post("/updateTerm", this::updateTerm);
         app.post("/selectSchedule", this::selectSchedule);
@@ -25,6 +25,30 @@ public class calendarControllor {
         app.post("/deleteSchedule", this::deleteSchedule);
         app.get("/checkConflicts", this::hasConflicts);
         app.post("/saveSchedule", this::saveSchedule);
+        app.get("/getCurrentData", this::getCurrentData);
+    }
+
+
+    private void getCurrentData(Context ctx) {
+        // These would be retrieved from your server's current state
+
+        String semester = core.getSemester();
+        String[] parts = semester.split("_");
+
+        String currentYear = parts[0]; // "2023"
+        String currentTerm = parts[1]; // "Fall"
+
+        int scheduleIndex = core.getSelectedSchedule();
+        int numOfSchedules = core.getNumOfSchedules();
+
+        String yearTermString = currentYear + "_" + currentTerm;
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("yearTermString", yearTermString);
+        response.put("scheduleIndex", scheduleIndex);
+        response.put("numOfSchedules", numOfSchedules);
+
+        ctx.json(response);
     }
 
 
@@ -57,9 +81,13 @@ public class calendarControllor {
         ctx.json(core.getNonConflictingCourses());
     }
 
-    private void getNumOfShecules(Context ctx) {
+    private void getNumberOfSchedulesAndCurrentSchedule(Context ctx) {
         int num  = core.getNumOfSchedules();
-        ctx.json(num);
+        int currentSchedule = core.getSelectedSchedule();
+        Map<String, Integer> response = new HashMap<>();
+        response.put("numOfSchedules", num);
+        response.put("currentSchedule", currentSchedule);
+        ctx.json(response);
     }
 
     private void selectSchedule(Context ctx) {
