@@ -24,6 +24,11 @@ const Calendar = () => {
   const navigate = useNavigate();
 
   const { selectedYear, selectedTerm, selectedSchedule, numOfSchedules } = useContext(ScheduleContext);
+ const {
+    handleYearChange,
+    handleTermChange,
+    handleScheduleChange,
+  } = useContext(ScheduleContext);
 
   const courseColors = {};
   const usedColors = new Set();
@@ -68,10 +73,11 @@ const Calendar = () => {
     console.log("Events for calendar:", newEvents);
   };
 
-  useEffect(() => {
-    fetchCourses();
-    updateConflicts();
-  }, [selectedYear, selectedTerm, selectedSchedule, numOfSchedules]);
+useEffect(() => {
+  fetchCourses();
+  updateConflicts();
+}, [numOfSchedules, selectedYear, selectedTerm, selectedSchedule]);
+
 
   const updateConflicts = async () => {
     try {

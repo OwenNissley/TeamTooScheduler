@@ -44,8 +44,5 @@ public class reactController {
        searchController.registerRoutes(app);
     }
 
-    public void saveCore() {
-        core.saveSchedulesIntoFile();
-    }
 
 }

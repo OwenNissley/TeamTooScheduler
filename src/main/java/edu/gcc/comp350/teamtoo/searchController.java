@@ -200,6 +200,7 @@ public class searchController {
         boolean genSearchEcuxted = core.getGeneralSearchExecuted();
         if (genSearchEcuxted) {
             core.setGeneralSearchExecuted(false);
+            core.searchGeneral("");
         }
         if (!core.getActiveFilters().isEmpty()) {
             core.clearAllFilters();

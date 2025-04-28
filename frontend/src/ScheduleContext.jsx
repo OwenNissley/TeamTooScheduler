@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 export const ScheduleContext = createContext();
 
@@ -8,19 +9,35 @@ export const ScheduleProvider = ({ children }) => {
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [selectedSchedule, setSelectedSchedule] = useState(1);
   const [numOfSchedules, setNumOfSchedules] = useState(1);
+  const location = useLocation();
+
+
 
   useEffect(() => {
-    const getNumberOfSchedules = async () => {
+    const getNumberOfSchedulesAndCurrentSchedule = async () => {
+        await new Promise(resolve => setTimeout(resolve, 500)); // wait .5 second
       try {
-        const response = await axios.get("http://localhost:7000/getNumOfSchedules");
-        setNumOfSchedules(response.data);
+            console.log("Fetching number of schedules...");
+        const response = await axios.get("http://localhost:7000/getNumberOfSchedulesAndCurrentSchedule");
+        console.log("Number of schedules:", response.data);
+        setNumOfSchedules(response.data.numOfSchedules);
+        setSelectedSchedule(response.data.currentSchedule + 1); // +1 to match the UI
       } catch (error) {
         console.error("Error fetching number of schedules:", error);
       }
     };
 
-    getNumberOfSchedules();
-  }, [selectedTerm, selectedYear]);
+    getNumberOfSchedulesAndCurrentSchedule();
+
+  }, [selectedTerm, selectedYear,location]);
+
+ useEffect(() => {
+
+
+    fetchCurrentSemester();
+
+  }, [location]);
+
 
   const handleYearChange = async (newYear) => {
     setSelectedYear(newYear);
@@ -57,6 +74,22 @@ export const ScheduleProvider = ({ children }) => {
     }
   };
 
+  // Fetch current data
+     const fetchCurrentSemester = async () => {
+       try {
+           await new Promise(resolve => setTimeout(resolve, 500)); // wait .5 second
+         const response = await axios.get("http://localhost:7000/getCurrentData");
+         const { yearTermString, scheduleIndex, numOfSchedules: scheduleNum } = response.data;
+         const [year, term] = yearTermString.split("_");
+
+         console.log("Fetched current data:", response.data);
+         setSelectedYear(year);
+         setSelectedTerm(term);
+       } catch (error) {
+         console.error("Error fetching current data:", error);
+       }
+     };
+
   const handleNewSchedule = async () => {
     try {
       const response = await axios.post("http://localhost:7000/newSchedule");
@@ -91,6 +124,10 @@ export const ScheduleProvider = ({ children }) => {
         setSelectedSchedule: handleScheduleChange,
         handleNewSchedule,
         handleDeleteSchedule,
+        handleYearChange,
+        handleTermChange,
+        handleScheduleChange,
+        fetchCurrentSemester,
       }}
     >
       {children}
