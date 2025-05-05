@@ -16,7 +16,9 @@ const AddCourseScreen = () => {
   const [conflictStatuses, setConflictStatuses] = useState([]);
   const [addedStatuses, setAddedStatuses] = useState([]);
   const [conflictingCourses, setConflictingCourses] = useState([]); // Cache for conflicting courses
-  const [addedCourses, setAddedCourses] = useState([]); // Cache for added courses
+  const [addedCourses, setAddedCourses] = useState([]); // Cache for added
+  const [notification, setNotification] = useState("");
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -159,7 +161,8 @@ const AddCourseScreen = () => {
 
       setFilteredCourses(response.data); // Update filteredCourses from response
       setSelectedCourseIndex(null); // Reset selection after successful addition
-      alert(`Course "${selectedCourse.name}" added successfully!`);
+      setNotification(`Course "${selectedCourse.name}" added successfully!`);
+      setTimeout(() => setNotification(""), 2000); // disappears after 2 seconds
     } catch (error) {
       console.error("Error adding course:", error);
     }
@@ -353,6 +356,13 @@ const AddCourseScreen = () => {
           )}
         </div>
       </div>
+
+      {notification && (
+        <div className="custom-notification">
+          {notification}
+        </div>
+      )}
+
 
       <div className="button-container">
         <button className="add-course-button" onClick={addCourseHandler}>

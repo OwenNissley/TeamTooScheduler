@@ -16,6 +16,7 @@ const ScheduleControls = () => {
     setNumOfSchedules,
     handleNewSchedule,
     handleDeleteSchedule,
+    deleteRunFlag,
   } = useContext(ScheduleContext);
 
     const handleSave = async () => {

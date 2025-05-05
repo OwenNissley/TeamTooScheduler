@@ -28,6 +28,7 @@ const Calendar = () => {
     handleYearChange,
     handleTermChange,
     handleScheduleChange,
+    deleteRunFlag,
   } = useContext(ScheduleContext);
 
   const courseColors = {};
@@ -76,7 +77,7 @@ const Calendar = () => {
 useEffect(() => {
   fetchCourses();
   updateConflicts();
-}, [numOfSchedules, selectedYear, selectedTerm, selectedSchedule]);
+}, [numOfSchedules, selectedYear, selectedTerm, selectedSchedule,deleteRunFlag]);
 
 
   const updateConflicts = async () => {
