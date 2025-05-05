@@ -9,6 +9,7 @@ export const ScheduleProvider = ({ children }) => {
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [selectedSchedule, setSelectedSchedule] = useState(1);
   const [numOfSchedules, setNumOfSchedules] = useState(1);
+  const [deleteRunFlag, setDeleteRunFlag] = useState(false);
   const location = useLocation();
 
 
@@ -29,14 +30,14 @@ export const ScheduleProvider = ({ children }) => {
 
     getNumberOfSchedulesAndCurrentSchedule();
 
-  }, [selectedTerm, selectedYear,location]);
+  }, [selectedTerm, selectedYear,location,deleteRunFlag]);
 
  useEffect(() => {
 
 
     fetchCurrentSemester();
 
-  }, [location]);
+  }, [location, numOfSchedules, selectedSchedule,deleteRunFlag]);
 
 
   const handleYearChange = async (newYear) => {
@@ -107,6 +108,8 @@ export const ScheduleProvider = ({ children }) => {
       const newScheduleIndex = response.data;
       setNumOfSchedules((prev) => (prev > 1 ? prev - 1 : 1));
       setSelectedSchedule(newScheduleIndex + 1);
+      const oldFlag = deleteRunFlag;
+      setDeleteRunFlag(!oldFlag);
     } catch (error) {
       console.error("Error deleting schedule:", error);
     }
@@ -128,6 +131,7 @@ export const ScheduleProvider = ({ children }) => {
         handleTermChange,
         handleScheduleChange,
         fetchCurrentSemester,
+        deleteRunFlag,
       }}
     >
       {children}
