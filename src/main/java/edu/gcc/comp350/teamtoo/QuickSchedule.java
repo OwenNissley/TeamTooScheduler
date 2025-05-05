@@ -240,7 +240,7 @@ public class QuickSchedule
             Course course = entry.getKey();
 
             // Check if the course can be added to the schedule
-            if (!schedule.hasConflict(course)) {
+            if (!schedule.hasConflict(course) && currentCredits + course.getCredits() < numCredits && course.getCredits() > 0) {
                 schedule.addCourse(course);
                 System.out.println("Adding course " + course.getName() + " to schedule");
                 currentCredits += course.getCredits();
